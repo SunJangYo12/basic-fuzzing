@@ -1,0 +1,1359 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: https://h0mbre.github.io/Fuzzing-Like-A-Caveman-4/
+Subject: Fuzzing Seperti Manusia Gua 4: Fuzzer Snapshot/Code Coverage! | Antarmuka Mesin Manusia
+Date: Wed, 20 Nov 2024 22:18:26 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----"
+
+
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: text/html
+Content-ID: <frame-107ACA783E040003FA329CB53E3F0435@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/Fuzzing-Like-A-Caveman-4/
+
+<!DOCTYPE html><html lang="id" class="translated-ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Fuzzing Seperti Manusia Gua 4: Fuzzer Snapshot/Code Coverage! | Antarmuka Mesin Manusia</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="Fuzzing Like A Caveman 4: Snapshot/Code Coverage Fuzzer!">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Introduction Last time we blogged, we had a dumb fuzzer that would test an intentionally vulnerable program that would perform some checks on a file and if the input file passed a check, it would progress to the next check, and if the input passed all checks the program would segfault. We discovered the importance of code coverage and how it can help reduce exponentially rare occurences during fuzzing into linearly rare occurences. Let‚Äôs get right into how we improved our dumb fuzzer!">
+<meta property="og:description" content="Introduction Last time we blogged, we had a dumb fuzzer that would test an intentionally vulnerable program that would perform some checks on a file and if the input file passed a check, it would progress to the next check, and if the input passed all checks the program would segfault. We discovered the importance of code coverage and how it can help reduce exponentially rare occurences during fuzzing into linearly rare occurences. Let‚Äôs get right into how we improved our dumb fuzzer!">
+<link rel="canonical" href="https://h0mbre.github.io/Fuzzing-Like-A-Caveman-4/">
+<meta property="og:url" content="https://h0mbre.github.io/Fuzzing-Like-A-Caveman-4/">
+<meta property="og:site_name" content="The Human Machine Interface">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2020-06-13T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Fuzzing Like A Caveman 4: Snapshot/Code Coverage Fuzzer!">
+
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="https://h0mbre.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://h0mbre.github.io/feed.xml" title="Antarmuka Manusia dan Mesin"><link type="text/css" rel="stylesheet" charset="UTF-8" href="https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.26tY-h6gH9w.L.W.O/am=DAY/d=0/rs=AN8SPfrCcgxoBri2FVMQptvuOBiOsolgBw/m=el_main_css"></head>
+<body class="post-page"><header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" rel="author" href="https://h0mbre.github.io/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Antarmuka Manusia dan Mesin</font></font></a>
+    </div>
+  </header><main class="page-content" aria-label="Isi">
+      <div class="wrapper">
+        <article class="post main-content">
+  <header class="post-header">
+    <h1 class="post-title"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fuzzing Seperti Manusia Gua 4: Fuzzer Cakupan Kode/Snapshot!</font></font></h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-06-13T00:00:00+00:00" itemprop="datePublished"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">13 Juni 2020
+      </font></font></time></p>
+  </header>
+  <div class="post-content">
+    <h2 id="introduction"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Perkenalan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Terakhir kali kita ngeblog, kita punya dumb fuzzer yang akan menguji program yang secara sengaja rentan yang akan melakukan beberapa pemeriksaan pada sebuah berkas dan jika berkas masukan lolos pemeriksaan, berkas itu akan berlanjut ke pemeriksaan berikutnya, dan jika masukan lolos semua pemeriksaan, program itu akan mengalami segfault. Kita menemukan pentingnya </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">cakupan kode</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> dan bagaimana hal itu dapat membantu mengurangi kejadian yang sangat jarang selama fuzzing menjadi kejadian yang sangat jarang secara linear. Mari kita langsung bahas bagaimana kita meningkatkan dumb fuzzer kita!</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Terima kasih banyak kepada @gamozolabs atas semua kontennya yang membuat saya terpikat pada topik ini.</font></font></p>
+
+<h2 id="performance"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Pertunjukan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Pertama-tama, fuzzer bodoh kami sangat lambat. Jika Anda ingat, kami rata-rata menangani sekitar 1.500 kasus fuzz per detik dengan fuzzer bodoh kami. Selama pengujian saya, AFL dalam mode QEMU (mensimulasikan tidak tersedianya kode sumber untuk instrumentasi kompilasi) berkisar sekitar 1.000 kasus fuzz per detik. Ini masuk akal, karena AFL bekerja jauh lebih banyak daripada fuzzer bodoh kami, terutama dalam mode QEMU di mana kami meniru CPU dan menyediakan cakupan kode.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Target biner kita (-&gt; </font></font><a href="https://gist.github.com/h0mbre/db209b70eb614aa811ce3b98ad38262d"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">HERE</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> &lt;-) akan melakukan hal berikut:</font></font></p>
+<ul>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengekstrak byte dari file di disk ke buffer</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">melakukan 3 pemeriksaan pada buffer untuk melihat apakah indeks yang diperiksa cocok dengan nilai hardcoded</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">segfaulted jika semua pemeriksaan berhasil, keluar jika salah satu pemeriksaan gagal</font></font></li>
+</ul>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fuzzer bodoh kita akan melakukan hal berikut:</font></font></p>
+<ul>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengekstrak byte dari jpeg yang valid pada disk ke buffer byte</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mutasikan 2% byte dalam buffer dengan penimpaan byte acak</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">tulis file yang bermutasi ke disk</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">masukkan file yang bermutasi ke biner target dengan menjalankan a </font></font><code class="language-plaintext highlighter-rouge">fork()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan </font></font><code class="language-plaintext highlighter-rouge">execvp()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">setiap iterasi fuzzing</font></font></li>
+</ul>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Seperti yang dapat Anda lihat, ini adalah banyak interaksi sistem berkas dan syscall. Mari kita gunakan </font></font><code class="language-plaintext highlighter-rouge">strace</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pada biner yang rentan dan lihat syscall apa yang dibuat oleh biner tersebut (untuk posting ini, saya telah mengkodekan </font></font><code class="language-plaintext highlighter-rouge">.jpeg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">berkas tersebut ke dalam biner yang rentan sehingga kita tidak perlu menggunakan argumen baris perintah untuk memudahkan pengujian):</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>execve("/usr/bin/vuln", ["vuln"], 0x7ffe284810a0 /* 52 vars */) = 0<font></font>
+brk(NULL)                               = 0x55664f046000<font></font>
+access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)<font></font>
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)<font></font>
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3<font></font>
+fstat(3, {st_mode=S_IFREG|0644, st_size=88784, ...}) = 0<font></font>
+mmap(NULL, 88784, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f0793d2e000<font></font>
+close(3)                                = 0<font></font>
+access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)<font></font>
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3<font></font>
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0&gt;\0\1\0\0\0\260\34\2\0\0\0\0\0"..., 832) = 832<font></font>
+fstat(3, {st_mode=S_IFREG|0755, st_size=2030544, ...}) = 0<font></font>
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f0793d2c000<font></font>
+mmap(NULL, 4131552, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f079372c000<font></font>
+mprotect(0x7f0793913000, 2097152, PROT_NONE) = 0<font></font>
+mmap(0x7f0793b13000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1e7000) = 0x7f0793b13000<font></font>
+mmap(0x7f0793b19000, 15072, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f0793b19000<font></font>
+close(3)                                = 0<font></font>
+arch_prctl(ARCH_SET_FS, 0x7f0793d2d500) = 0<font></font>
+mprotect(0x7f0793b13000, 16384, PROT_READ) = 0<font></font>
+mprotect(0x55664dd97000, 4096, PROT_READ) = 0<font></font>
+mprotect(0x7f0793d44000, 4096, PROT_READ) = 0<font></font>
+munmap(0x7f0793d2e000, 88784)           = 0<font></font>
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 0), ...}) = 0<font></font>
+brk(NULL)                               = 0x55664f046000<font></font>
+brk(0x55664f067000)                     = 0x55664f067000<font></font>
+write(1, "[&gt;] Analyzing file: Canon_40D.jp"..., 35[&gt;] Analyzing file: Canon_40D.jpg.<font></font>
+) = 35<font></font>
+openat(AT_FDCWD, "Canon_40D.jpg", O_RDONLY) = 3<font></font>
+fstat(3, {st_mode=S_IFREG|0644, st_size=7958, ...}) = 0<font></font>
+fstat(3, {st_mode=S_IFREG|0644, st_size=7958, ...}) = 0<font></font>
+lseek(3, 4096, SEEK_SET)                = 4096<font></font>
+read(3, "\v\260\v\310\v\341\v\371\f\22\f*\fC\f\\\fu\f\216\f\247\f\300\f\331\f\363\r\r\r&amp;"..., 3862) = 3862<font></font>
+lseek(3, 0, SEEK_SET)                   = 0<font></font>
+write(1, "[&gt;] Canon_40D.jpg is 7958 bytes."..., 33[&gt;] Canon_40D.jpg is 7958 bytes.<font></font>
+) = 33<font></font>
+read(3, "\377\330\377\340\0\20JFIF\0\1\1\1\0H\0H\0\0\377\341\t\254Exif\0\0II"..., 4096) = 4096<font></font>
+read(3, "\v\260\v\310\v\341\v\371\f\22\f*\fC\f\\\fu\f\216\f\247\f\300\f\331\f\363\r\r\r&amp;"..., 4096) = 3862<font></font>
+close(3)                                = 0<font></font>
+write(1, "[&gt;] Check 1 no.: 2626\n", 22[&gt;] Check 1 no.: 2626<font></font>
+) = 22<font></font>
+write(1, "[&gt;] Check 2 no.: 3979\n", 22[&gt;] Check 2 no.: 3979<font></font>
+) = 22<font></font>
+write(1, "[&gt;] Check 3 no.: 5331\n", 22[&gt;] Check 3 no.: 5331<font></font>
+) = 22<font></font>
+write(1, "[&gt;] Check 1 failed.\n", 20[&gt;] Check 1 failed.<font></font>
+)   = 20<font></font>
+write(1, "[&gt;] Char was 00.\n", 17[&gt;] Char was 00.<font></font>
+)      = 17<font></font>
+exit_group(-1)                          = ?<font></font>
++++ exited with 255 +++<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Anda dapat melihat bahwa selama proses biner target, kami menjalankan banyak kode bahkan sebelum kami membuka berkas input. Melihat keluaran strace, kami bahkan tidak membuka berkas input hingga kami menjalankan syscall berikut:</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>execve<font></font>
+brk<font></font>
+access<font></font>
+access<font></font>
+openat<font></font>
+fstat<font></font>
+mmap<font></font>
+close<font></font>
+access<font></font>
+openat<font></font>
+read<font></font>
+opeant<font></font>
+read<font></font>
+fstat<font></font>
+mmap<font></font>
+mmap<font></font>
+mprotect<font></font>
+mmap<font></font>
+mmap<font></font>
+arch_prctl<font></font>
+mprotect<font></font>
+mprotect<font></font>
+mprotect<font></font>
+munmap<font></font>
+fstat<font></font>
+brk<font></font>
+brk<font></font>
+write<font></font>
+</code></pre></div></div>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Setelah semua syscall tersebut, kami </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">akhirnya</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> membuka file dari disk untuk membaca byte dengan baris ini dari </font></font><code class="language-plaintext highlighter-rouge">strace</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">output:</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>openat(AT_FDCWD, "Canon_40D.jpg", O_RDONLY) = 3
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi perlu diingat, kami menjalankan syscall ini </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">setiap</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> iterasi fuzzing dengan fuzzer bodoh kami. Fuzzer bodoh kami (-&gt; </font></font><a href="https://gist.github.com/h0mbre/0873edec8346122fc7dc5a1a03f0d2f1"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">DI SINI</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> &lt;-) akan menulis file ke disk setiap iterasi, dan memunculkan contoh program target dengan </font></font><code class="language-plaintext highlighter-rouge">fork() + execvp()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Biner yang rentan akan menjalankan semua syscall awal dan akhirnya membaca file dari disk setiap iterasi. Jadi itu berarti ada beberapa lusin syscall dan </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dua</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> interaksi sistem file setiap iterasi fuzzing. Tidak heran fuzzer bodoh kami sangat lambat.</font></font></p>
+
+<h2 id="rudimentary-snapshot-mechanism"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mekanisme Snapshot Rudimenter</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya mulai berpikir tentang bagaimana kita dapat menghemat waktu saat melakukan fuzzing pada biner target yang sederhana dan berpikir jika saya dapat menemukan cara untuk mengambil snapshot dari memori program </font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">setelah</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> program telah membaca file dari disk dan menyimpan konten di tumpukannya, saya dapat menyimpan status proses tersebut dan secara manual memasukkan fuzzcase baru di tempat byte yang telah dibaca target dan kemudian menjalankan program hingga mencapai panggilan </font></font><code class="language-plaintext highlighter-rouge">exit()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Setelah target mencapai panggilan keluar, saya akan memundurkan status program ke keadaan saat saya mengambil snapshot dan memasukkan fuzzcase baru dan kemudian melakukannya lagi.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Anda dapat melihat bagaimana ini akan meningkatkan kinerja. Kami akan melewati semua overhead startup biner target dan kami akan sepenuhnya melewati semua interaksi sistem berkas. Perbedaan besarnya adalah kami hanya akan membuat </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">satu</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> panggilan </font></font><code class="language-plaintext highlighter-rouge">fork()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">yang merupakan syscall mahal. Untuk 100.000 iterasi fuzzing, katakanlah, kami akan beralih dari 200.000 interaksi sistem berkas (satu untuk fuzzer bodoh untuk membuat </font></font><code class="language-plaintext highlighter-rouge">mutated.jpeg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pada disk, satu untuk target untuk membaca </font></font><code class="language-plaintext highlighter-rouge">mutated.jpeg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">) dan 100.000 </font></font><code class="language-plaintext highlighter-rouge">fork()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">panggilan ke 0 interaksi sistem berkas dan hanya . awal </font></font><code class="language-plaintext highlighter-rouge">fork()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Singkatnya, proses fuzzing kita akan terlihat seperti ini:</font></font></p>
+<ol>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mulai target biner, tetapi hentikan pada instruksi pertama sebelum apa pun berjalan</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tetapkan titik henti pada lokasi 'mulai' dan 'akhir' (mulai akan terjadi </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">setelah</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> program membaca byte dari file pada disk, akhir akan menjadi alamat </font></font><code class="language-plaintext highlighter-rouge">exit()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">)</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jalankan program hingga mencapai breakpoint 'mulai'</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kumpulkan semua bagian memori yang dapat ditulis dari proses dalam buffer</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tangkap semua status register</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Masukkan fuzzcase kita ke dalam tumpukan yang menimpa byte yang dibaca program dari file di disk</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Lanjutkan target biner hingga mencapai titik henti 'akhir'</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Memutar ulang status proses ke tempat asalnya saat 'mulai'</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ulangi dari langkah 6</font></font></li>
+</ol>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kita hanya melakukan langkah 1-5 satu kali saja, jadi rutinitas ini tidak perlu terlalu cepat. Langkah 6-9 adalah tempat fuzzer akan menghabiskan 99% waktunya, jadi kita perlu melakukannya dengan cepat.</font></font></p>
+
+<h2 id="writing-a-simple-debugger-with-ptrace"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Menulis Debugger Sederhana dengan Ptrace</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Untuk mengimplementasikan mekanisme snapshot, kita perlu menggunakan </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">antarmuka yang sangat intuitif, meskipun tampaknya lambat dan terbatas. Ketika saya mulai menulis bagian debugger dari fuzzer beberapa minggu yang lalu, saya sangat bergantung pada </font></font><a href="https://eli.thegreenplace.net/2011/01/23/how-debuggers-work-part-1"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">posting blog</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> ini oleh </font></font><a href="https://twitter.com/elibendersky"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Eli Bendersky</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> yang merupakan pengantar yang bagus </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan menunjukkan kepada Anda cara membuat debugger sederhana.</font></font></p>
+
+<h3 id="breakpoints"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Titik henti</font></font></h3>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Bagian debugger dari kode kita tidak terlalu memerlukan banyak fungsi, ia hanya perlu dapat memasukkan breakpoint dan menghapus breakpoint. Cara yang Anda gunakan </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">untuk menetapkan dan menghapus breakpoint adalah dengan menimpa instruksi satu-byte di alamat dengan </font></font><code class="language-plaintext highlighter-rouge">int3</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">opcode </font></font><code class="language-plaintext highlighter-rouge">\xCC</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Namun, jika Anda menimpa nilai di sana saat menetapkan breakpoint, breakpoint tidak akan dapat dihapus karena Anda tidak akan tahu nilai apa yang awalnya disimpan di sana dan dengan demikian Anda tidak akan tahu </font></font><code class="language-plaintext highlighter-rouge">\xCC</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dengan apa harus ditimpa.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Untuk mulai menggunakan </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, kita buat proses kedua dengan </font></font><code class="language-plaintext highlighter-rouge">fork()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pid_t</span> <span class="n">child_pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">child_pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//we're the child process here</span>
+    <span class="n">execute_debugee</span><span class="p">(</span><span class="n">debugee</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekarang kita perlu meminta proses anak untuk 'dilacak' oleh proses induk. Ini dilakukan dengan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_TRACEME</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">argumen, yang akan kita gunakan di dalam </font></font><code class="language-plaintext highlighter-rouge">execute_debugee</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">fungsi kita:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// request via PTRACE_TRACEME that the parent trace the child</span>
+<span class="kt">long</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_TRACEME</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"</span><span class="se">\033</span><span class="s">[1;35mdragonfly&gt;</span><span class="se">\033</span><span class="s">[0m error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+    <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fungsi sisanya tidak terlibat </font></font><code class="language-plaintext highlighter-rouge">ptrace</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, tetapi saya akan teruskan dan tunjukkan di sini karena ada fungsi penting untuk menonaktifkan ASLR secara paksa dalam proses debuggee. Ini penting karena kita akan memanfaatkan breakpoint pada alamat statis yang </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">tidak dapat</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> mengubah proses ke proses. Kita menonaktifkan ASLR dengan memanggil </font></font><code class="language-plaintext highlighter-rouge">personality()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">with </font></font><code class="language-plaintext highlighter-rouge">ADDR_NO_RANDOMIZE</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Secara terpisah, kita akan mengarahkan </font></font><code class="language-plaintext highlighter-rouge">stdout</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan </font></font><code class="language-plaintext highlighter-rouge">stderr</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ke </font></font><code class="language-plaintext highlighter-rouge">/dev/null</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">agar kita tidak mengacaukan terminal kita dengan keluaran biner target.</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// disable ASLR</span>
+<span class="kt">int</span> <span class="n">personality_result</span> <span class="o">=</span> <span class="n">personality</span><span class="p">(</span><span class="n">ADDR_NO_RANDOMIZE</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">personality_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"</span><span class="se">\033</span><span class="s">[1;35mdragonfly&gt;</span><span class="se">\033</span><span class="s">[0m error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+    <span class="n">perror</span><span class="p">(</span><span class="s">"personality"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+<span class="p">}</span><font></font>
+ <font></font>
+<span class="c1">// dup both stdout and stderr and send them to /dev/null</span>
+<span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">"/dev/null"</span><span class="p">,</span> <span class="n">O_WRONLY</span><span class="p">);</span>
+<span class="n">dup2</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">dup2</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span><font></font>
+ <font></font>
+<span class="c1">// exec our debugee program, NULL terminated to avoid Sentinel compilation</span>
+<span class="c1">// warning. this replaces the fork() clone of the parent with the </span>
+<span class="c1">// debugee process </span>
+<span class="kt">int</span> <span class="n">execl_result</span> <span class="o">=</span> <span class="n">execl</span><span class="p">(</span><span class="n">debugee</span><span class="p">,</span> <span class="n">debugee</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">execl_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"</span><span class="se">\033</span><span class="s">[1;35mdragonfly&gt;</span><span class="se">\033</span><span class="s">[0m error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+    <span class="n">perror</span><span class="p">(</span><span class="s">"execl"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi, hal pertama yang harus dilakukan adalah mencari cara untuk mengambil nilai satu-byte pada suatu alamat sebelum kita memasukkan breakpoint. Untuk fuzzer, saya mengembangkan file header dan file sumber yang saya panggil </font></font><code class="language-plaintext highlighter-rouge">ptrace_helpers</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">untuk membantu mempermudah proses pengembangan penggunaan </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Untuk mengambil nilai, kita akan mengambil nilai 64-bit pada alamat tersebut, tetapi hanya memperhatikan byte di ujung paling kanan. (Saya menggunakan tipe </font></font><code class="language-plaintext highlighter-rouge">long long unsigned</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">karena begitulah cara nilai register didefinisikan </font></font><code class="language-plaintext highlighter-rouge">&lt;sys/user.h&gt;</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan saya ingin agar semuanya tetap sama).</font></font></p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="nf">get_value</span><span class="p">(</span><span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">address</span><span class="p">)</span> <span class="p">{</span><font></font>
+    <font></font>
+    <span class="n">errno</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">value</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_PEEKTEXT</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">address</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">errno</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="k">return</span> <span class="n">value</span><span class="p">;</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi fungsi ini akan menggunakan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_PEEKTEXT</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">argumen untuk membaca nilai yang terletak di </font></font><code class="language-plaintext highlighter-rouge">address</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dalam proses anak ( </font></font><code class="language-plaintext highlighter-rouge">child_pid</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">) yang merupakan target kita. Jadi sekarang setelah kita memiliki nilai ini, kita dapat menyimpannya dan memasukkan breakpoint kita dengan kode berikut:</font></font></p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">set_breakpoint</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">bp_address</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">original_value</span><span class="p">,</span> <span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="n">errno</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">breakpoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">original_value</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFFFFFFFF00</span> <span class="o">|</span> <span class="mh">0xCC</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_POKETEXT</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">bp_address</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">breakpoint</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">errno</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Anda dapat melihat bahwa fungsi ini akan mengambil nilai asli yang kita kumpulkan dengan fungsi sebelumnya dan melakukan dua operasi bitwise untuk menjaga 7 byte pertama tetap utuh, tetapi kemudian mengganti byte terakhir dengan </font></font><code class="language-plaintext highlighter-rouge">\xCC</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Perhatikan bahwa kita sekarang menggunakan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_POKETEXT</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Salah satu fitur antarmuka yang membuat frustrasi </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">adalah kita hanya dapat membaca dan menulis 8 byte dalam satu waktu!</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi sekarang kita bisa menyetel breakpoint, fungsi terakhir yang perlu kita implementasikan adalah fungsi untuk menghapus breakpoint, yang akan memerlukan penimpaan </font></font><code class="language-plaintext highlighter-rouge">int3</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dengan nilai byte asli.</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">revert_breakpoint</span><span class="p">(</span><span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">bp_address</span><span class="p">,</span> <span class="kt">long</span> <span class="kt">long</span> <span class="kt">unsigned</span> <span class="n">original_value</span><span class="p">,</span> <span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="n">errno</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_POKETEXT</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">bp_address</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">original_value</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">errno</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekali lagi, dengan menggunakan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_POKETEXT</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, kita dapat menimpa </font></font><code class="language-plaintext highlighter-rouge">\xCC</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dengan nilai byte asli. Jadi sekarang kita memiliki kemampuan untuk mengatur dan menghapus breakpoint.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Terakhir, kita memerlukan cara untuk melanjutkan eksekusi di debuggee. Ini dapat dilakukan dengan menggunakan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_CONT</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">argumen </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">sebagai berikut:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">resume_execution</span><span class="p">(</span><span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_CONT</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Hal penting yang perlu diperhatikan adalah, jika kita mencapai breakpoint pada alamat </font></font><code class="language-plaintext highlighter-rouge">0x000000000000000</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, </font></font><code class="language-plaintext highlighter-rouge">rip</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">sebenarnya akan berada pada </font></font><code class="language-plaintext highlighter-rouge">0x0000000000000001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Jadi setelah mengembalikan instruksi yang ditimpa ke nilai sebelumnya, kita juga perlu mengurangi 1 dari </font></font><code class="language-plaintext highlighter-rouge">rip</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">sebelum melanjutkan eksekusi, kita akan mempelajari cara melakukannya </font></font><code class="language-plaintext highlighter-rouge">ptrace</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">di bagian berikutnya.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekarang mari kita pelajari bagaimana kita dapat memanfaatkan </font></font><code class="language-plaintext highlighter-rouge">ptrace</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">file </font></font><code class="language-plaintext highlighter-rouge">/proc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">semu untuk membuat snapshot target kita!</font></font></p>
+
+<h3 id="snapshotting-with-ptrace-and-proc"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Snapshotting dengan ptrace dan /proc</font></font></h3>
+
+<h3 id="register-states"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Daftarkan Negara</font></font></h3>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fitur keren lainnya </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">adalah kemampuan untuk menangkap dan mengatur status register dalam proses debuggee. Kita dapat melakukan kedua hal tersebut masing-masing dengan fungsi pembantu yang saya tempatkan di </font></font><code class="language-plaintext highlighter-rouge">ptrace_helpers.c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// retrieve register states</span>
+<span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="nf">get_regs</span><span class="p">(</span><span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">,</span> <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="n">registers</span><span class="p">)</span> <span class="p">{</span>                                                                                                 
+    <span class="kt">int</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_GETREGS</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">registers</span><span class="p">);</span>                                                                              
+    <span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>                                                                              
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>                                                                         
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>                                                                              
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>                                                                              
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="k">return</span> <span class="n">registers</span><span class="p">;</span>                                                                              
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// set register states</span>
+<span class="kt">void</span> <span class="nf">set_regs</span><span class="p">(</span><span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">,</span> <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="n">registers</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">ptrace_result</span> <span class="o">=</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SETREGS</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">registers</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ptrace_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"ptrace"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Yang </font></font><code class="language-plaintext highlighter-rouge">struct user_regs_struct</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">didefinisikan dalam </font></font><code class="language-plaintext highlighter-rouge">&lt;sys/user.h&gt;</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Anda dapat melihat kami menggunakan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_GETREGS</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan </font></font><code class="language-plaintext highlighter-rouge">PTRACE_SETREGS</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">masing-masing untuk mengambil data register dan mengatur data register. Jadi dengan kedua fungsi ini, kami akan dapat membuat sejumlah </font></font><code class="language-plaintext highlighter-rouge">struct user_regs_struct</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">nilai register snapshot saat kami berada di breakpoint 'mulai' dan saat kami mencapai breakpoint 'akhir', kami akan dapat mengembalikan status register (yang terpenting </font></font><code class="language-plaintext highlighter-rouge">rip</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">) ke kondisi semula saat di-snapshot.</font></font></p>
+
+<h3 id="snapshotting-writable-memory-sections-with-proc"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mengambil Snapshot Bagian Memori yang Dapat Ditulis dengan /proc</font></font></h3>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekarang setelah kita memiliki cara untuk merekam status register, kita akan memerlukan cara untuk merekam status memori yang dapat ditulis untuk snapshot kita. Saya melakukannya dengan berinteraksi dengan </font></font><code class="language-plaintext highlighter-rouge">/proc</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">file pseudo. Saya menggunakan GDB untuk menghentikan fungsi pertama yang melakukan pemeriksaan </font></font><code class="language-plaintext highlighter-rouge">vuln</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, yang penting fungsi ini setelah </font></font><code class="language-plaintext highlighter-rouge">vuln</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">membaca </font></font><code class="language-plaintext highlighter-rouge">jpeg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">disk yang dimatikan dan akan berfungsi sebagai breakpoint 'awal' kita. Setelah kita menghentikan di sini di GDB, kita dapat melihat file </font></font><code class="language-plaintext highlighter-rouge">cat</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">tersebut </font></font><code class="language-plaintext highlighter-rouge">/proc/$pid/maps</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">untuk melihat bagaimana memori dipetakan dalam proses tersebut (perlu diingat GDB juga memaksa ASLR mati menggunakan metode yang sama yang kita lakukan di debugger kita). Kita dapat melihat output di sini yang mencari bagian yang dapat ditulis (yaitu, bagian yang dapat dihancurkan selama fuzzcase dijalankan):</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing/dragonfly_dir$ cat /proc/12011/maps | grep rw<font></font>
+555555756000-555555757000 rw-p 00002000 08:01 786686                     /home/h0mbre/fuzzing/dragonfly_dir/vuln<font></font>
+555555757000-555555778000 rw-p 00000000 00:00 0                          [heap]<font></font>
+7ffff7dcf000-7ffff7dd1000 rw-p 001eb000 08:01 1055012                    /lib/x86_64-linux-gnu/libc-2.27.so<font></font>
+7ffff7dd1000-7ffff7dd5000 rw-p 00000000 00:00 0 <font></font>
+7ffff7fe0000-7ffff7fe2000 rw-p 00000000 00:00 0 <font></font>
+7ffff7ffd000-7ffff7ffe000 rw-p 00028000 08:01 1054984                    /lib/x86_64-linux-gnu/ld-2.27.so<font></font>
+7ffff7ffe000-7ffff7fff000 rw-p 00000000 00:00 0 <font></font>
+7ffffffde000-7ffffffff000 rw-p 00000000 00:00 0                          [stack]<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi, ada tujuh bagian memori yang berbeda. Anda akan melihat bahwa adalah </font></font><code class="language-plaintext highlighter-rouge">heap</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">salah satu bagiannya. Penting untuk menyadari bahwa fuzzcase kita akan dimasukkan ke dalam heap, tetapi alamat di heap yang menyimpan fuzzcase tidak akan sama di fuzzer kita seperti di GDB. Saya rasa ini mungkin karena beberapa jenis perbedaan variabel lingkungan antara kedua debugger. Jika kita melihat di GDB saat kita masuk ke </font></font><code class="language-plaintext highlighter-rouge">check_one()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, </font></font><code class="language-plaintext highlighter-rouge">vuln</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">kita melihat bahwa </font></font><code class="language-plaintext highlighter-rouge">rax</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">adalah pointer ke awal input kita, dalam kasus ini </font></font><code class="language-plaintext highlighter-rouge">Canon_40D.jpg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$rax   : 0x00005555557588b0  ‚Üí  0x464a1000e0ffd8ff
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Pointer tersebut, </font></font><code class="language-plaintext highlighter-rouge">0x00005555557588b0</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, terletak di tumpukan. Jadi yang harus saya lakukan untuk mengetahui di mana pointer tersebut berada di debugger/fuzzer kami, adalah menghentikannya di titik yang sama dan menggunakannya </font></font><code class="language-plaintext highlighter-rouge">ptrace()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">untuk mengambil </font></font><code class="language-plaintext highlighter-rouge">rax</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">nilainya.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya akan memecahnya </font></font><code class="language-plaintext highlighter-rouge">check_one</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan kemudian membukanya </font></font><code class="language-plaintext highlighter-rouge">/proc/$pid/maps</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">untuk mendapatkan offset dalam program yang berisi bagian memori yang dapat ditulis, dan kemudian saya akan membuka </font></font><code class="language-plaintext highlighter-rouge">/proc/$pid/mem</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan membaca dari offset tersebut ke dalam buffer untuk menyimpan memori yang dapat ditulis. Kode ini disimpan dalam file sumber yang disebut </font></font><code class="language-plaintext highlighter-rouge">snapshot.c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">yang berisi beberapa definisi dan fungsi untuk menangkap snapshot dan memulihkannya. Untuk bagian ini, menangkap memori yang dapat ditulis, saya menggunakan definisi dan fungsi berikut:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">create_snapshot</span><span class="p">(</span><span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">)</span> <span class="p">{</span><font></font>
+ <font></font>
+    <span class="k">struct</span> <span class="n">SNAPSHOT_MEMORY</span> <span class="n">read_memory</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">{</span>
+            <span class="c1">// maps_offset</span>
+            <span class="mh">0x555555756000</span><span class="p">,</span>
+            <span class="mh">0x7ffff7dcf000</span><span class="p">,</span>
+            <span class="mh">0x7ffff7dd1000</span><span class="p">,</span>
+            <span class="mh">0x7ffff7fe0000</span><span class="p">,</span>
+            <span class="mh">0x7ffff7ffd000</span><span class="p">,</span>
+            <span class="mh">0x7ffff7ffe000</span><span class="p">,</span>
+            <span class="mh">0x7ffffffde000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="c1">// snapshot_buf_offset</span>
+            <span class="mh">0x0</span><span class="p">,</span>
+            <span class="mh">0xFFF</span><span class="p">,</span>
+            <span class="mh">0x2FFF</span><span class="p">,</span>
+            <span class="mh">0x6FFF</span><span class="p">,</span>
+            <span class="mh">0x8FFF</span><span class="p">,</span>
+            <span class="mh">0x9FFF</span><span class="p">,</span>
+            <span class="mh">0xAFFF</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="c1">// rdwr length</span>
+            <span class="mh">0x1000</span><span class="p">,</span>
+            <span class="mh">0x2000</span><span class="p">,</span>
+            <span class="mh">0x4000</span><span class="p">,</span>
+            <span class="mh">0x2000</span><span class="p">,</span>
+            <span class="mh">0x1000</span><span class="p">,</span>
+            <span class="mh">0x1000</span><span class="p">,</span>
+            <span class="mh">0x21000</span>
+        <span class="p">}</span>
+    <span class="p">};</span>  <font></font>
+ <font></font>
+    <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">snapshot_buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x2C000</span><span class="p">);</span><font></font>
+ <font></font>
+    <span class="c1">// this is just /proc/$pid/mem</span>
+    <span class="kt">char</span> <span class="n">proc_mem</span><span class="p">[</span><span class="mh">0x20</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+    <span class="n">sprintf</span><span class="p">(</span><span class="n">proc_mem</span><span class="p">,</span> <span class="s">"/proc/%d/mem"</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">);</span><font></font>
+ <font></font>
+    <span class="c1">// open /proc/$pid/mem for reading</span>
+    <span class="c1">// hardcoded offsets are from typical /proc/$pid/maps at main()</span>
+    <span class="kt">int</span> <span class="n">mem_fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="n">proc_mem</span><span class="p">,</span> <span class="n">O_RDONLY</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mem_fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">"open"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+ <font></font>
+    <span class="c1">// this loop will:</span>
+    <span class="c1">//  -- go to an offset within /proc/$pid/mem via lseek()</span>
+    <span class="c1">//  -- read x-pages of memory from that offset into the snapshot buffer</span>
+    <span class="c1">//  -- adjust the snapshot buffer offset so nothing is overwritten in it</span>
+    <span class="kt">int</span> <span class="n">lseek_result</span><span class="p">,</span> <span class="n">bytes_read</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//printf("dragonfly&gt; Reading from offset: %d\n", i+1);</span>
+        <span class="n">lseek_result</span> <span class="o">=</span> <span class="n">lseek</span><span class="p">(</span><span class="n">mem_fd</span><span class="p">,</span> <span class="n">read_memory</span><span class="p">.</span><span class="n">maps_offset</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">SEEK_SET</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lseek_result</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+            <span class="n">perror</span><span class="p">(</span><span class="s">"lseek"</span><span class="p">);</span>
+            <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+        <span class="p">}</span><font></font>
+ <font></font>
+        <span class="n">bytes_read</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">mem_fd</span><span class="p">,</span>
+            <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="n">read_memory</span><span class="p">.</span><span class="n">snapshot_buf_offset</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
+            <span class="n">read_memory</span><span class="p">.</span><span class="n">rdwr_length</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">bytes_read</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"dragonfly&gt; Error (%d) during "</span><span class="p">,</span> <span class="n">errno</span><span class="p">);</span>
+            <span class="n">perror</span><span class="p">(</span><span class="s">"read"</span><span class="p">);</span>
+            <span class="n">exit</span><span class="p">(</span><span class="n">errno</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span><font></font>
+ <font></font>
+    <span class="n">close</span><span class="p">(</span><span class="n">mem_fd</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">snapshot_buf</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Anda dapat melihat bahwa saya mengkodekan semua offset dan panjang bagian secara keras. Perlu diingat, ini tidak perlu cepat. Kita hanya mengambil snapshot sekali, jadi tidak apa-apa untuk berinteraksi dengan sistem file. Jadi kita akan mengulang 7 offset dan panjang ini dan menulis semuanya ke buffer yang disebut </font></font><code class="language-plaintext highlighter-rouge">snapshot_buf</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">yang akan disimpan di heap fuzzer kita. Jadi sekarang kita memiliki status register dan status memori dari proses kita saat dimulai </font></font><code class="language-plaintext highlighter-rouge">check_one</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">(titik henti 'mulai' kita).</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekarang mari kita cari tahu cara memulihkan snapshot saat kita mencapai titik henti 'akhir'.</font></font></p>
+
+<h3 id="restoring-snapshot"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Memulihkan Snapshot</font></font></h3>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Untuk memulihkan status memori proses, kita bisa menulis dengan </font></font><code class="language-plaintext highlighter-rouge">/proc/$pid/mem</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">cara yang sama seperti saat kita membacanya; namun, bagian ini harus cepat karena kita melakukan ini setiap iterasi fuzzing sekarang. Berinteraksi dengan sistem berkas setiap iterasi fuzzing akan sangat memperlambat kita. Untungnya, sejak kernel Linux versi 3.2, ada dukungan untuk API pembacaan/penulisan memori antarproses yang jauh lebih cepat yang dapat kita manfaatkan yang disebut </font></font><a href="https://linux.die.net/man/2/process_vm_writev"><code class="language-plaintext highlighter-rouge">process_vm_writev()</code></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Karena proses ini bekerja secara langsung dengan proses lain dan tidak melintasi kernel dan tidak melibatkan sistem berkas, kecepatan penulisan kita akan meningkat pesat.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Agak membingungkan pada awalnya, tetapi contoh halaman manual ini benar-benar semua yang Anda butuhkan untuk memahami cara kerjanya. Saya memilih untuk hanya meng-hardcode semua offset karena fuzzer ini hanyalah POC. dan kita dapat memulihkan memori yang dapat ditulis sebagai berikut:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">restore_snapshot</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">snapshot_buf</span><span class="p">,</span> <span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">)</span> <span class="p">{</span><font></font>
+ <font></font>
+    <span class="kt">ssize_t</span> <span class="n">bytes_written</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="c1">// we're writing *from* 7 different offsets within snapshot_buf</span>
+    <span class="k">struct</span> <span class="n">iovec</span> <span class="n">local</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="c1">// we're writing *to* 7 separate sections of writable memory here</span>
+    <span class="k">struct</span> <span class="n">iovec</span> <span class="n">remote</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span><font></font>
+ <font></font>
+    <span class="c1">// this struct is the local buffer we want to write from into the </span>
+    <span class="c1">// struct that is 'remote' (ie, the child process where we'll overwrite</span>
+    <span class="c1">// all of the non-heap writable memory sections that we parsed from </span>
+    <span class="c1">// proc/$pid/memory)</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="n">snapshot_buf</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0xFFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x2000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0x2FFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x4000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0x6FFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x2000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0x8FFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0x9FFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">6</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)(</span><span class="n">snapshot_buf</span> <span class="o">+</span> <span class="mh">0xAFFF</span><span class="p">);</span>
+    <span class="n">local</span><span class="p">[</span><span class="mi">6</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x21000</span><span class="p">;</span><font></font>
+ <font></font>
+    <span class="c1">// just hardcoding the base addresses that are writable memory</span>
+    <span class="c1">// that we gleaned from /proc/pid/maps and their lengths</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x555555756000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffff7dcf000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x2000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffff7dd1000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x4000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffff7fe0000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x2000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffff7ffd000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffff7ffe000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x1000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">6</span><span class="p">].</span><span class="n">iov_base</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0x7ffffffde000</span><span class="p">;</span>
+    <span class="n">remote</span><span class="p">[</span><span class="mi">6</span><span class="p">].</span><span class="n">iov_len</span> <span class="o">=</span> <span class="mh">0x21000</span><span class="p">;</span><font></font>
+ <font></font>
+    <span class="n">bytes_written</span> <span class="o">=</span> <span class="n">process_vm_writev</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="c1">//printf("dragonfly&gt; %ld bytes written\n", bytes_written);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi untuk 7 bagian yang dapat ditulis berbeda, kita akan menulis ke dalam proses debuggee pada offset yang ditentukan dari </font></font><code class="language-plaintext highlighter-rouge">/proc/$pid/maps</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">yang </font></font><code class="language-plaintext highlighter-rouge">snapshot_buf</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">memiliki data snapshot murni. DAN ITU AKAN CEPAT!</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi sekarang setelah kita memiliki kemampuan untuk memulihkan memori yang dapat ditulis, kita hanya perlu memulihkan status register sekarang dan kita akan dapat menyelesaikan mekanisme snapshot dasar kita. Itu mudah dilakukan dengan menggunakan </font></font><code class="language-plaintext highlighter-rouge">ptrace_helpers</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">fungsi yang telah kita tentukan dan Anda dapat melihat dua panggilan fungsi dalam loop fuzzing sebagai berikut:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// restore writable memory from /proc/$pid/maps to its state at Start</span>
+<span class="n">restore_snapshot</span><span class="p">(</span><span class="n">snapshot_buf</span><span class="p">,</span> <span class="n">child_pid</span><span class="p">);</span><font></font>
+<font></font>
+<span class="c1">// restore registers to their state at Start</span>
+<span class="n">set_regs</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="n">snapshot_registers</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi seperti itulah cara kerja proses snapshot kami dan dalam pengujian saya, kami mencapai peningkatan kecepatan sekitar 20-30x dibanding fuzzer bodoh!</font></font></p>
+
+<h2 id="making-our-dumb-fuzzer-smart"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membuat Fuzzer Bodoh Kita Menjadi Cerdas</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Pada titik ini, kita masih memiliki fuzzer bodoh (meskipun sekarang jauh lebih cepat). Kita perlu dapat melacak cakupan kode. Cara yang sangat sederhana untuk melakukan ini adalah dengan menempatkan breakpoint di setiap 'blok dasar' antara </font></font><code class="language-plaintext highlighter-rouge">check_one</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan </font></font><code class="language-plaintext highlighter-rouge">exit</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">sehingga jika kita mencapai kode baru, breakpoint akan tercapai dan kita dapat </font></font><code class="language-plaintext highlighter-rouge">do_something()</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">melakukannya.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ini persis yang saya lakukan kecuali demi kesederhanaan, saya hanya menempatkan breakpoint 'dinamis' (cakupan kode) di titik masuk ke </font></font><code class="language-plaintext highlighter-rouge">check_two</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan </font></font><code class="language-plaintext highlighter-rouge">check_three</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Ketika breakpoint 'dinamis' tercapai, kami menyimpan input yang mencapai kode ke dalam array </font></font><code class="language-plaintext highlighter-rouge">char</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pointer yang disebut 'corpus' dan sekarang kami dapat mulai mengubah input yang tersimpan tersebut alih-alih hanya input 'prototipe' kami dari </font></font><code class="language-plaintext highlighter-rouge">Canon_40D.jpg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi mekanisme umpan balik cakupan kode kita akan bekerja seperti ini:</font></font></p>
+<ol>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mutasikan input prototipe dan masukkan fuzzcase ke dalam tumpukan</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Lanjutkan debuggee</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jika 'titik henti dinamis' tercapai, simpan masukan ke dalam korpus</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jika korpus &gt; 0, pilih input secara acak dari korpus atau prototipe dan ulangi dari langkah 1</font></font></li>
+</ol>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kita juga harus menghapus breakpoint dinamis agar kita tidak lagi mengalami kerusakan karenanya. Untungnya kita sudah tahu cara melakukannya dengan baik!</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Seperti yang mungkin Anda ingat dari posting terakhir, cakupan kode sangat penting bagi kemampuan kita untuk merusak biner pengujian ini </font></font><code class="language-plaintext highlighter-rouge">vuln</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">karena ia melakukan 3 perbandingan byte yang semuanya harus lulus sebelum ia rusak. Kami menentukan secara matematis pada posting terakhir bahwa peluang kita untuk lulus pemeriksaan pertama adalah sekitar </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">1 banding 13 ribu</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> dan peluang kita untuk lulus dua pemeriksaan pertama adalah sekitar </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">1 banding 170 juta</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> . Karena kita menyimpan masukan dari yang lolos </font></font><code class="language-plaintext highlighter-rouge">check_one</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan mengubahnya lebih lanjut, kita dapat mengurangi kemungkinan untuk meneruskannya </font></font><code class="language-plaintext highlighter-rouge">check_two</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">hingga mendekati angka </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">1 banding 13 ribu</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> . Ini juga berlaku untuk masukan yang kemudian lolos </font></font><code class="language-plaintext highlighter-rouge">check_two</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan oleh karena itu kita dapat mencapai dan lulus </font></font><code class="language-plaintext highlighter-rouge">check_three</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dengan mudah.</font></font></p>
+
+<h2 id="running-the-fuzzer"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Menjalankan Fuzzer</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tahap pertama fuzzer kami, yang mengumpulkan data snapshot dan menetapkan 'titik henti dinamis' untuk cakupan kode, selesai dengan sangat cepat meskipun tidak dimaksudkan untuk cepat. Ini karena semua nilai dikodekan secara keras karena target kami sangat sederhana. Dalam target multi-utas yang kompleks, kami memerlukan beberapa cara untuk membuat skrip penemuan alamat titik henti dinamis melalui Ghidra atau </font></font><code class="language-plaintext highlighter-rouge">objdump</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">semacamnya dan kami perlu membuat skrip tersebut menulis file konfigurasi untuk fuzzer kami, tetapi itu masih jauh. Untuk saat ini, untuk POC, ini berfungsi dengan baik.</font></font></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing/dragonfly_dir$ ./dragonfly <font></font>
+<font></font>
+dragonfly&gt; debuggee pid: 12156<font></font>
+dragonfly&gt; setting 'start/end' breakpoints:<font></font>
+<font></font>
+   start-&gt; 0x555555554b41<font></font>
+   end  -&gt; 0x5555555548c0<font></font>
+<font></font>
+dragonfly&gt; set dynamic breakpoints: <font></font>
+<font></font>
+           0x555555554b7d<font></font>
+           0x555555554bb9<font></font>
+<font></font>
+dragonfly&gt; collecting snapshot data<font></font>
+dragonfly&gt; snapshot collection complete<font></font>
+dragonfly&gt; press any key to start fuzzing!<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Anda dapat melihat bahwa fuzzer membantu menampilkan titik henti 'mulai' dan 'akhir' serta mencantumkan 'titik henti dinamis' bagi kita sehingga kita dapat memeriksa apakah titik henti tersebut benar sebelum melakukan fuzzing. Fuzzer berhenti dan menunggu kita menekan tombol apa saja untuk memulai fuzzing. Kita juga dapat melihat bahwa pengumpulan data snapshot telah berhasil diselesaikan sehingga sekarang kita berhenti di 'mulai' dan memiliki semua data yang kita butuhkan untuk memulai fuzzing.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Setelah kita menekan enter, kita mendapatkan output statistik yang menunjukkan kepada kita bagaimana proses fuzzing berlangsung:</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dragonfly&gt; stats (target:vuln, pid:12156)<font></font>
+<font></font>
+fc/s       : 41720<font></font>
+crashes    : 5<font></font>
+iterations : 0.3m<font></font>
+coverage   : 2/2 (%100.00)<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Seperti yang dapat Anda lihat, ia menemukan kedua 'titik henti dinamis' hampir seketika dan saat ini menjalankan sekitar 41 ribu iterasi fuzzing per detik waktu CPU (sekitar 20-30x lebih cepat dalam waktu di dinding daripada fuzzer bodoh kita).</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Yang terpenting, Anda dapat melihat bahwa kami mampu menghancurkan biner sebanyak 5 kali hanya dalam 300 ribu iterasi! Kami tidak akan pernah bisa melakukan ini dengan fuzzer kami sebelumnya.</font></font></p>
+
+<p><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">vv KLIK INI UNTUK MENONTON AKSINYA vv</font></font></strong></p>
+
+<p><a href="https://asciinema.org/a/WJEXrsznf1GY3FLxAAf7TsNBi"><img src="https://asciinema.org/a/WJEXrsznf1GY3FLxAAf7TsNBi.png" alt="siaran ascii"></a></p>
+
+<h2 id="conclusion"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kesimpulan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Salah satu hal terpenting yang saya dapatkan dari melakukan ini adalah seberapa banyak performa yang dapat Anda peroleh dari fuzzer jika Anda menyesuaikannya dengan target Anda. Menggunakan kerangka kerja seperti AFL adalah hal yang hebat dan merupakan alat yang sangat mengesankan. Saya berharap fuzzer ini suatu hari akan berkembang menjadi sesuatu yang sebanding. Kami dapat menjalankan sekitar 20-30x lebih cepat daripada AFL untuk target yang sangat sederhana ini dan dapat membuatnya mogok hampir seketika hanya dengan sedikit rekayasa balik dan penyesuaian. Saya pikir ini sangat bagus dan instruktif. Di masa mendatang, ketika saya mengadaptasi fuzzer ini untuk target yang sebenarnya, saya seharusnya dapat mengungguli kerangka kerja lagi.</font></font></p>
+
+<h2 id="ideas-for-improvment"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ide untuk Perbaikan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Dari mana memulainya? Ada banyak hal yang dapat kami tingkatkan, tetapi beberapa perbaikan langsung yang dapat dilakukan adalah:</font></font></p>
+<ul>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengoptimalkan kinerja dengan melakukan refaktor kode, mengubah lokasi variabel global</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengaktifkan konfigurasi dinamis fuzzer melalui file konfigurasi yang dapat dibuat melalui skrip Python</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">menerapkan lebih banyak metode mutasi</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">menerapkan lebih banyak mekanisme cakupan kode</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengembangkan fuzzer sehingga banyak instance dapat berjalan secara paralel dan berbagi input/data cakupan yang ditemukan</font></font></li>
+</ul>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mungkin kita akan melihat peningkatan ini di postingan berikutnya dan hasil pengaburan target nyata dengan pendekatan umum yang sama. Sampai jumpa!</font></font></p>
+
+<h2 id="code"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kode</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Semua kode untuk blogpost ini dapat ditemukan di sini: https://github.com/h0mbre/Fuzzing/tree/master/Caveman4</font></font></p>
+
+  </div>
+</article>
+      </div>
+    </main><footer class="site-footer">
+    <div class="wrapper">
+      <div class="social-links"><ul class="social-media-list"><li><a href="https://github.com/h0mbre"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pria</font></font></span></a></li><li><a href="https://www.twitter.com/h0mbre_"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">h0mbre_</font></font></span></a></li></ul>
+</div>
+    </div>
+  </footer><div id="goog-gt-tt" class="VIpgJd-yAWNEb-L7lbkb skiptranslate" style="border-radius: 12px; margin: 0 0 0 -23px; padding: 0; font-family: 'Google Sans', Arial, sans-serif;" data-id=""><div id="goog-gt-vt" class="VIpgJd-yAWNEb-hvhgNd"><div class=" VIpgJd-yAWNEb-hvhgNd-l4eHX-i3jM8c"><img src="https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg" width="24" height="24" alt=""></div><div class=" VIpgJd-yAWNEb-hvhgNd-k77Iif-i3jM8c"><div class="VIpgJd-yAWNEb-hvhgNd-IuizWc" dir="ltr">Teks asli</div><div id="goog-gt-original-text" class="VIpgJd-yAWNEb-nVMfcd-fmcmS VIpgJd-yAWNEb-hvhgNd-axAV1"></div></div><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid ltr"><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od ltr" dir="ltr"><div class="VIpgJd-yAWNEb-hvhgNd-UTujCb">Beri rating terjemahan ini</div><div class="VIpgJd-yAWNEb-hvhgNd-eO9mKe">Masukan Anda akan digunakan untuk membantu meningkatkan kualitas Google Terjemahan</div></div><div class="VIpgJd-yAWNEb-hvhgNd-xgov5 ltr"><button id="goog-gt-thumbUpButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Terjemahan bagus" aria-label="Terjemahan bagus" aria-pressed="false"><span id="goog-gt-thumbUpIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7H2v13h16c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM7 18H4V9h3v9zm14-7l-3 7H9V8l4.34-4.34L12 9h9v2z"></path></svg></span><span id="goog-gt-thumbUpIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7v13h11c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM5 7H1v13h4V7z"></path></svg></span></button><button id="goog-gt-thumbDownButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Terjemahan buruk" aria-label="Terjemahan buruk" aria-pressed="false"><span id="goog-gt-thumbDownIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7h5V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zM17 6h3v9h-3V6zM3 13l3-7h9v10l-4.34 4.34L12 15H3v-2z"></path></svg></span><span id="goog-gt-thumbDownIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zm16 0h4V4h-4v13z"></path></svg></span></button></div></div><div id="goog-gt-votingHiddenPane" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><form id="goog-gt-votingForm" action="https://translate.googleapis.com/translate_voting?client=te_lib" method="post" target="votingFrame" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><input type="text" name="sl" id="goog-gt-votingInputSrcLang"><input type="text" name="tl" id="goog-gt-votingInputTrgLang"><input type="text" name="query" id="goog-gt-votingInputSrcText"><input type="text" name="gtrans" id="goog-gt-votingInputTrgText"><input type="text" name="vote" id="goog-gt-votingInputVote"></form><iframe name="votingFrame" frameborder="0"></iframe></div></div></div>
+</body></html>
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/assets/main.css
+
+@charset "utf-8";
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap");
+
+@font-face { font-family: "GNU Unifont"; src: url("/assets/fonts/unifont-15.1.05.otf") format("opentype"); }
+
+@font-face { font-family: "Perfect DOS VGA 437"; src: url("/assets/fonts/Perfect DOS VGA 437.ttf") format("truetype"); }
+
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0px; padding: 0px; }
+
+body { font-style: normal; font-variant: normal; font-optical-sizing: auto; font-variation-settings: normal; font-weight: 400; font-stretch: normal; font-size: 16px; line-height: 1.5; font-family: "GNU Unifont", monospace; color: rgb(17, 17, 17); background-color: rgb(253, 253, 253); text-size-adjust: 100%; font-feature-settings: "kern"; font-kerning: normal; display: flex; min-height: 100vh; flex-direction: column; }
+
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, ul, ol, dl, figure, .highlight { margin-bottom: 15px; }
+
+main { display: block; }
+
+img { max-width: 100%; vertical-align: middle; }
+
+figure > img { display: block; }
+
+figcaption { font-size: 14px; }
+
+ul, ol { margin-left: 30px; }
+
+li > ul, li > ol { margin-bottom: 0px; }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+
+a { color: rgb(42, 122, 226); text-decoration: none; }
+
+a:visited { color: rgb(23, 86, 169); }
+
+a:hover { color: rgb(17, 17, 17); text-decoration: underline; }
+
+.social-media-list a:hover { text-decoration: none; }
+
+.social-media-list a:hover .username { text-decoration: underline; }
+
+blockquote { color: rgb(130, 130, 130); border-left: 4px solid rgb(232, 232, 232); padding-left: 15px; font-size: 18px; letter-spacing: -1px; font-style: italic; }
+
+blockquote > :last-child { margin-bottom: 0px; }
+
+pre, code { font-size: 15px; border: 1px solid rgb(232, 232, 232); border-radius: 3px; background-color: rgb(238, 238, 255); }
+
+code { padding: 1px 5px; }
+
+pre { padding: 8px 12px; overflow-x: auto; }
+
+pre > code { border: 0px; padding-right: 0px; padding-left: 0px; }
+
+.wrapper { max-width: calc(940px); margin-right: auto; margin-left: auto; padding-right: 30px; padding-left: 30px; }
+
+@media screen and (max-width: 800px) {
+  .wrapper { max-width: calc(970px); padding-right: 15px; padding-left: 15px; }
+}
+
+.wrapper::after, .footer-col-wrapper::after { content: ""; display: table; clear: both; }
+
+.svg-icon { width: 16px; height: 16px; display: inline-block; fill: rgb(130, 130, 130); padding-right: 5px; vertical-align: text-top; }
+
+.social-media-list li + li { padding-top: 5px; }
+
+table { margin-bottom: 30px; width: 100%; text-align: left; color: rgb(63, 63, 63); border-collapse: collapse; border: 1px solid rgb(232, 232, 232); }
+
+table tr:nth-child(2n) { background-color: rgb(247, 247, 247); }
+
+table th, table td { padding: 10px 15px; }
+
+table th { background-color: rgb(240, 240, 240); border-width: 1px; border-style: solid; border-color: rgb(222, 222, 222) rgb(222, 222, 222) rgb(201, 201, 201); border-image: initial; }
+
+table td { border: 1px solid rgb(232, 232, 232); }
+
+.site-header { border-top: 5px solid rgb(66, 66, 66); border-bottom: 1px solid rgb(232, 232, 232); min-height: 55.95px; position: relative; }
+
+.site-title { font-size: 26px; font-weight: 300; line-height: 54px; letter-spacing: -1px; margin-bottom: 0px; float: left; }
+
+.site-title, .site-title:visited { color: rgb(66, 66, 66); }
+
+.site-nav { float: right; line-height: 54px; }
+
+.site-nav .nav-trigger { display: none; }
+
+.site-nav .menu-icon { display: none; }
+
+.site-nav .page-link { color: rgb(17, 17, 17); line-height: 1.5; }
+
+.site-nav .page-link:not(:last-child) { margin-right: 20px; }
+
+@media screen and (max-width: 600px) {
+  .site-nav { position: absolute; top: 9px; right: 15px; background-color: rgb(253, 253, 253); border: 1px solid rgb(232, 232, 232); border-radius: 5px; text-align: right; }
+  .site-nav label[for="nav-trigger"] { display: block; float: right; width: 36px; height: 36px; z-index: 2; cursor: pointer; }
+  .site-nav .menu-icon { display: block; float: right; width: 36px; height: 26px; line-height: 0; padding-top: 10px; text-align: center; }
+  .site-nav .menu-icon > svg { fill: rgb(66, 66, 66); }
+  .site-nav input ~ .trigger { clear: both; display: none; }
+  .site-nav input:checked ~ .trigger { display: block; padding-bottom: 5px; }
+  .site-nav .page-link { display: block; padding: 5px 10px; margin-left: 20px; }
+  .site-nav .page-link:not(:last-child) { margin-right: 0px; }
+}
+
+.site-footer { border-top: 1px solid rgb(232, 232, 232); padding: 30px 0px; }
+
+.footer-heading { font-size: 18px; margin-bottom: 15px; }
+
+.contact-list, .social-media-list { list-style: none; margin-left: 0px; }
+
+.footer-col-wrapper { font-size: 15px; color: rgb(130, 130, 130); margin-left: -15px; }
+
+.footer-col { float: left; margin-bottom: 15px; padding-left: 15px; }
+
+.footer-col-1 { width: calc(35% - 15px); }
+
+.footer-col-2 { width: calc(20% - 15px); }
+
+.footer-col-3 { width: calc(45% - 15px); }
+
+@media screen and (max-width: 800px) {
+  .footer-col-1, .footer-col-2 { width: calc(50% - 15px); }
+  .footer-col-3 { width: calc(100% - 15px); }
+}
+
+@media screen and (max-width: 600px) {
+  .footer-col { float: none; width: calc(100% - 15px); }
+}
+
+.page-content { padding: 30px 0px; flex: 1 1 0%; }
+
+.page-heading { font-size: 32px; }
+
+.post-list-heading { font-size: 28px; }
+
+.post-list { margin-left: 0px; list-style: none; }
+
+.post-list > li { margin-bottom: 30px; }
+
+.post-meta { font-size: 14px; color: rgb(130, 130, 130); }
+
+.post-link { display: block; font-size: 24px; }
+
+.post-header { margin-bottom: 30px; }
+
+.post-title { font-size: 42px; letter-spacing: -1px; line-height: 1; }
+
+@media screen and (max-width: 800px) {
+  .post-title { font-size: 36px; }
+}
+
+.post-content { margin-bottom: 30px; }
+
+.post-content h2 { font-size: 32px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h2 { font-size: 28px; }
+}
+
+.post-content h3 { font-size: 26px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h3 { font-size: 22px; }
+}
+
+.post-content h4 { font-size: 20px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h4 { font-size: 18px; }
+}
+
+.highlight { background: rgb(255, 255, 255); }
+
+.highlighter-rouge .highlight { background: rgb(238, 238, 255); }
+
+.highlight .c { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .err { color: rgb(166, 23, 23); background-color: rgb(227, 210, 210); }
+
+.highlight .k { font-weight: bold; }
+
+.highlight .o { font-weight: bold; }
+
+.highlight .cm { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .cp { color: rgb(153, 153, 153); font-weight: bold; }
+
+.highlight .c1 { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .cs { color: rgb(153, 153, 153); font-weight: bold; font-style: italic; }
+
+.highlight .gd { color: rgb(0, 0, 0); background-color: rgb(255, 221, 221); }
+
+.highlight .gd .x { color: rgb(0, 0, 0); background-color: rgb(255, 170, 170); }
+
+.highlight .ge { font-style: italic; }
+
+.highlight .gr { color: rgb(170, 0, 0); }
+
+.highlight .gh { color: rgb(153, 153, 153); }
+
+.highlight .gi { color: rgb(0, 0, 0); background-color: rgb(221, 255, 221); }
+
+.highlight .gi .x { color: rgb(0, 0, 0); background-color: rgb(170, 255, 170); }
+
+.highlight .go { color: rgb(136, 136, 136); }
+
+.highlight .gp { color: rgb(85, 85, 85); }
+
+.highlight .gs { font-weight: bold; }
+
+.highlight .gu { color: rgb(170, 170, 170); }
+
+.highlight .gt { color: rgb(170, 0, 0); }
+
+.highlight .kc { font-weight: bold; }
+
+.highlight .kd { font-weight: bold; }
+
+.highlight .kp { font-weight: bold; }
+
+.highlight .kr { font-weight: bold; }
+
+.highlight .kt { color: rgb(68, 85, 136); font-weight: bold; }
+
+.highlight .m { color: rgb(0, 153, 153); }
+
+.highlight .s { color: rgb(221, 17, 68); }
+
+.highlight .na { color: teal; }
+
+.highlight .nb { color: rgb(0, 134, 179); }
+
+.highlight .nc { color: rgb(68, 85, 136); font-weight: bold; }
+
+.highlight .no { color: teal; }
+
+.highlight .ni { color: purple; }
+
+.highlight .ne { color: rgb(153, 0, 0); font-weight: bold; }
+
+.highlight .nf { color: rgb(153, 0, 0); font-weight: bold; }
+
+.highlight .nn { color: rgb(85, 85, 85); }
+
+.highlight .nt { color: navy; }
+
+.highlight .nv { color: teal; }
+
+.highlight .ow { font-weight: bold; }
+
+.highlight .w { color: rgb(187, 187, 187); }
+
+.highlight .mf { color: rgb(0, 153, 153); }
+
+.highlight .mh { color: rgb(0, 153, 153); }
+
+.highlight .mi { color: rgb(0, 153, 153); }
+
+.highlight .mo { color: rgb(0, 153, 153); }
+
+.highlight .sb { color: rgb(221, 17, 68); }
+
+.highlight .sc { color: rgb(221, 17, 68); }
+
+.highlight .sd { color: rgb(221, 17, 68); }
+
+.highlight .s2 { color: rgb(221, 17, 68); }
+
+.highlight .se { color: rgb(221, 17, 68); }
+
+.highlight .sh { color: rgb(221, 17, 68); }
+
+.highlight .si { color: rgb(221, 17, 68); }
+
+.highlight .sx { color: rgb(221, 17, 68); }
+
+.highlight .sr { color: rgb(0, 153, 38); }
+
+.highlight .s1 { color: rgb(221, 17, 68); }
+
+.highlight .ss { color: rgb(153, 0, 115); }
+
+.highlight .bp { color: rgb(153, 153, 153); }
+
+.highlight .vc { color: teal; }
+
+.highlight .vg { color: teal; }
+
+.highlight .vi { color: teal; }
+
+.highlight .il { color: rgb(0, 153, 153); }
+
+body { font-family: "GNU Unifont", monospace; color: rgb(29, 30, 32); }
+
+body.post-page { background-color: rgb(123, 146, 191); }
+
+body.home-page { background-color: rgb(0, 128, 128); }
+
+.main-content { max-width: 1000px; margin: 0px auto; padding: 1rem; background-color: rgb(197, 201, 199); box-shadow: rgb(102, 102, 102) 5px 5px 0px; border-radius: 0px; width: 100%; box-sizing: border-box; }
+
+.post-meta { color: black; margin-top: 0.1rem; font-size: 0.875rem; }
+
+.home-content a { color: black; }
+
+body.post-page h1, body.home-page h1, body.post-page h2, body.home-page h2, body.post-page h3, body.home-page h3, body.post-page h4, body.home-page h4, body.post-page h5, body.home-page h5, body.post-page h6, body.home-page h6, .post-title { font-family: "GNU Unifont", monospace; color: rgb(29, 30, 32); }
+
+body.post-page h1, body.home-page h1 { font-size: 1.2rem; }
+
+body.post-page h2, body.home-page h2 { font-size: 1.1rem; }
+
+body.post-page h3, body.home-page h3 { font-size: 1rem; }
+
+body.post-page h4, body.home-page h4 { font-size: 0.9rem; }
+
+body.post-page h5, body.home-page h5 { font-size: 0.8rem; }
+
+body.post-page h6, body.home-page h6 { font-size: 0.7rem; }
+
+body.post-page h1, body.post-page h2, body.post-page h3, body.post-page h4, body.post-page h5, body.post-page h6 { text-decoration: underline; }
+
+.home-content .post-link { font-family: "Perfect DOS VGA 437", sans-serif; }
+
+.site-header { background-color: rgb(51, 51, 51); padding: 1rem 0px; border-bottom: 2px solid rgb(102, 102, 102); display: flex; justify-content: center; align-items: center; }
+
+.wrapper { display: flex; justify-content: center; align-items: center; width: 100%; padding: 0px 1rem; position: relative; }
+
+.social-links { position: absolute; left: 1rem; display: flex; align-items: center; }
+
+.social-links a { color: white; margin-right: 1rem; text-decoration: none; }
+
+.site-footer { background-color: rgb(51, 51, 51); padding: 3rem 0px; border-top: 2px solid rgb(102, 102, 102); }
+
+.site-title { font-family: "GNU Unifont", monospace; font-size: 2rem; text-align: center; display: block; color: rgb(240, 240, 240) !important; }
+
+.highlight pre, .highlight code { font-family: "JetBrains Mono", Consolas, "Courier New", monospace; font-size: 0.95em; }
+
+p code, li code, span code { font-size: 0.875em; font-family: "JetBrains Mono", Consolas, "Courier New", monospace; }
+
+.doc-icon { width: 24px; height: 24px; min-width: 24px; min-height: 24px; margin-right: 0.5rem; vertical-align: middle; }
+
+.post-item { margin-bottom: 1rem; }
+
+.post-details { display: flex; align-items: center; }
+
+.post-details .post-link { margin-left: 0.5rem; font-size: 1rem; color: white; }
+
+.post-list .post-meta { margin-left: 0.5rem; font-size: 0.875rem; color: white; }
+
+.post .post-header, .post .post-content { padding: 0px 1rem; }
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .site-header { flex-direction: column; align-items: center; padding: 0.5rem 0px; }
+  .social-links { position: static; margin-bottom: 1rem; }
+  .site-title { font-size: 1.5rem; width: 100%; text-align: center; }
+  .wrapper { padding: 0px; }
+  .doc-icon { width: 24px; height: 24px; }
+  .post-details { display: flex; align-items: center; }
+  .post-item { margin-bottom: 1rem; }
+  .main-content { margin: 0px; padding: 0.5rem; width: calc(100% - 1rem); box-shadow: rgb(102, 102, 102) 3px 3px 0px; }
+  .post .post-header, .post .post-content { padding: 0px 0.5rem; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+  .post-title { font-size: 1.5rem; }
+  .post-content h2 { font-size: 1.25rem; }
+  .post-content h3 { font-size: 1.1rem; }
+  .post-content h4 { font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .main-content { width: calc(100% - 1rem); margin: 0.5rem auto; padding: 0.5rem; }
+  .post-title { font-size: 1.3rem; }
+  .post-content h2 { font-size: 1.2rem; }
+  .post-content h3 { font-size: 1.1rem; }
+  .post-content h4 { font-size: 1rem; }
+}
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap
+
+@charset "utf-8";
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.26tY-h6gH9w.L.W.O/am=DAY/d=0/rs=AN8SPfrCcgxoBri2FVMQptvuOBiOsolgBw/m=el_main_css
+
+@charset "utf-8";
+
+.VIpgJd-ZVi9od-ORHb-OEVmcd { left: 0px; top: 0px; height: 39px; width: 100%; z-index: 10000001; position: fixed; border-top: none; border-right: none; border-left: none; border-image: initial; border-bottom: 1px solid rgb(107, 144, 218); margin: 0px; box-shadow: rgb(153, 153, 153) 0px 0px 8px 1px; }
+
+.VIpgJd-ZVi9od-xl07Ob-OEVmcd { z-index: 10000002; border: none; position: fixed; box-shadow: rgb(153, 153, 153) 0px 3px 8px 2px; }
+
+.VIpgJd-ZVi9od-SmfZ-OEVmcd { z-index: 10000000; border: none; margin: 0px; }
+
+.goog-te-gadget { font-family: arial; font-size: 11px; color: rgb(102, 102, 102); white-space: nowrap; }
+
+.goog-te-gadget img { vertical-align: middle; border: none; }
+
+.goog-te-gadget-simple { background-color: rgb(255, 255, 255); border-width: 1px; border-style: solid; border-color: rgb(155, 155, 155) rgb(213, 213, 213) rgb(232, 232, 232); font-size: 10pt; display: inline-block; padding-top: 1px; padding-bottom: 2px; cursor: pointer; }
+
+.goog-te-gadget-icon { margin-left: 2px; margin-right: 2px; width: 19px; height: 19px; border: none; vertical-align: middle; }
+
+.goog-te-combo { margin-left: 4px; margin-right: 4px; vertical-align: baseline; }
+
+.goog-te-gadget .goog-te-combo { margin: 4px 0px; }
+
+.VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-l4eHX-hSRGPd:link, .VIpgJd-ZVi9od-l4eHX-hSRGPd:visited, .VIpgJd-ZVi9od-l4eHX-hSRGPd:hover, .VIpgJd-ZVi9od-l4eHX-hSRGPd:active { font-size: 12px; font-weight: bold; color: rgb(68, 68, 68); text-decoration: none; }
+
+.VIpgJd-ZVi9od-ORHb .VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-TvD9Pc-hSRGPd { display: block; margin: 0px 10px; }
+
+.VIpgJd-ZVi9od-ORHb .VIpgJd-ZVi9od-l4eHX-hSRGPd { padding-top: 2px; padding-left: 4px; }
+
+.goog-te-combo, .VIpgJd-ZVi9od-ORHb *, .VIpgJd-ZVi9od-SmfZ *, .VIpgJd-ZVi9od-xl07Ob *, .VIpgJd-ZVi9od-vH1Gmf *, .VIpgJd-ZVi9od-l9xktf * { font-family: arial; font-size: 10pt; }
+
+.VIpgJd-ZVi9od-ORHb { margin: 0px; background-color: rgb(228, 239, 251); overflow: hidden; }
+
+.VIpgJd-ZVi9od-ORHb img { border: none; }
+
+.VIpgJd-ZVi9od-ORHb-bN97Pc { color: rgb(0, 0, 0); }
+
+.VIpgJd-ZVi9od-ORHb-bN97Pc img { vertical-align: middle; }
+
+.VIpgJd-ZVi9od-ORHb-Tswv1b { color: rgb(102, 102, 102); vertical-align: top; margin-top: 0px; font-size: 7pt; }
+
+.VIpgJd-ZVi9od-ORHb-KE6vqe { width: 8px; }
+
+.VIpgJd-ZVi9od-LgbsSe { border-color: rgb(231, 231, 231); border-style: none solid solid none; border-width: 0px 1px 1px 0px; }
+
+.VIpgJd-ZVi9od-LgbsSe div { border-color: rgb(204, 204, 204) rgb(153, 153, 153) rgb(153, 153, 153) rgb(204, 204, 204); border-style: solid; border-width: 1px; height: 20px; }
+
+.VIpgJd-ZVi9od-LgbsSe button { background: transparent; border: none; cursor: pointer; height: 20px; overflow: hidden; margin: 0px; vertical-align: top; white-space: nowrap; }
+
+.VIpgJd-ZVi9od-LgbsSe button:active { background: none 0px 0px repeat scroll rgb(204, 204, 204); }
+
+.VIpgJd-ZVi9od-SmfZ { margin: 0px; background-color: rgb(255, 255, 255); white-space: nowrap; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd { text-decoration: none; font-weight: bold; font-size: 10pt; border: 1px outset rgb(136, 136, 136); padding: 6px 10px; white-space: nowrap; position: absolute; left: 0px; top: 0px; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd img { margin-left: 2px; margin-right: 2px; width: 19px; height: 19px; border: none; vertical-align: middle; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd span { text-decoration: underline; margin-left: 2px; margin-right: 2px; vertical-align: middle; }
+
+.goog-te-float-top .VIpgJd-ZVi9od-SmfZ-hSRGPd { padding: 2px; border-top-width: 0px; }
+
+.goog-te-float-bottom .VIpgJd-ZVi9od-SmfZ-hSRGPd { padding: 2px; border-bottom-width: 0px; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed { text-decoration: none; color: rgb(0, 0, 204); white-space: nowrap; margin-left: 4px; margin-right: 4px; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed span { text-decoration: underline; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed img { margin-left: 2px; margin-right: 2px; }
+
+.goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed { color: rgb(0, 0, 0); }
+
+.goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed span { text-decoration: none; }
+
+.VIpgJd-ZVi9od-xl07Ob { background-color: rgb(255, 255, 255); text-decoration: none; border: 2px solid rgb(195, 217, 255); overflow: hidden scroll; position: absolute; left: 0px; top: 0px; }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b { padding: 3px; text-decoration: none; }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b, .VIpgJd-ZVi9od-xl07Ob-ibnC6b:link { color: rgb(0, 0, 204); background: rgb(255, 255, 255); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:visited { color: rgb(85, 26, 139); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:hover { background: rgb(195, 217, 255); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:active { color: rgb(0, 0, 204); }
+
+.VIpgJd-ZVi9od-vH1Gmf { background-color: rgb(255, 255, 255); text-decoration: none; border: 1px solid rgb(107, 144, 218); overflow: hidden; padding: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-KrhPNb { width: 16px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-hgDUwe { margin: 6px 0px; height: 1px; background-color: rgb(170, 170, 170); overflow: hidden; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd div { padding: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b .uDEFge { display: none; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd .uDEFge { }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd .fmcmS { padding-left: 4px; padding-right: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd { text-decoration: none; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:link div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:visited div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:active div { color: rgb(0, 0, 204); background: rgb(255, 255, 255); }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b:hover div { color: rgb(255, 255, 255); background: rgb(51, 102, 204); }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:link div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:visited div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:hover div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:active div { color: rgb(0, 0, 0); font-weight: bold; }
+
+.VIpgJd-ZVi9od-l9xktf { background-color: rgb(255, 255, 255); overflow: hidden; padding: 8px; border: none; border-radius: 10px; }
+
+.VIpgJd-ZVi9od-l9xktf-OEVmcd { background-color: rgb(255, 255, 255); border: 1px solid rgb(107, 144, 218); box-shadow: rgb(153, 153, 153) 0px 3px 8px 2px; border-radius: 8px; }
+
+.VIpgJd-ZVi9od-l9xktf img { border: none; }
+
+.VIpgJd-ZVi9od-l9xktf-fmcmS { margin-top: 6px; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc { margin-top: 6px; white-space: nowrap; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc * { vertical-align: middle; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc .DUGJie { background-image: url("https://www&google.com/images/zippy_minus_sm.gif"); }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc .TdyTDe { background-image: url("https://www&google.com/images/zippy_plus_sm.gif"); }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc span { color: rgb(0, 0, 204); text-decoration: underline; cursor: pointer; margin: 0px 4px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp { margin: 6px 0px 0px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp form { margin: 0px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp form textarea { margin-bottom: 4px; width: 100%; }
+
+.VIpgJd-ZVi9od-l9xktf-yePe5c { margin: 6px 0px 4px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf { z-index: 1000; position: fixed; transition-delay: 0.6s; left: -1000px; top: -1000px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf-ti6hGc { transition-delay: 0s; left: -14px; top: -14px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO { display: flex; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; width: 104px; height: 104px; border-radius: 50px; background: url("https://www.gstatic.com/images/branding/product/2x/translate_24dp.png") 50% 50% no-repeat rgb(255, 255, 255); transition: all 0.6s ease-in-out 0s; transform: scale(0.4); opacity: 0; }
+
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO-ti6hGc { transform: scale(0.5); opacity: 1; }
+
+.VIpgJd-ZVi9od-aZ2wEe { margin: 2px 0px 0px 2px; animation: 1.4s linear 0s infinite normal none running spinner-rotator; }
+
+@-webkit-keyframes spinner-rotator { 
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(270deg); }
+}
+
+@keyframes spinner-rotator { 
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(270deg); }
+}
+
+.VIpgJd-ZVi9od-aZ2wEe-Jt5cK { stroke-dasharray: 187; stroke-dashoffset: 0; stroke: rgb(66, 133, 244); transform-origin: center center; animation: 1.4s ease-in-out 0s infinite normal none running spinner-dash; }
+
+@-webkit-keyframes spinner-dash { 
+  0% { stroke-dashoffset: 187; }
+  50% { stroke-dashoffset: 46.75; transform: rotate(135deg); }
+  100% { stroke-dashoffset: 187; transform: rotate(450deg); }
+}
+
+@keyframes spinner-dash { 
+  0% { stroke-dashoffset: 187; }
+  50% { stroke-dashoffset: 46.75; transform: rotate(135deg); }
+  100% { stroke-dashoffset: 187; transform: rotate(450deg); }
+}
+
+.VIpgJd-yAWNEb-L7lbkb html, .VIpgJd-yAWNEb-L7lbkb body, .VIpgJd-yAWNEb-L7lbkb div, .VIpgJd-yAWNEb-L7lbkb span, .VIpgJd-yAWNEb-L7lbkb iframe, .VIpgJd-yAWNEb-L7lbkb h1, .VIpgJd-yAWNEb-L7lbkb h2, .VIpgJd-yAWNEb-L7lbkb h3, .VIpgJd-yAWNEb-L7lbkb h4, .VIpgJd-yAWNEb-L7lbkb h5, .VIpgJd-yAWNEb-L7lbkb h6, .VIpgJd-yAWNEb-L7lbkb p, .VIpgJd-yAWNEb-L7lbkb a, .VIpgJd-yAWNEb-L7lbkb img, .VIpgJd-yAWNEb-L7lbkb ol, .VIpgJd-yAWNEb-L7lbkb ul, .VIpgJd-yAWNEb-L7lbkb li, .VIpgJd-yAWNEb-L7lbkb table, .VIpgJd-yAWNEb-L7lbkb form, .VIpgJd-yAWNEb-L7lbkb tbody, .VIpgJd-yAWNEb-L7lbkb tr, .VIpgJd-yAWNEb-L7lbkb td { margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-family: inherit; font-optical-sizing: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-size: 100%; vertical-align: baseline; text-align: left; line-height: normal; }
+
+.VIpgJd-yAWNEb-L7lbkb ol, .VIpgJd-yAWNEb-L7lbkb ul { list-style: none; }
+
+.VIpgJd-yAWNEb-L7lbkb table { border-collapse: collapse; border-spacing: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb caption, .VIpgJd-yAWNEb-L7lbkb th, .VIpgJd-yAWNEb-L7lbkb td { text-align: left; font-weight: normal; }
+
+div > .VIpgJd-yAWNEb-L7lbkb { padding: 10px 14px; }
+
+.VIpgJd-yAWNEb-L7lbkb { color: rgb(34, 34, 34); background-color: rgb(255, 255, 255); border: 1px solid rgb(238, 238, 238); box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px; display: none; font-family: arial; font-size: 10pt; width: 420px; padding: 12px; position: absolute; z-index: 10000; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-nVMfcd-fmcmS, .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-pbTTYe { clear: both; font-size: 10pt; position: relative; text-align: justify; width: 100%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-r4nke { color: rgb(153, 153, 153); font-family: arial, sans-serif; margin: 4px 0px; text-align: left; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TvD9Pc-LgbsSe { display: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-l4eHX { float: left; margin: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-PLDbbf { display: inline-block; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-fw42Ze-Z0Arqf-haAclf { display: none; width: 100%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-H9tDt { margin-top: 20px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-LK5yu { float: left; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-qwU8Me { float: right; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-cGMI2b { min-height: 15px; position: relative; height: 1%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-jOfkMb-Ne3sFf { background: rgb(41, 145, 13); border-radius: 4px; box-shadow: rgb(30, 102, 9) 0px 2px 2px inset; color: white; font-size: 9pt; font-weight: bolder; margin-top: 12px; padding: 6px; text-shadow: rgb(30, 102, 9) 1px 1px 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-hSRGPd { color: rgb(17, 85, 204); cursor: pointer; font-family: arial; font-size: 11px; margin-right: 15px; text-decoration: none; }
+
+.VIpgJd-yAWNEb-L7lbkb > textarea { font-family: arial; resize: vertical; width: 100%; margin-bottom: 10px; border-radius: 1px; border-width: 1px; border-style: solid; border-color: silver rgb(217, 217, 217) rgb(217, 217, 217); border-image: initial; font-size: 13px; height: auto; overflow-y: auto; padding: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb textarea:focus { box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px inset; border: 1px solid rgb(77, 144, 254); outline: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-IbE0S { margin-right: 10px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp { min-height: 25px; vertical-align: middle; padding-top: 8px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp { margin-bottom: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input { display: inline-block; min-width: 54px; border: 1px solid rgba(0, 0, 0, 0.1); text-align: center; color: rgb(68, 68, 68); font-size: 11px; font-weight: bold; height: 27px; outline: 0px; padding: 0px 8px; vertical-align: middle; line-height: 27px; margin: 0px 16px 0px 0px; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px; border-radius: 2px; transition: all 0.218s ease 0s; background-color: rgb(245, 245, 245); background-image: -webkit-linear-gradient(top, rgb(245, 245, 245), rgb(241, 241, 241)); user-select: none; cursor: default; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:hover { border: 1px solid rgb(198, 198, 198); color: rgb(34, 34, 34); transition: all 0s ease 0s; background-color: rgb(248, 248, 248); background-image: -webkit-linear-gradient(top, rgb(248, 248, 248), rgb(241, 241, 241)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active { border: 1px solid rgb(198, 198, 198); color: rgb(51, 51, 51); background-color: rgb(246, 246, 246); background-image: -webkit-linear-gradient(top, rgb(246, 246, 246), rgb(241, 241, 241)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus:active { box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px inset; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe { outline: none; border: 1px solid rgb(77, 144, 254); z-index: 4 !important; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.gk6SMd { background-color: rgb(238, 238, 238); background-image: -webkit-linear-gradient(top, rgb(238, 238, 238), rgb(224, 224, 224)); box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px inset; border: 1px solid rgb(204, 204, 204); color: rgb(51, 51, 51); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf { color: white; border-color: rgb(48, 121, 237); background-color: rgb(77, 144, 254); background-image: -webkit-linear-gradient(top, rgb(77, 144, 254), rgb(71, 135, 237)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf.AHmuwe .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:active { border-color: rgb(48, 121, 237); background-color: rgb(53, 122, 232); background-image: -webkit-linear-gradient(top, rgb(77, 144, 254), rgb(53, 122, 232)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover { box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.1) 0px 1px 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:hover, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf.AHmuwe, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover { border-color: rgb(48, 121, 237); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-mrxPge { color: rgb(153, 153, 153); font-family: arial, sans-serif; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-W0vJo-fmcmS { color: rgb(153, 153, 153); font-size: 11px; font-family: arial, sans-serif; margin: 15px 0px 5px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-u0pjoe-fmcmS { color: rgb(136, 0, 0); display: none; font-size: 9pt; }
+
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q { background-color: rgb(201, 215, 241); box-shadow: rgb(153, 153, 170) 2px 2px 4px; box-sizing: border-box; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-xl07Ob { background: rgb(255, 255, 255); border: 1px solid rgb(221, 221, 221); box-shadow: rgb(153, 153, 170) 0px 2px 4px; min-width: 0px; outline: none; padding: 0px; position: absolute; z-index: 2000; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb { cursor: pointer; padding: 2px 5px 5px; margin-right: 0px; border-style: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb:hover { background: rgb(221, 221, 221); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb h1 { font-size: 100%; font-weight: bold; margin: 4px 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb strong { color: rgb(52, 90, 173); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-VIpgJd-eKm5Fc-hFsbo { text-align: right; position: absolute; right: 0px; left: auto; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-VIpgJd-j7LFlb-SIsrTd .VIpgJd-yAWNEb-VIpgJd-eKm5Fc-hFsbo { text-align: left; position: absolute; left: 0px; right: auto; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-fmcmS, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { background-color: rgb(241, 234, 0); border-radius: 4px; box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 4px; box-sizing: border-box; color: rgb(241, 234, 0); cursor: pointer; margin: -2px -2px -2px -3px; padding: 2px 2px 2px 3px; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { color: rgb(34, 34, 34); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-pbTTYe { color: white; position: absolute !important; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { background-color: rgb(201, 215, 241); border-radius: 4px 4px 0px 0px; box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 4px; box-sizing: border-box; cursor: pointer; margin: -2px -2px -2px -3px; padding: 2px 2px 3px 3px; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb span:focus { outline: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-DyVDA { background-color: transparent; border: 1px solid rgb(77, 144, 254); border-radius: 0px; margin: -2px; padding: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-TVLw9c-sn54Q-LzX3ef { border-left: 2px solid red; margin-left: -2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-TVLw9c-sn54Q-YIAiIb { border-right: 2px solid red; margin-right: -2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf { padding: 2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS { font-size: 11px; padding: 2px 2px 3px; margin: 0px; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51); border-width: 1px; border-style: solid; border-color: rgb(192, 192, 192) rgb(217, 217, 217) rgb(217, 217, 217); border-image: initial; display: inline-block; vertical-align: top; height: 21px; box-sizing: border-box; border-radius: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS:hover { border-width: 1px; border-style: solid; border-color: rgb(160, 160, 160) rgb(185, 185, 185) rgb(185, 185, 185); border-image: initial; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px inset; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS:focus { box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px inset; outline: none; border: 1px solid rgb(77, 144, 254); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-sFeBqf { font-size: 11px; padding: 2px 6px 3px; margin: 0px 0px 0px 2px; height: 21px; }
+
+.VIpgJd-yAWNEb-hvhgNd { font-family: "Google Sans", Arial, sans-serif; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-l4eHX-i3jM8c { position: absolute; top: 10px; left: 14px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-l4eHX-SIsrTd { position: absolute; top: 10px; right: 14px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-i3jM8c, .VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-SIsrTd { margin: 16px; padding: 0px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-IuizWc { margin: 0px 0px 0px 36px; padding: 0px; color: rgb(116, 119, 117); font-size: 14px; font-weight: 500; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-SIsrTd .VIpgJd-yAWNEb-hvhgNd-IuizWc { text-align: right; margin: 0px 36px 0px 0px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-axAV1 { width: auto; padding: 12px 0px 0px; color: rgb(31, 31, 31); font-size: 16px; text-align: initial; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-axAV1 .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid { border-radius: 0px 0px 12px 12px; margin: 0px; background: rgb(241, 244, 249); position: relative; min-height: 50px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od { display: inline-block; width: 77%; padding: 12px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-UTujCb { color: rgb(31, 31, 31); font-size: 12px; font-weight: 500; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd .VIpgJd-yAWNEb-hvhgNd-UTujCb { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-eO9mKe { color: rgb(68, 71, 70); font-size: 12px; padding-top: 4px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd .VIpgJd-yAWNEb-hvhgNd-eO9mKe { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-xgov5 { position: absolute; top: 10px; right: 5px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-xgov5 .VIpgJd-yAWNEb-SIsrTd { left: 5px; right: auto; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-THI6Vb { fill: rgb(11, 87, 208); }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-bgm6sf { margin: -4px 2px 0px 0px; padding: 2px 0px 0px; width: 48px; height: 48px; border: none; border-radius: 24px; cursor: pointer; background: none; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-bgm6sf:hover { background: rgb(232, 235, 236); }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-aXYTce { display: none; }
+
+sentinel { }
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: image/png
+Content-Transfer-Encoding: binary
+Content-Location: https://asciinema.org/a/WJEXrsznf1GY3FLxAAf7TsNBi.png
+
+âPNG
+
+   IHDR  è  p   o¶   HPLTEˇˇˇT·πÃÃÃ∏S‡MΩ!(+-3=;LQP+aFàààkklûûû9èw≥≥≥MÃ®¬¬¬CÆêm6Ñ;äÙÙÙóF∑˘P‹   tRNS*V¯î    IDATx⁄ÏùÌn£<FﬂH$å,dƒ˝ﬂÈãø«Ê#IõÓ¶ŸÁ¸i∫+∆„·ø    ¿_Âøˇp         |     >    ¯     |         ¯    ‡#         ¿G     ‡#    Äè     ¿G         Äè     >         |     >    ¯     |         ¯    ‡#+dW~∂ﬂÖÔƒFƒ/πsBÙ÷8G^f5ËÌF9O¸ÈƒwˇÃrÔ   |§èÿÎı˙≥>≤\=À˙Î5Bø‰ŒÈŒº∑/›"Ø?ı–M{˜£;rŸ;/Í”Ö…Ÿ_Wﬁ‡79 ü^Ù≥k7–ÃàGâ©ì¯Ô  ˇÜèPTÖ√^∑>ÚÍ¯u›ù'i’uœKê0ùbßn¯Åaˇ;∆Û6>“«ÎH˙1ﬂ2To…y´éë7∆¸K|  ¿À|‰«„#.<≤Xk›ìÆõ´˘â¯»}—_Òëf8ú∫◊O|œG.˝ œ¯»Ó|Õ°èÃ«>Ø≠—ìïÚ–GƒT	!   ƒGæÂ#‘|˛Ò—»˚≈GÚHˇá˛%=·#sOÇÊ≤≠ı∑kñ°ÖˇŒÎ1~öW‹   àè8⁄˘ôÂ,>Ú≈»üÒëˆ¯»Ò|Õ‹ãûâDœfiB∞cû•òãèàt’s
+ê¯≠Î? ∑#w";dê  ¿á˚à∞´XQ‚#dk/¥∏È7Ñ…ëÒÚ≤∂[‚∞"-o@nák¥D√±kSü;‚OΩı*€mË˝∫<0˛®qÍ&3™pï√0å]gG∏,“£ô&3ƒXø
+-Fﬂ"ı<ò©3£>ÎmÏ∆|≥‹°©;	ß(
+‰v…¡¨Õ¬u»ı:ç*˜z—Ó ”!z=óÈ&Nµ? ß¸OäIûi-ç€#w}ƒ∑pŸ§Û£˛%◊€F√z•yÌå¯≠
+m¸˛ì|÷êC“∑Áfì/¡=®ÏË”QssˆŸ¸Ä  x#aŸÀR‚#î>∆-)5˚]€Cñz¡åﬂ±‰Ï’ÍyRà«GD9˘‚OÍª∞t/¶—Ò∫@ıñ!=’gb4BMıÁ]acA¡;QıñQîáy•Y«*Ó_Ø7
+ã©ÆkdÁ,£Æ1FmF¯9˛ñÇ3˚+Ò·ÖæIΩ“·vLta7l™ö¯õ≈}D3~›Grcj|§äó§’  ¯I*±TÚê∂6>≤‰»∆ï5(:•ÇÎù˘H‘≤⁄x3a sÚu÷AqTDRO^ÑZYt˜#DLd7jI§∆(¥ÓXù@˚a‘û∫im"’hN«ÈµpáNkøπ±éŒÆì°∏ƒÍ#∫õ÷—fßı:◊5˙à”◊ÎêLj=◊ÿŒ2wEÉ Xù<Ñ˚à<Ùë&+ÙæèLì&“ŸŒ¬Ö†…}Èøâ`VhÓ˙»\m€ÛYáw®ô}˙R2  Ä_„#Ü}[‰"πÄ_|ƒí∏¯	o6ƒ.l-,ÎÜ¨4an&¥Á§∏û∆ZôÉU˛ÒC≠?"	œ·04Êq∞ú¶ 2∑úDtiO5Ë4SON‘˘#™4£Ï#ì	á»–;•pNj)”Cø»G∑Fƒ|$ÎáHvÒX|‰÷À˘Ò¨ïB>öﬂEòHÓ‚&‹GÓ∆G®JiÁkÊt‘ÌH`Ç„·0  |Æèÿ(¢ô\âQ¡ÜÍ§
+K•!lÉ∏rca'œQﬁsùﬂöÏ§Xä†T@Ì†å´i∆¡Àa>+ìê˙9˚°ßÓÕT¡˛z_ô›Fv¸¥î'"˙Hﬁ‡~S˘H
+É‰°˛±¯H>YPY,¯ùeﬂ^$œ∆Gnı&Ê#îÆÔV+K{Ÿ>  Ì#üsaÒëZà\d#∂»ª£èàlñôäΩ4kàó”ı5∂ú´¨:1	e]òÛÓ˘[ù±âè‹Â∆Vˆ◊◊Ó#„^f>¢À’î,Õ≠èH)´öas»≈„Òë÷XÓ˙àﬁFÑòèî≈»–z°w|dﬁ…!v’∑9f∫àˆs=CB+  |∏è–•äe¥ïHDù@BY?¢¬Pùyr‰#{Î}ÀÁ("õU«AIv◊q}ù˘àtK_JÓ©K2©|ƒ=ËèZû/.6[9ËD∑„v≠1üu˝°"%qgΩotçM…y|ƒ˝| GT{…ïèî\X67Øı—ÍHÂ#U˝3¡[ÙÕMÒ?  >◊G™T{©Õ$õBÎ#èi4+sûÒj?nä§ÖIõ˝	á∞æfË»GÜf-Ãe3C#√JóQ=Á#√~'≈GTÂ#‘˙H·A	ÅYUªπ<9˜ë≤˘©ıæ^Gƒëè‰j3ª|⁄fΩLàè  ¿?·#Ú(>≤îÏ÷∆G6Òëß|§˘L>wµÓ:%µ.Éü‘~©Ï$˜}dpjAhkõ	5Lı:€„6d®t#t"ˆ}Dl|då•F<˙1	&“Áq¸·¯»ﬂ˜ë≠é‘>rëÆ"k/∏èÙ€UAòØ Äèˆëjæ∆Ó˘H^$çEºpæÜ?q FFŒÀê∑ö◊Ï˙à»Cÿâè¯£\Ÿç„I.R|DÛË…ÿˆΩâè¥Û5”^'ÁıY˝ =WoÅŸãèàüÙë˝˘ö;>“ou§Ò˛ŸW©ÚY ‡„}$Á≥÷V∂kõaí6–s˘¨˜|$ÈGË’.T …É#ÌçZíèØÛ5•ÈÒ”˜Ê)=™)£∏…˘¨Ù¥è¯	õ2–≈GË{>Úh>Î„>≤ß#ª>"ŸQ€l÷Êû  ¯4©÷˚Ó≈Gäè$cY‚ r∫ﬁ˜!·≤!Æ;5Pyçç*OÛ’™–jaã⁄6>RåYQ¯»p‡#"ebRYÔ´w|§öhÕãÿÀòa!ã{»òg¡ﬂ•€ü˚à“Zù›«ºﬁ◊Ï]ÿ˛zﬂÕ9´˜◊ÏÈ»ûèàˆ{˝)  Q>Í°ë\ÆG˘#U’≥%ª¬rmÎ°—≤)jvÊ#6••i)d‚èº3 ±Bd¢®¬»U°‘âWõg|ˇâˆ∂6¥Ø˜uÄ≈∆6‘Q>´_O≠®ã«Áå≈Í¢4û‘’µ›b÷'±o2¨Më|€‹˜Ω<Ùë±;Y•‚æÅ¨%óM=4J7tø˛»ÃWÀ‘UbCƒÉ⁄-tÎ•í◊ë;5‹Ç_  ¯l·µﬁ˜◊◊ÑyîÖΩé∆≤ÛmΩxzÿGD[@ûÿz 42πBÌB|Æ≈•∞ÍT ›óewK G	Rf[ §ˆèˆY›‰N\˜k'z2G>‚™¨æ"|™Ô6HWÈﬁd	q5]ıQΩ¯2“œ,ÓêHë‚√¸◊|$◊ã)Œ*‘ãœıı◊7 5òéÍ≥ﬁN|‰ñ‚<çèdàU6,§è  ¿G˚à`/«€çèà¸.õ¥=$±%˚tÔ}z˜|$Õ…‘-Ï„_g Ô∆+.!ü^la∏ ƒç&GNÍı¿55ÇRéIÔ∆3Ú»GRóÉNâ±“‰~%ìúzùO„#}âˇ\ŸFˇàèg_3ΩO/ï≥/L9Ñ“æOØäè|«GàüÑÓ¸	   |òèª∞ÇÏbcÓ∆˙K•>∑‘Õ«ÿî]*¨{•À 	ÔÆI1π∂ÙK`Àk€~n”R˙Zé*±Ó#ı∏éÎ”X?8+Ìñ—∆Y∑ñ◊hA√P‚B˘Ö∂ÈwWÀÃÁÉùiŒ•Ô$úS∆ùAàaHÔ¬·›˘&z◊ùeÍc›‡∫5Îó¸9ã»T\U1˚Ë«Û~›∆æZÔı©πóîıg~çÚt6¨ª‘9N•†ãÒã˚˝Óñ˜˚ñEÀ´˝p“EG¬k|€-"~JæU_4â™° ¿á˚»◊9¨ú˙5⁄∫∞!æπˇ°&™º˜Ó´ùÑA’<–∑{≠çc8›+_sGü˝"DwNJ˚Y»   ˛i±6WtΩæØﬁºÛíÏÖø^bÙ|ëäzﬂA@14  Äèl}ƒ•∑.◊'”=Në÷._	è¸!‰ù …9!Òug	Õü◊™≥a˝}}Ñ&dè   |dœGØ
+ﬁ[û˚Üƒ≈4_‘Äi–Jèø‚9À˙¯]>¢0[  ëc±/À%∞/ç∂ºi5Õõœ9($i   ¯M>‚ﬁ-c˝
+õÀ+OH‚CÔªÀqÙªO9ê÷ò ÄˇŸª›∆qDÅ¢,Ä¢ˆÂˇˇu¥ã^™\$∂Ûﬁ9†mEJ∑rAëø©G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  û˜Hﬁé˝§}ÚBøcá‰?;ƒ¢.‚’GOÑ‘Õﬂ ¯—âó’ì)üûÒë∫,´÷WıÙr÷’Gç4ÎÅb}[eâ∏]º©}Å ‡'{d¸∑È/ó¸˜}Ízjâf}9««∞∆(˘0µH3.Ózdz ^ÿ#Sh\ <œˇ~O¢º\∆ﬂ˜°Ûl8Ú£™ä˘#›ﬁÕö±ÀÜ•¥Ú"∆Â≈~Mó5€°‹ ~≤GÊ±ëÁóèóK¸}∫…äc|‰lîıH‹´„x±+ˆbÈn~  ¸LèÑ)G˙õøÿEYﬁƒtx$ƒ≤åøaägù5!ªkä.÷n’1UKwS1›óÄWı»>w$ù?RˆÀ€æ◊'Ó√#qª®˚Ù÷ˇ^E˘0‰·n|dÔë*À∂Ë:_≠ó”EÙ ºßG⁄„@r&âÁo˛D˘1ı™©+Ó«GˆBô*d´ô˙˙˜‘GûÃ=Úlb Ì=≤ÂH›#”yÂˆ≤_ÜF⁄±ˇ¯)≤.|›çèƒf[Ã{5>íÆüé+∫lÊ:ÖØ ¸\èÑÚπ/é=øÊwóq˙{ ˛Ïë¸úb2ü∞ïƒwØ∑y“#°õz5>RUMóe√zQ:$Ìë‚¸≠«zﬂ∆	 ¸Xè|›Œgmó:ŸZ%=∫èƒÀ«,¸Õáa¯ÀöüjÊ∏Y˙¢€FE“ı5iè4€Ê#Û˘UQƒ¢2ÛH ‡Ö=2ﬂ¿)Ô˛'gÑe •¸¸ÒÇ∏Ó*r5>R◊Us∆≈6,íwC⁄#yrAÿ√gª≈ º¢GnÊç¨Ê·ëêÀ2Ö‰√∑Î÷∆∏õ?éŸ"q åaæÅSß=R?hè¬ 	 º∞GÊ‘˜gÙÁ±|º¸€ÛÔUœìYøæ¨Øô«E÷èóÁ◊uûˆHw≥…ÚKÜÄÍëy|‰v‡£ΩIèr/íÚÉ?nìÕ¨[∆@Æ¶Ω&VÛ¢(¬<Å$&?|¨öNè ¿k{‰&3B?d€˛ÚŸ¥i“áı^'FºMé˙ÿâ‰no¥çÒ xaè¥˜˜a áwfÊJÈ?¯„ı&À∫∫æJå‚vôpwN1…Ô∑s˝„Q ‡gz$˜aBª›√ËØÓ‡Ñ}fkˇˆZÛ¶iû.{y<‰Í≤t:k˝pKìÍ·M ‡gzd]>3∂ÌÒ¿ö€·ëÈmcŸæˇ~Õ”˝‚∑Yá6äj˝<Û˙öıÊK~ÏãvﬁåŸûm≥eHˆ3¢¿Îz$Ôoû_3ﬁ, NvòÛ|÷Ìëu|§ò'∂VÀ˛#€.jq9pæˇJˆH[4«ô„‡Ö=rÆÁÌóª4ÂÌ0Hˇ)9Ú_«GÜ}rkè¯X7É?{´∫∫ï”‹^ ¸Lè|ïì´±m«vü=2ﬁÌèñó”œ«∂|˚~haY¨˚LQÏˇ˝±Æ™¶™ì«Ú‘”˚*^ù|8Îï¡ ¯È˘´¯Ÿ´zÄˇ=“ˆ}Èˇ; ‡ù= †G  = †G  = †G  = †G  = †G  = †G  = ô=€∂˝Eè ¡W ˛œıHyπ\⁄œ¸»±Æö¶N‰’êeCWÁæ †G^° ’y§÷CY·Î  z‰ö)<∫¥Gä,™"ußG @èºD]!Oz$Ÿ∞›®1á Ù»À§=RªO ü⁄#°ß¢Ë€∏æçm;ñ_qÏßCÛhBàÌÙ˙“èÂ1®PÆ∂+÷iÁÛoŒhèi£y;øü~«´'í¶=“eùo |dèƒ©VÂëcπô£›|È◊˛„q‰Ïëıÿ∏I>^ˇ ØÚ∏‚[RÚÆÎ‚?˜H»≤⁄∑  >±G‚ë
+IèÙ…ë≥G.˝r¬˝Uè§|Ö˛ÊwÊÎ˝∑˜»Ûï2Ièƒ˘‰¢iö*˙2 ¿Gı»RmÀ1Èë˘^KY∂˝2>“∑1l√(ÛÚ∞èîƒ∂?/ËÀr>a¸⁄
+¶/Û∏¸3lÊ{9°ﬂÿ#Eñ≈Ên	0 ˆYÜG÷ÒÇxNŸnºÑ%;∂3˜i´ÒÂÁ˘6N≤À%ﬂ√dbâÈ%oÈë:Àö¨´ã∫s„ >™G⁄ª{(Âëg¥îì˝Ã|üXí^0n?Ëì˜g¬Ãóé?pì$ƒ√ÈëıuﬁÎ~ÄËëÒútö‰Eü˛EO&ê,ô±ŒŸW◊ú’∂ó€4Ìd∑Ké[@ﬂæÌ«”_x›#√z~aÄ >≠G‚]èå…ÙdrÍz<ﬁ¨∑y‘#7s`èCÌ´7"ªû?“‹ ~AèåÎ–Fª‹ØYèüÀy„?ˆ»WŸßEÛ∂Ÿ_e |HèîÎëc”êÙx(€˛®ãG=2ñª=vb9û	Ûñ…ı |fè<ûœzˆH~4D{3∫qÃ3πÌë?Ó⁄ª¯yeè|Ó◊ ¿Gˆ»„ıæèz‰ÿ^d_ö2n¢›ˆHHË,ƒÁ·¸ó}Á$°ÆÎ¸ﬂ{§2ü >≤G÷’2Û~hm∫_¸ıœ˜5ªÎÒÀ˙$õ?éèl˚°≈</⁄~iôr}8Œ∑èè¸∑˝GŒi≤Ãz_ ¯†y∏_|“#KáÙcŒF=ˆ~O&ñ\ıH∫_¸⁄#…%ﬂOz§®™jJèn˙GµwHÛyìV∑k ‡ìz‰ÒÛÙŒOœk”π$èœªÎëdN“#Wÿ{Iè‘Ÿa}∞oË∂∑Mu ÄOÍëØ∞<ú∑o∑Tàm€¶’ñµ∫mûœ[ú-'îÎh…x^∞º”?˜ç‰◊S˙qô>2/«Yﬂ∑ﬂª∫&Ø™ø=oŸÌâ“Sçò< ü÷#K1¸ıÌÚ˛˙Xx>¬ûºC# °=¿ˇÿ;∑›Vq(Ä™
+ío0¸ˇøæb 9ç⁄¶ùµZjÃ6ôAbùÌm    ¿G       ¿G       ¿G       ¿G       ¿G       ¿G    æ›G‰≤,„Wè.÷A˛'   ‡#«®€ÌˆÂ™ ÷Aˇ   ëˇõèH;Ω>?Øl?ÉU<   ÔÊ#„ä|m,µå£˘q—]`:˚0SóËè  ¿˚àsÆˆ∑™√ã>b÷mIäX˘fYudÓmø
+…ânÃ›4Ùvòªn‡Ò   ¯YŸÛ%>Ú˝àπõ˝«∞]gè{§â1úˆ   Ä_Î#‚|DgÀò∫˘∫ß$A  ì>"L$ót™ıÿ˚HhÃR¢|Eâ)ì*úífmì9H’CÆßG_í≤≈MÉ‘%˛Ú-f8)L=äà1?_k:t]fªN_wùª)å∫Ô’á∞}/y`   æÀG‰-íÎGñ[EÙï⁄\÷â1¯JlîÕ5°á©Cƒ∏È∑i–ÿ∆Ù
+§\hI"¨®qí◊∞÷ Gí±~ÄG”1"ÊG÷_}◊u≥¸OJ\  ﬁ«G‘ﬁOÇèåï,∏∂«>"v
+:§∂8ÕSπëÓ"Û·ÌbtBöŸ~•ç]UdÓ{*J   æœG¬∂©ïèåÒœõo^¸\â∂±å&¥™‚#ﬁ.|œË#Îyz∏êOYœÁ}_” ≈GBÑet%Ê≠j9a2e÷¶O˙àä‚£u9SrË-*Ø¿âﬁU§ß¢  ‡€|$g@N◊˚˙D≈"ÚAeAVByGﬁ¨dŸÆ;XÔ[˘àÃâë%wK©ëEl∑dƒ>"&/ÛπèÑÌGf+REádâÚ5'O  ¿ª¯»íS!QR|ƒÌ-AàPbûÒë¢6a.(˚àJ£ô‘‡ñ≤ä˛¢Ó4L¬ÿŒµN|däRS|D˙ü¯  ¿ª¯H»Xƒ≈1.õ…∏ó≥∏]â…µèl‚ícÊ:ër&\^X]}Dá©öã¸àR⁄]7§˘Ú*¡Gfû  Ä7Òyk8ÚÈÓñ‰àk)9óí…u#„~ëé?ªŒ%÷èhø g~êÏ∞©‘$˚à6√  Ê>Rm%◊≈8í$©⁄„eŸ÷˚∫OÓ"Îı5äSá∞º  xc#À8¯H®õ…ñgÚ#¶ÈCÒ˚°πf)Ú?≤Yà|¥ﬁ◊'H>  Æ>RL°¢ıìkR£f<ìiÎG‰±èìKßT±Íáõâƒ\Ò  Ä˜Òëm:•…ex?8Òóç„˘ı5Æ98ÒëfÒR ÛÚí>ËE<(!ƒz…YW|  ‡g|D¨ÒbsÄE¶?MŸ’]7ûÂGÚtMŒè®xúb¯ﬂ2,é-aÈò*a«CYb†∞ëÎ©r\Ó?í7DÛﬂÛ;’Ê1µvÂÊ∞ö  ¯Q∑˚Õ›∑Ω⁄M∂øŸjqáùèπpq{÷≠¯£)öA\!~_ç8ÙÁ∑kC…y˝»µè¯/‘≥ÎËC›©ˆ;Y%¸∑‡Ãeøx|  ‡M|D∏⁄Gdıï6G>≤ÈKU?í˜î?Òër:ozv‰#ª-M˛›G‰ÍÛ47’¨çèÑΩY√éh°Ú  x˘c‹‡,-ñIÎ\nnTG>"‚“\ßöˆ¥G⁄âè‰ÂºKö3πﬂ$[–r±%⁄˘êC‹˛„ÿGTe§õb|  ‡G|‰Iî1FÀÀÛÍ31Øˆ: ˜êØ}f©µæD™µÉ‰Ÿ   ¯>   Äè    >   Äè    >   Äè    >   Äè    >   Äè    >   Äè    >   Äè    >   Äè<ã“V´Év!ÚÅ≤ZÀGaƒ4_˜%`@Æ√ä›}®Î!¥noTÏÜYÛ  >Úe§ü;œlÔ^˛]ﬁız∫ÈÅ,Ù]_<AÌ˙
+máuú°≤ëa7™öéo£∫°yw64≤∫Ââ'  ëﬂá∑Ä9®@/ˆgÇ>»ÆÙ∞WÅ÷~≤ÚÑ6S—G•Ÿ|DÆ]&Ø(ŸaTn8ƒ˙ Î}Ãj:áY›≥Â  |‰˜˘»&IÙ¥7›u:z∆d◊æíqï!ÈãmÿUÜ6\ø6Ÿ⁄G‚y1§AºIxÉë”È jıí$Sπ¡Aƒ_ï≥ÃÇg  ëﬂÜMÔoŸussbHÔ}©∑¸DG≥ê!É°Ê⁄¬¸M%*≈Ÿ.tÚŸLÍ¥æM≈f”ôí{Ùï¬¨Ò®  Ä?Ì#RSˇ€])Û†¢bwA
+cî<)çëwÉ™Ô˘ˇ∞Õ∑$cÿΩŸEwUùaãŒË®˝ùT™Q"9±±ﬁ∆·Á]Mchd÷#Y{R¶3   ¡G‘rÛ∏1Ω-ç´˛T˛0∂˚Ê^cËqÀ|¯ *ÜYBÑqÌë<@,±øˇôâ]ı“GRÍ•È€ôí·^>Ê+ôäËòø∏Ùë©öt±µm¯Ù«aÜCó	†d,∂öÍôÍníá  ˛™èå∑åâ≤ëˇt¢±ôÕD∫“Cn>bRõQ"¶"˘…X|d7Ë'Ò©OLb¥â	u_X*∫ã‹É‹˙´n~ıÔùl◊o°RrCïá:©h›Ù√FqÍãyÙ’ùÀéäV  ¯≥>í<¬e5ÿL!Ê:∆|¬w˝7Ë»ä‚#∑÷G‹2∆ú».fÙë0®ã1^»ê<Á#[Ü"Ω„ÁÛ≈q˙BU©kSæDı√Åèl˙ëÃdã≠N™T∂ÙM2ìÕüöÃŒtU‰  õ}$ÿÖ[_z¬8ì≤ ^"LŒ]®ZLTr	üëK…nÛpF
+i\àiDùQir«4	ìb._Ì#}”È(Õ0]≠]Y/ﬂ˛ki˘∞–CΩ°»ﬁGÏ†Ú$PÙëæóß≠!"˚5jró…è®[&YÜfb  ¯õ>b § ˙™Æ¡‰ó¶i™ﬂ1ßQL%¯»™(>LÛ^_‚\OcI>íS-©Ú‰Û>2œÛ√´uõñËÔ›£ø¥öVîµ*Ï¥6‘ól¶îBá=—GBŒ√˙ÇŸ≥Y°êô“u—G¬’Ò:}(F    G∆¢õBòú‹∏â-/¢RGπ∏ñjêe‰Cöq\ñ%©K√§+∂Ã ¯b…3Œä>JÜcæKèËÀ’æwÂØ15“VêÏ|ƒÔo&R1jPä˛Èk]
+¥˘à•†  ˛™è,;!(Â´Â(âHûÆQ∑qD‘ı"™íY˘»∆¯•:2uÕwœÿnˇU4∫ª^H;5>íR#¢˝vô›|ç&›Ã◊Hﬂp9_£ßA6Û5zÍ>  ˇ#Q;Õ_a≤Ñ?]…ql»it√T>í◊˚∫oÛ1uÕåéò˜π5áΩPüÛëú	_/SÌBTœ˙±Øgï/÷≥‚#  ß}DüÊG¬À–ÎÑY‘âèlÔM´[ïîÀI~‰€|D≠é‹ø”U;ùs@]?¢c’àÌÊﬁN›—˙QØØIÎ}∑ı5gÎ}Us‘¨˜ïµ∑ ¿ﬂısò/)≥1>#bLÓWmêvdlˆ.1'ı#Í;>Ú-dY(  qIDAT∞ØT›ØôïS¯Íò+4`⁄0mπãj&¶l≠ñÙc´—˜CÎÀ~hÍﬁÖé*  ¸1ª∑ç;DÔ©ë±Ã„O9íòb…˛«ﬁΩ-'
+ ^ßù!¡˜◊Ué	†€÷mù:ﬂw'£–›˛	$π/ßüLÛkæˇ-÷˘˛^¨o˝˘*G∫=9nˆ¡CaÀpG∫^|6˝Æ®€ÏHN7E“¯hhHIﬂÄ=Y0ÄÌë,,OLöiπëÎÍ"Y4gÊ˙ÍH;gK4#'4ÂçiÁ·êrLòsÕ¥˛H>Æy“ÈëıGÍ∫ŒÔÊ»Í…Íñæ~ªd◊vªõ±Géª=RDõ‚%]í≈ã“Wu]E’0yÓêÈõ…Î¨ôıYxŸÒëaÌ‘∂iöv≤VUÌw®ôñÉ/ìï›ÛÒÂu÷eëeº#vÆ	Â4øfª>Î∞’ÕıÌÊ·œgz‰Ózh«Õ|5<≤yªdﬂÊÿ·yÕ%fäù…∆!ó˘Í”Ñ„d∞¶éG>∆	«Ÿ<X3˛6ù™\l∆i ‡ez$k”≠dBªŸZ&ã¶ˆ“6{„#À¸öy˙ı˛5—EæØGﬁ#≈Xı*O˜h]ø∑QºwUuöû⁄,¶≥v’ÒSK\Í¢;ì9l>ıÎ–O˝t)ì˜˙Xu…øÆ∫∑Á ¸Óô7ªõû†ÑÒs[¶Å±<W)óıv{d:Cπøé∑¥—˛æŸ˘LØ˘dè¨üº|∞G¬ˆ"—|ﬂMèäÆˇPáh†¶?ê›Íëa˙h8'∫Ë∫;π¿ÎÙ»Â>]6ÁsSé∑ÀÏê«˚€cy?,(ö˛+˘|Ç≤L^’ÏOí„YH÷v/ö\Ê”≤¢(nˇæàÑ!“Ü„ŒeÍÌ∫!Y^ÑÂoXù#´∫äOÿH∂‰Èzj◊Õ˘™dÕ◊bs‡ﬁ; ˚{‰˚çw“Ú±ÌÛîdÛΩ?|˛Bd'√# Ëë«r‰≠πn˛€º˝–<ﬂ}Uw˙‚CuwÉõax =Úpè,oØ˛∆%œC˜Ùí”«v @èl{ƒîU –#œ—”i⁄∆Üp †Gû'¡ †G˛¯?  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  Ù †G  =‚ˇ  –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# ¸e∑é    ˘['RªV§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™ÍèTU§™˙#TU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#UU§™˙#U’Ÿ†™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©™˙#U’©
+;wl¬@QÅ}F'Ã€©.cºW¬F?	–# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä –# Ä Ùà  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#  z –#¿{;†GÄ≤Ÿ/G Ù–ÌëÃÌ
+Ä∫=í¨À =t{$9f$Ä =íŸNË†€#…˙8†GÄnè$è	†GÄrèdé∑øÄ∫=o=‘{ƒå–#@øGíØ∑øÄ =bFË†ﬁ#f$Ä˙=bFË†ﬂ#f$Ä˙=íŸf$Ä∫=bFË†ﬂ#…ÚÖ<†GÄrè$«å–#@πG2€ë =t{ƒ€_@ècÔéR‹Ü¡(å"ap2$"‰¡˚_ja
+•å¿≠lçoÁ,!O…’»˜H≠o3@è ·qB–#@ºGº˝ÙêÔ3@è ˘qB–#@æGÃH =ƒ{ƒå–#@æGúêÙêÔ3@è ˘©€√å–#@∂Gj]ÃH =Ñ{ƒ	y@è ˘©’€_@è È©€√«Ë €#N»z»˜à	†GÄ|è8!Ë ﬁ#N»z»˜à	†GÄ|è8!Ë‡;z§ôë z˜»zõë z»ˆH)À‡åƒ€_@è ì{§¨èÕå–#@¥GJπ5'‰=d{§î—…bFË`rèîÚ‹úêÙêÌëÒâ∑øÄ&˜H)∑ó	†GÄlèx˚ÎÑ<†GÄ…=bFË ﬂ#emõÚÄ¢=R ˝ÂÑ<†GÄlèòë z»˜H)É[ùêÙ0πGF˛~æ˝5#Ù0≠GÜ£ôë zò€#œC5Ú9#Òˆ–#¿Ñπ/ıÑfFzDè '{‰÷Í9N»É—#¿©98Òˆ–#¿¨˘XÍN»É8÷#˜wù≈	y–# zdmª/yùêÙ›=≤˜∆˜Á∑N»z¯ŒŸmç_kê—ª$N»É¯€Ÿ=ˇ˚◊k€ÃH =ÃÔë›7æ_ˇîftÛjFz‡œ=≤˚#Lwm’¨–#¿¸˘7ø◊ z∏¥G˙Ø6ÏY=\Ÿ#_á#ﬁ˚z∏∏G∫Ø6nÜ#ÄÆÏëÓ´ç—ˇŸ3=p™GŒG¸üËÄ3=“µa8Ë‡“Èá#mt[¸Vz‡xèúéÙ‘ =0–#˝pd¯ß√@è 'z§é¯≥@è óˆH˜&f|8b7Ë‡DèÙobáÙpeèÙobºÒÙpiètobÓé√z∏≤G∫71ks–#¿ï=‚8<†GÄtèé z¯ßz‰ˆ>†GÄâ=2~ﬁp–#¿‘1ÙêÌë—„ã7æÄ¶ˆ»¯qxü(†GÄô=2<q–#¿‹yéæÒ5Ù0µGFá#é√zò‹#√GºÒÙ0πGG =¸O=‚8<†GÄlèé z»ˆ»Ê8<†GÄlè8Ë €#Ü#Ä≤=‚8<†GÄpèé z»ˆà·†GÄlè,ﬁ¯zàˆà„Ä¬=‚8<†GÄlè,Ü#Ä¢=‚8<†GÄlè8Ë ‹#Ü#Ä≤=‚8<†GÄlèé z»ˆà·†GÄpè8Ë €#Ü#Ä≤=‚8<†GÄpè4o|=D{ƒqx@è ŸÒ∆–#@∂GG =Ñ{ƒqx@è ŸÒ∆–#@∂GG =d{ƒqx@è ·1ÙêÌ√@è Ÿ1ÙêÌ√@è ·y;Ë ⁄#Ü#Ä≤=≤=äﬂj =${§y„Ë ⁄#ã·†GÄhèx„Ë ‹#ª@è YÜ#Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä Ù Ä‡ªu      ‰ˇ⁄ÍG™™~§™˙ë™™©™~§™˙ë©™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™˘ë™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©
+ªu      ‰ˇ⁄™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™˘ë™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™˙ë©™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§
+ªu      ‰ˇ⁄™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™˙ë©™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™˘ë™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§™ÍG™™©™˙ë™ÍG™™~§™˙ë™™©™~§Jªu      »ﬂzêã"  | ¿G    ¿G  |    | ¿G    ¿G  |    | ¿G    ¿G  |    | ¿G    ¿G  |    | ¿G    ¿G  |    | ¿G    ¿G  |    | ¿G    ¿G  |  ¿G|  ¿G  | x$ø}_Øj≠áx    IENDÆB`Ç
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: image/svg+xml
+Content-Transfer-Encoding: binary
+Content-Location: https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><defs><path d="M21.5 5h-9.17L11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5h9.17L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5z" id="a"/></defs><clipPath id="b"><use overflow="visible" xlink:href="#a"/></clipPath><g clip-path="url(#b)"><image height="31" opacity=".2" overflow="visible" transform="translate(3 1)" width="29" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAfCAYAAAAbW8YEAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABQBJREFUeNq8V8tu20YUvXdm+LCk RKiMwI1TFEXhVZJd1gW66xekv9DPqPsvXdU/UaDroJskKy+CInCcGpKtFy2SM/f2DEXZia0odtKW AkFJ8zhzzn3S0Ycvps+79EMDbj3Yfgv4EM+XTN/fEOb3Zg3AXmq7j64D5/e/x/EfzZMnX5jx+LFZ LLyp6yNDOzskYb6RubFdpbdvKUl2Jc+d9PvP5dmzUyH6TVoYXQOq+H5g9vb+cONsO9maLpIyyZPU kZNAppmh9Vpg5kSXwCSVJ5/Vi/r8Tl73y2F9ePidJ3oaga+B4vkUgF+6EW1ndz11gvNdDdL1bDNr yKkCWO16thyUGWIIeae2ZGvn1of5xFExoGF5eHgM4ANZsW032Tf05MjeW+xmNKeedeWAg9tmywPM 6rGYzOAPBSfQ5Ss0Nf4pAmRrSmBP1ehIxQ6DpxF1aXaSH5X0bDcAR1aOxLRPtPdrZrwnd55Sx3gz IMO72OwBq9kmox0RSkHHRNxrRJWFDbQXKpR1xN4eOfx0NqnMdFHulY/rw/1RAE5crEvvffGCvX/E VUoOC3Mm24eaO6TyNZjeB5E+sDLMt2tCqZEW8lcgPSU2x0IhKlAYoTP4xUTueUMvHvJK3ouQ8ffH HP62JpGeg/VSYciqNADbHQxvY5etdr65yhNXlG2B5xjzgWfHJoSeZ5Olbuaq+czQyYSvxal701dJ SWoigRNqXItjORhsC+x74NfDtPQ6aGPkgAUlGROpTKBQR4gbB1x6fjz3/DK8GsoHj/SVG6pJACi+ NhQdApsQJFPCeliYKImgeEJmylc3Xzw5yp9xnIMYMkZt9HjVhK/GeHtqZI5+KUVJXtSVQcwcYDPo FI93jhW+DWSjzZrGts0NQSwOZTFoMaMBaly6CTFZG2KXUt3Z1aQzC36rKrFJ0cgUb6aZRnuRwjtI lo7Eq3CLWSya4eJ7a+TN2eudvClbk17ItFepoQLrpyQyxkZTjBYIiwqnXwF/1mXerQivtu+Hohp7 tf7cWJnCTgBleCQ3bBEaPiaCTRXkNqBLu955o2kv+NzIIogDkGlAEfuwL51DYh9z3sdK1y1ALyX2 FxJLK3Fj339NYnO16P4fEl8J9HUSaytxTHFRYqrhnJ60AZU2lNpDNOULaZH1FqBXJS4LhN8ECeos MgbLWUx3AK+xv4+ZKN6ACxxlZw0xDzdZKj7Z6E1ALyQ+91WNclwgIU6wwRli7xTkzjA8BQCSBxfL +MUhlnGMDMYlfsPuWsdSF4GZa226io1MW4nzPvkQbWgDnIlGYHSCTU+QbOI9BNtTTB7hxmEIh+FT KDJGZoiVpkA6KmNRj90E0duPNmaNxJ29QVh0RxWsOMNRh0JyDIk7LBK1iw62BV1cLKaXpY2n+HWs GkZidOZEysp3fDK4K3TvK90EisGf6bD/k6CTqDpBZt6EoTWcSXQU5mhX1FvNm/XRiyQiaw0XKmDi EXL9kdV6FMMu9kvpyUDoB3SIB5uYxp2+fSr9P7Na7IOipsUpxZ5BqISNTw1rFy6bGrKoIjAbS9uu EKoT2NowqiWJ7cqM0KD9lT8X2t+lKz3S2l4Z/e4v9ptXzcFyn9Zd8nlHHcjXaNZsaCvKqlW6dWP2 Ibr7sdE2e68H9sy+TvN5J6nwydLUvtuWfmoLugH4Zg34JzbbHwO/wavG+68VdJPXihuC/zcvUJ+0 0W2ufwQYAGHKK2CFMIrzAAAAAElFTkSuQmCC"/><radialGradient cx="7.394" cy="5.437" gradientUnits="userSpaceOnUse" id="c" r="23.416"><stop offset="0" stop-color="#EEE"/><stop offset=".432" stop-color="#E6E6E6"/><stop offset="1" stop-color="#E1E1E1"/></radialGradient><path d="M13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5H7l6 18z" fill="url(#c)"/></g><path clip-path="url(#b)" d="M18 11v-1h-1v1h-3.75v1h5.32c-.2.49-.6 1.3-1.32 2.14-.51-.6-.86-1.18-1.1-1.64h-1.11c.36.84.9 1.66 1.52 2.38l-2.6 2.58.71.71 2.58-2.58 2.58 2.58.71-.71-2.6-2.58c.74-.86 1.33-1.85 1.68-2.88H21v-1h-3z" fill="#607D8B"/><linearGradient gradientUnits="userSpaceOnUse" id="d" x1="12.333" x2="23" y1="14" y2="14"><stop offset="0" stop-color="#212121" stop-opacity=".1"/><stop offset="1" stop-color="#212121" stop-opacity=".02"/></linearGradient><path clip-path="url(#b)" d="M12.33 5L23 15.67V23H13" fill="url(#d)"/><g clip-path="url(#b)"><image height="8" opacity=".1" overflow="visible" transform="translate(10.5 17.5)" width="9" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAJCAYAAAALpr0TAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAOFJREFUeNp0UD1LA0EUnLe7JsJh CiFpLVNYaS3411L7Z/InUpgmqRIRLGxEOEVQsoRcbnecu6AGTB4M72vevjdr+DPDf+Nvs3858q7a Fp4oDOZBJ5dJMCVDzJ2T+LYYpeAyTj39UMNXhA00HABXKy89bY6UlqrFoMHm5QK0a/mbXYxSyyZm eCBTe5Kr68+NGq+Kv4QzoSM8q3ZP8imjXjdEv/6Ysnd+q6a7UN4XFsKYlifbUJXvj3ftytAqM1vJ z6UgGvgiIbN90g8RVddFKZ/pzqX+Y5NDtdonHTI71vgWYADzWmdx/4fpmQAAAABJRU5ErkJggg=="/><path d="M17 19l-4 4-1.33-4" fill="#3F51B5"/></g><path clip-path="url(#b)" d="M21.5 5H7l.04.12H21.5c.82 0 1.5.67 1.5 1.5V6.5c0-.83-.68-1.5-1.5-1.5z" fill="#212121" fill-opacity=".02"/><path clip-path="url(#b)" d="M21.5 22.88H13L11.71 19h-.04L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-.12c0 .82-.68 1.5-1.5 1.5z" fill="#212121" fill-opacity=".1"/><path clip-path="url(#b)" d="M12.97 22.91L13 23l4-4h-.12" fill="#1A237E" fill-opacity=".2"/><path clip-path="url(#b)" d="M11.67 19.12h5.21L17 19h-5.33" fill="#1A237E" fill-opacity=".1"/><g clip-path="url(#b)"><image height="22" opacity=".2" overflow="visible" transform="translate(-.5 -.5)" width="20" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAXCAYAAADk3wSdAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUpJREFUeNqslbFOwzAQQO/sQCRc sqAOlRgrMjCVr+Er+IZ+Ax/WTCwVeyVQl9IOQY2Pc2qhNFwcGsdSrHNsP52fpTPCeUP4X6PQZA2Z Pi41lqXRpCYKtA5tsFBVFdo9penh821ZSWsS112X1hBdPXG44BSyQMaEoHcJ6QJLu+LxrguKQDQB UAuOn3nfLATlqc0psmvuvyQVibfARyaXoQPeh6Hk9Mw4uL2bv3xs31+P7UWq5Rd7LsvN8akg5zBP KTPSIgWXN3OCQo6ARkpiCNQd36maegV6DGgjW1lBJFRWMBQaVDAUGlQwAvSvghhop4IYaKeCkaDn CmKhooJYqKhAtao59VV1od3w99BU4EsfcQVXruBuPBMvgJIv1sdmPSVA3HOhLvy/bCC0qDk8rjP9 TtWB36gVv1Hrvjeq792SjokRF/Z7Fz8CDAC8EmWDKVGDLgAAAABJRU5ErkJggg=="/><path d="M11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5H17L11 1z" fill="#4285F4"/></g><path clip-path="url(#b)" d="M2.5 1C1.68 1 1 1.68 1 2.5v.12c0-.82.68-1.5 1.5-1.5H11V1H2.5z" fill="#FFF" fill-opacity=".02"/><path clip-path="url(#b)" d="M11 1v.12l5.92 17.75H2.5c-.82 0-1.5-.67-1.5-1.5v.12c0 .84.68 1.51 1.5 1.51H17L11 1z" fill="#212121" fill-opacity=".1"/><g clip-path="url(#b)"><path d="M7.5 10v1.2h1.98c-.08.52-.6 1.51-1.98 1.51-1.2 0-2.17-.99-2.17-2.21S6.3 8.29 7.5 8.29c.68 0 1.13.29 1.39.54l.95-.92C9.24 7.35 8.44 7 7.5 7 5.57 7 4 8.57 4 10.5S5.57 14 7.5 14c2.02 0 3.36-1.42 3.36-3.42 0-.23-.02-.41-.06-.58H7.5z" fill="#EEE"/><path d="M4 7h7v7H4z" fill="none"/></g><radialGradient cx="1.457" cy="1.42" gradientUnits="userSpaceOnUse" id="e" r="29.792"><stop offset="0" stop-color="#FFF" stop-opacity=".1"/><stop offset="1" stop-color="#FFF" stop-opacity="0"/></radialGradient><path d="M21.5 5h-9.17L11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5h9.17L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5z" fill="url(#e)"/></svg>
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN----
+Content-Type: text/html
+Content-ID: <frame-69F289A92B0010C47F33F3F14A259F46@mhtml.blink>
+Content-Transfer-Encoding: binary
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body></body></html>
+------MultipartBoundary--RHHcwOM241JcqIMGeBow367lvW04EbN4LmxvX7qqwN------

@@ -1,0 +1,6 @@
+ 2155  python3 2_fuzz.py image/Canon_40D.jpg 
+ 2156  python3 -m cProfile -o caveman.profile 2_fuzz.py image/Canon_40D.jpg 
+ 2157  ls
+ 2158  nano caveman.profile 
+ 2159  snakeviz
+ 2160  python3 -m snakeviz caveman.profile

@@ -1,0 +1,1379 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: https://h0mbre.github.io/Fuzzing-Like-A-Caveman-3/
+Subject: Fuzzing Seperti Manusia Gua 3: Mencoba Memahami Sedikit Pentingnya Cakupan Kode | Antarmuka Mesin Manusia
+Date: Wed, 20 Nov 2024 13:41:14 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----"
+
+
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: text/html
+Content-ID: <frame-107ACA783E040003FA329CB53E3F0435@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/Fuzzing-Like-A-Caveman-3/
+
+<!DOCTYPE html><html lang="id" class="translated-ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Fuzzing Seperti Manusia Gua 3: Mencoba Memahami Sedikit Pentingnya Cakupan Kode | Antarmuka Mesin Manusia</title>
+<meta name="generator" content="Jekyll v3.9.5">
+<meta property="og:title" content="Fuzzing Like A Caveman 3: Trying to Somewhat Understand The Importance Code Coverage">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Introduction In this episode of â€˜Fuzzing like a Cavemanâ€™, weâ€™ll be continuing on our by noob for noobs fuzzing journey and trying to wrap our little baby fuzzing brains around the concept of code coverage and why its so important. As far as I know, code coverage is, at a high-level, the attempt made by fuzzers to track/increase how much of the target applicationâ€™s code is reached by the fuzzerâ€™s inputs. The idea being that the more code your fuzzer inputs reach, the greater the attack surface, the more comprehensive your testing is, and other big brain stuff that I donâ€™t understand yet.">
+<meta property="og:description" content="Introduction In this episode of â€˜Fuzzing like a Cavemanâ€™, weâ€™ll be continuing on our by noob for noobs fuzzing journey and trying to wrap our little baby fuzzing brains around the concept of code coverage and why its so important. As far as I know, code coverage is, at a high-level, the attempt made by fuzzers to track/increase how much of the target applicationâ€™s code is reached by the fuzzerâ€™s inputs. The idea being that the more code your fuzzer inputs reach, the greater the attack surface, the more comprehensive your testing is, and other big brain stuff that I donâ€™t understand yet.">
+<link rel="canonical" href="https://h0mbre.github.io/Fuzzing-Like-A-Caveman-3/">
+<meta property="og:url" content="https://h0mbre.github.io/Fuzzing-Like-A-Caveman-3/">
+<meta property="og:site_name" content="The Human Machine Interface">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2020-05-26T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Fuzzing Like A Caveman 3: Trying to Somewhat Understand The Importance Code Coverage">
+
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="https://h0mbre.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://h0mbre.github.io/feed.xml" title="Antarmuka Manusia dan Mesin"><link type="text/css" rel="stylesheet" charset="UTF-8" href="https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.26tY-h6gH9w.L.W.O/am=DAY/d=0/rs=AN8SPfrCcgxoBri2FVMQptvuOBiOsolgBw/m=el_main_css"></head>
+<body class="post-page"><header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" rel="author" href="https://h0mbre.github.io/"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Antarmuka Manusia dan Mesin</font></font></a>
+    </div>
+  </header><main class="page-content" aria-label="Isi">
+      <div class="wrapper">
+        <article class="post main-content">
+  <header class="post-header">
+    <h1 class="post-title"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fuzzing Seperti Manusia Gua 3: Mencoba Memahami Sedikit Pentingnya Cakupan Kode</font></font></h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-05-26T00:00:00+00:00" itemprop="datePublished"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">26 Mei 2020
+      </font></font></time></p>
+  </header>
+  <div class="post-content">
+    <h2 id="introduction"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Perkenalan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Dalam episode 'Fuzzing like a Caveman' ini, kami akan melanjutkan perjalanan fuzzing oleh pemula untuk pemula dan mencoba memahami konsep cakupan kode dan mengapa hal itu begitu penting. Sejauh yang saya ketahui, cakupan kode, pada tingkat tinggi, adalah upaya yang dilakukan oleh fuzzer untuk melacak/meningkatkan seberapa banyak kode aplikasi target yang dijangkau oleh input fuzzer. Idenya adalah semakin banyak kode yang dijangkau input fuzzer Anda, semakin besar permukaan serangannya, semakin komprehensif pengujian Anda, dan hal-hal besar lainnya yang belum saya pahami.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya telah mengasah keterampilan pwn saya, tetapi mengambil jeda sejenak untuk kewarasan untuk menulis beberapa C dan menonton beberapa aliran @gamozolabs. @gamozolabs menguraikan pentingnya cakupan kode selama salah satu aliran ini, dan saya tidak dapat melacak klipnya, tetapi saya mengingatnya dengan cukup samar untuk menyiapkan beberapa kasus uji hanya untuk pengujian saya sendiri guna menunjukkan mengapa fuzzer "bodoh" sangat dirugikan dibandingkan dengan fuzzer yang dipandu cakupan kode. Bersiaplah untuk beberapa teori probabilitas kelas 8 (yang mungkin salah ğŸ¤£). Di akhir posting blog ini, kita setidaknya harus dapat memahami, secara umum, bagaimana fuzzer canggih bekerja pada tahun 1990.</font></font></p>
+
+<h2 id="our-fuzzer"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Fuzzer kami</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kami memiliki fuzzer mutasi jpeg berulir tunggal yang cantik, bebas kesalahan, ditulis dengan sempurna, yang telah kami porting ke C dari posting blog kami sebelumnya dan sedikit dimodifikasi untuk tujuan percobaan kami di sini.</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;time.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="c1"> </span><span class="cp">
+#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="n">crashes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><font></font>
+<font></font>
+<span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">length</span><span class="p">;</span>
+<span class="p">};</span><font></font>
+<font></font>
+<span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="nf">get_data</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">fuzz_target</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fileptr</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">clone_data</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">filelen</span><span class="p">;</span><font></font>
+<font></font>
+    <span class="c1">// open file in binary read mode</span>
+    <span class="c1">// jump to end of file, get length</span>
+    <span class="c1">// reset pointer to beginning of file</span>
+    <span class="n">fileptr</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">fuzz_target</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fileptr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[!] Unable to open fuzz target, exiting...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">fseek</span><span class="p">(</span><span class="n">fileptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SEEK_END</span><span class="p">);</span>
+    <span class="n">filelen</span> <span class="o">=</span> <span class="n">ftell</span><span class="p">(</span><span class="n">fileptr</span><span class="p">);</span>
+    <span class="n">rewind</span><span class="p">(</span><span class="n">fileptr</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="c1">// cast malloc as char ptr</span>
+    <span class="c1">// ptr offset * sizeof char = data in .jpeg</span>
+    <span class="n">clone_data</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">filelen</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span><font></font>
+<font></font>
+    <span class="c1">// get length for struct returned</span>
+    <span class="kt">size_t</span> <span class="n">length</span> <span class="o">=</span> <span class="n">filelen</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="c1">// read in the data</span>
+    <span class="n">fread</span><span class="p">(</span><span class="n">clone_data</span><span class="p">,</span> <span class="n">filelen</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fileptr</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">fileptr</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="n">original_file</span><span class="p">;</span>
+    <span class="n">original_file</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clone_data</span><span class="p">;</span>
+    <span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span><span class="p">;</span><font></font>
+<font></font>
+    <span class="k">return</span> <span class="n">original_file</span><span class="p">;</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">create_new</span><span class="p">(</span><span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="n">original_file</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">mutations</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="c1">//</span>
+    <span class="c1">//----------------MUTATE THE BITS-------------------------</span>
+    <span class="c1">//</span>
+    <span class="kt">int</span><span class="o">*</span> <span class="n">picked_indexes</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">*</span><span class="n">mutations</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mutations</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">picked_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="kt">char</span> <span class="o">*</span> <span class="n">mutated_data</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">mutated_data</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">mutations</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">char</span> <span class="n">current</span> <span class="o">=</span> <span class="n">mutated_data</span><span class="p">[</span><span class="n">picked_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]];</span><font></font>
+<font></font>
+        <span class="c1">// figure out what bit to flip in this 'decimal' byte</span>
+        <span class="kt">int</span> <span class="n">rand_byte</span> <span class="o">=</span> <span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="mi">256</span><span class="p">;</span><font></font>
+        <font></font>
+        <span class="n">mutated_data</span><span class="p">[</span><span class="n">picked_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="n">rand_byte</span><span class="p">;</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="c1">//</span>
+    <span class="c1">//---------WRITING THE MUTATED BITS TO NEW FILE-----------</span>
+    <span class="c1">//</span>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">fileptr</span><span class="p">;</span>
+    <span class="n">fileptr</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="s">"mutated.jpeg"</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fileptr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[!] Unable to open mutated.jpeg, exiting...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="c1">// buffer to be written from,</span>
+    <span class="c1">// size in bytes of elements,</span>
+    <span class="c1">// how many elements,</span>
+    <span class="c1">// where to stream the output to :)</span>
+    <span class="n">fwrite</span><span class="p">(</span><span class="n">mutated_data</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">,</span> <span class="n">fileptr</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">fileptr</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">mutated_data</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">picked_indexes</span><span class="p">);</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">exif</span><span class="p">(</span><span class="kt">int</span> <span class="n">iteration</span><span class="p">)</span> <span class="p">{</span><font></font>
+    <font></font>
+    <span class="c1">//fileptr = popen("exiv2 pr -v mutated.jpeg &gt;/dev/null 2&gt;&amp;1", "r");</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">file</span> <span class="o">=</span> <span class="s">"vuln"</span><span class="p">;</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+    <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">"vuln"</span><span class="p">;</span>
+    <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s">"mutated.jpeg"</span><span class="p">;</span>
+    <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">pid_t</span> <span class="n">child_pid</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">child_status</span><span class="p">;</span><font></font>
+<font></font>
+    <span class="n">child_pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">child_pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span><font></font>
+        <font></font>
+        <span class="c1">// this means we're the child process</span>
+        <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">"/dev/null"</span><span class="p">,</span> <span class="n">O_WRONLY</span><span class="p">);</span><font></font>
+<font></font>
+        <span class="c1">// dup both stdout and stderr and send them to /dev/null</span>
+        <span class="n">dup2</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">dup2</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+        <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span><font></font>
+        <font></font>
+<font></font>
+        <span class="n">execvp</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">argv</span><span class="p">);</span>
+        <span class="c1">// shouldn't return, if it does, we have an error with the command</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[!] Unknown command for execvp, exiting...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// this is run by the parent process</span>
+        <span class="k">do</span> <span class="p">{</span>
+            <span class="n">pid_t</span> <span class="n">tpid</span> <span class="o">=</span> <span class="n">waitpid</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">child_status</span><span class="p">,</span> <span class="n">WUNTRACED</span> <span class="o">|</span>
+             <span class="n">WCONTINUED</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tpid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"[!] Waitpid failed!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+                <span class="n">perror</span><span class="p">(</span><span class="s">"waitpid"</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">child_status</span><span class="p">))</span> <span class="p">{</span>
+                <span class="c1">//printf("WIFEXITED: Exit Status: %d\n", WEXITSTATUS(child_status));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFSIGNALED</span><span class="p">(</span><span class="n">child_status</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">crashes</span><span class="o">++</span><span class="p">;</span>
+                <span class="kt">int</span> <span class="n">exit_status</span> <span class="o">=</span> <span class="n">WTERMSIG</span><span class="p">(</span><span class="n">child_status</span><span class="p">);</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\r</span><span class="s">[&gt;] Crashes: %d"</span><span class="p">,</span> <span class="n">crashes</span><span class="p">);</span>
+                <span class="n">fflush</span><span class="p">(</span><span class="n">stdout</span><span class="p">);</span>
+                <span class="kt">char</span> <span class="n">command</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+                <span class="n">sprintf</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="s">"cp mutated.jpeg ccrashes/%d.%d"</span><span class="p">,</span> <span class="n">iteration</span><span class="p">,</span> 
+                <span class="n">exit_status</span><span class="p">);</span>
+                <span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">child_status</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"WIFSTOPPED: Exit Status: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">child_status</span><span class="p">));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFCONTINUED</span><span class="p">(</span><span class="n">child_status</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"WIFCONTINUED: Exit Status: Continued.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">child_status</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">WIFSIGNALED</span><span class="p">(</span><span class="n">child_status</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Usage: ./cfuzz &lt;valid jpeg&gt; &lt;num of fuzz iterations&gt;</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Usage: ./cfuzz Canon_40D.jpg 10000</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="c1">// get our random seed</span>
+    <span class="n">srand</span><span class="p">((</span><span class="kt">unsigned</span><span class="p">)</span><span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">));</span><font></font>
+<font></font>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">fuzz_target</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="n">original_file</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">fuzz_target</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Size of file: %ld bytes.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
+    <span class="kt">size_t</span> <span class="n">mutations</span> <span class="o">=</span> <span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="p">.</span><span class="mo">02</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Flipping up to %ld bytes.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">mutations</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">iterations</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Fuzzing for %d iterations...</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">iterations</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">create_new</span><span class="p">(</span><span class="n">original_file</span><span class="p">,</span> <span class="n">mutations</span><span class="p">);</span>
+        <span class="n">exif</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+    <font></font>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">[&gt;] Fuzzing completed, exiting...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Tidak akan menghabiskan banyak waktu untuk membahas fitur fuzzer (fitur apa?) di sini, tetapi beberapa hal penting tentang kode fuzzer:</font></font></p>
+<ul>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mengambil file sebagai input dan menyalin byte dari file ke buffer</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ini menghitung panjang buffer dalam byte, dan kemudian mengubah 2% byte dengan menimpanya secara acak dengan byte yang sembarangan</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">fungsi yang bertanggung jawab atas mutasi, </font></font><code class="language-plaintext highlighter-rouge">create_new</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, tidak melacak indeks byte mana yang dimutasi, jadi secara teoritis, indeks yang sama dapat dipilih untuk mutasi beberapa kali, jadi sebenarnya, fuzzer memutasi </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">hingga</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> 2% byte.</font></font></li>
+</ul>
+
+<h3 id="small-detour-i-apologize"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jalan memutar kecil, saya minta maaf</font></font></h3>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kita hanya memiliki satu metode mutasi di sini untuk menjaga semuanya tetap sederhana, dengan melakukannya, saya benar-benar mempelajari sesuatu yang sangat berguna yang sebelumnya tidak saya pikirkan dengan jelas. Dalam posting sebelumnya saya bertanya-tanya, dengan malu, dengan lantang dan tercetak, seberapa jauh perbedaan antara pembalikan bit acak dan penimpaan byte acak (pembalikan?). Nah, ternyata, keduanya sangat berbeda. Mari kita luangkan waktu sebentar untuk melihat perbedaannya.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Katakanlah kita melakukan mutasi pada array byte yang disebut </font></font><code class="language-plaintext highlighter-rouge">bytes</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Kita melakukan mutasi indeks 5. </font></font><code class="language-plaintext highlighter-rouge">bytes[5]</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">== </font></font><code class="language-plaintext highlighter-rouge">\x41</code> <code class="language-plaintext highlighter-rouge">(65 in decimal)</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pada file asli yang tidak dimutasi dan murni. Jika kita </font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">hanya</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> melakukan bit flip, kita sangat terbatas dalam hal seberapa banyak kita dapat melakukan mutasi pada byte ini. 65 dalam </font></font><code class="language-plaintext highlighter-rouge">01000001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">bentuk biner. Mari kita lihat seberapa banyak perubahan yang terjadi akibat pembalikan satu bit secara sembarangan:</font></font></p>
+<ul>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit pertama: </font></font><code class="language-plaintext highlighter-rouge">11000001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 193,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit kedua: </font></font><code class="language-plaintext highlighter-rouge">00000001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 1,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit ketiga: </font></font><code class="language-plaintext highlighter-rouge">01100001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 97,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit keempat: </font></font><code class="language-plaintext highlighter-rouge">01010001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 81,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit kelima: </font></font><code class="language-plaintext highlighter-rouge">01001001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 73,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit keenam: </font></font><code class="language-plaintext highlighter-rouge">01000101</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 69,</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit ketujuh: </font></font><code class="language-plaintext highlighter-rouge">01000011</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 67, dan</font></font></li>
+  <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Membalik bit kedelapan: </font></font><code class="language-plaintext highlighter-rouge">010000001</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">= 64.</font></font></li>
+</ul>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Seperti yang Anda lihat, kita terkunci pada kemungkinan yang sangat terbatas.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi untuk program ini, saya memilih untuk mengganti metode mutasi ini dengan metode yang hanya mengganti byte acak, bukan bit dalam byte.</font></font></p>
+
+<h2 id="vulnerable-program"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Program Rentan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya menulis program kartun sederhana untuk menunjukkan betapa sulitnya bagi para fuzzer yang "bodoh" untuk menemukan bug. Bayangkan sebuah aplikasi target yang memiliki beberapa pohon keputusan dalam tampilan peta pembongkaran biner. Aplikasi tersebut melakukan 2-3 pemeriksaan pada input untuk melihat apakah input tersebut memenuhi kriteria tertentu sebelum meneruskan input tersebut ke beberapa jenis fungsi yang rentan. Inilah yang saya maksud:</font></font></p>
+
+<p><img src="https://h0mbre.github.io/assets/images/AWE/tree.PNG" alt=""></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Program kami melakukan hal yang persis seperti ini, mengambil byte dari file input dan memeriksa byte pada indeks 1/3 dari panjang file, 1/2 dari panjang file, dan 2/3 dari panjang file untuk melihat apakah byte pada posisi tersebut cocok dengan beberapa nilai yang dikodekan secara kaku (arbitrer). Jika semua pemeriksaan berhasil, aplikasi menyalin buffer byte ke buffer kecil yang menyebabkan segfault untuk mensimulasikan fungsi yang rentan. Berikut adalah program kami:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;errno.h&gt;</span><span class="cp">
+</span>
+<span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">length</span><span class="p">;</span>
+<span class="p">};</span><font></font>
+<font></font>
+<span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="nf">get_bytes</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">fileName</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="kt">FILE</span> <span class="o">*</span><span class="n">filePtr</span><span class="p">;</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">fileLen</span><span class="p">;</span><font></font>
+<font></font>
+    <span class="n">filePtr</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">filePtr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Unable to open %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">fileName</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+    <font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fseek</span><span class="p">(</span><span class="n">filePtr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SEEK_END</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] fseek() failed, wtf?</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="n">fileLen</span> <span class="o">=</span> <span class="n">ftell</span><span class="p">(</span><span class="n">filePtr</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fileLen</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] ftell() failed, wtf?</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="n">errno</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">rewind</span><span class="p">(</span><span class="n">filePtr</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">errno</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] rewind() failed, wtf?</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="kt">long</span> <span class="n">trueSize</span> <span class="o">=</span> <span class="n">fileLen</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] %s is %ld bytes.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">trueSize</span><span class="p">);</span>
+    <span class="n">buffer</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">fileLen</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+    <span class="n">fread</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">fileLen</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">filePtr</span><span class="p">);</span>
+    <span class="n">fclose</span><span class="p">(</span><span class="n">filePtr</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="n">original_file</span><span class="p">;</span>
+    <span class="n">original_file</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">;</span>
+    <span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">trueSize</span><span class="p">;</span><font></font>
+<font></font>
+    <span class="k">return</span> <span class="n">original_file</span><span class="p">;</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">check_one</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="kt">int</span> <span class="n">check</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="n">check</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'\x6c'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 1 failed.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">check_two</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="kt">int</span> <span class="n">check</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="n">check</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'\x57'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 2 failed.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">check_three</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="kt">int</span> <span class="n">check</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="n">check</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'\x21'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 3 failed.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">void</span> <span class="nf">vuln</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">buffer</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span><font></font>
+<font></font>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Passed all checks!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="kt">char</span> <span class="n">vulnBuff</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span><font></font>
+<font></font>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">vulnBuff</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">length</span><span class="p">);</span><font></font>
+<font></font>
+<span class="p">}</span><font></font>
+<font></font>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span><font></font>
+    <font></font>
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">argc</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Usage: vuln example.txt</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span><font></font>
+<font></font>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">filename</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Analyzing file: %s.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">filename</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="k">struct</span> <span class="n">ORIGINAL_FILE</span> <span class="n">original_file</span> <span class="o">=</span> <span class="n">get_bytes</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">checkNum1</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">*</span> <span class="p">.</span><span class="mi">33</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 1 no.: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">checkNum1</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">checkNum2</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">*</span> <span class="p">.</span><span class="mi">5</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 2 no.: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">checkNum2</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="kt">int</span> <span class="n">checkNum3</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">original_file</span><span class="p">.</span><span class="n">length</span> <span class="o">*</span> <span class="p">.</span><span class="mi">67</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[&gt;] Check 3 no.: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">checkNum3</span><span class="p">);</span><font></font>
+<font></font>
+    <span class="n">check_one</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">checkNum1</span><span class="p">);</span>
+    <span class="n">check_two</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">checkNum2</span><span class="p">);</span>
+    <span class="n">check_three</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">checkNum3</span><span class="p">);</span><font></font>
+    <font></font>
+    <span class="n">vuln</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">);</span><font></font>
+    <font></font>
+<font></font>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Perlu diingat bahwa ini hanyalah satu jenis kriteria, ada beberapa jenis kriteria berbeda yang ada dalam biner. Saya memilih yang ini karena pemeriksaannya sangat spesifik sehingga dapat menunjukkan, dengan cara yang berlebihan, betapa sulitnya mencapai kode baru hanya dengan cara acak.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">File contoh kami, yang akan kami mutasi dan masukkan ke aplikasi rentan ini masih berupa file yang sama dari postingan sebelumnya, </font></font><code class="language-plaintext highlighter-rouge">Canon_40D.jpg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">file dengan data exif.</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing$ file Canon_40D.jpg <font></font>
+Canon_40D.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 72x72, segment length 16, Exif Standard: [TIFF image data, little-endian, direntries=11, manufacturer=Canon, model=Canon EOS 40D, orientation=upper-left, xresolution=166, yresolution=174, resolutionunit=2, software=GIMP 2.4.5, datetime=2008:07:31 10:38:11, GPS-Data], baseline, precision 8, 100x68, frames 3<font></font>
+h0mbre@pwn:~/fuzzing$ ls -lah Canon_40D.jpg <font></font>
+-rw-r--r-- 1 h0mbre h0mbre 7.8K May 25 06:21 Canon_40D.jpg<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">File tersebut berukuran 7958 byte. Mari kita masukkan ke program yang rentan dan lihat indeks apa yang dipilih untuk pemeriksaan:</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing$ vuln Canon_40D.jpg <font></font>
+[&gt;] Analyzing file: Canon_40D.jpg.<font></font>
+[&gt;] Canon_40D.jpg is 7958 bytes.<font></font>
+[&gt;] Check 1 no.: 2626<font></font>
+[&gt;] Check 2 no.: 3979<font></font>
+[&gt;] Check 3 no.: 5331<font></font>
+[&gt;] Check 1 failed.<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi kita dapat melihat bahwa indeks </font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, </font></font><code class="language-plaintext highlighter-rouge">3979</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, dan </font></font><code class="language-plaintext highlighter-rouge">5331</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dipilih untuk pengujian dan bahwa berkas tersebut gagal pada pemeriksaan pertama karena byte pada posisi tersebut bukan </font></font><code class="language-plaintext highlighter-rouge">\x6c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<h2 id="experiment-1-passing-only-one-check"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Percobaan 1: Hanya Melewati Satu Pemeriksaan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mari kita hilangkan pemeriksaan dua dan tiga dan lihat bagaimana fuzzer bodoh kita bekerja terhadap biner ketika kita hanya harus melewati satu pemeriksaan.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya akan mengomentari cek dua dan tiga:</font></font></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">check_one</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">checkNum1</span><span class="p">);</span>
+<span class="c1">//check_two(original_file.data, checkNum2);</span>
+<span class="c1">//check_three(original_file.data, checkNum3);</span><font></font>
+    <font></font>
+<span class="n">vuln</span><span class="p">(</span><span class="n">original_file</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">original_file</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi sekarang, kita akan mengambil jpeg yang tidak diubah, yang secara alami tidak lolos pemeriksaan pertama, dan meminta fuzzer kita untuk mengubahnya dan mengirimkannya ke aplikasi yang rentan dengan harapan akan terjadi crash. Ingat, bahwa fuzzer mengubah hingga 159 byte dari total 7958 byte setiap iterasi fuzzing. Jika fuzzer secara acak memasukkan </font></font><code class="language-plaintext highlighter-rouge">\x6c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ke dalam index </font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, kita akan lolos pemeriksaan pertama dan eksekusi akan diteruskan ke fungsi yang rentan dan menyebabkan crash. Mari kita jalankan fuzzer bodoh kita 1 juta kali dan lihat berapa banyak crash yang kita dapatkan.</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing$ ./fuzzer Canon_40D.jpg 1000000<font></font>
+[&gt;] Size of file: 7958 bytes.<font></font>
+[&gt;] Flipping up to 159 bytes.<font></font>
+[&gt;] Fuzzing for 1000000 iterations...<font></font>
+[&gt;] Crashes: 88<font></font>
+[&gt;] Fuzzing completed, exiting...<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi dari 1 juta iterasi, kami mendapat 88 crash. Jadi pada sekitar %.0088 dari iterasi kami, kami memenuhi kriteria untuk lulus pemeriksaan 1 dan mencapai fungsi yang rentan. Mari periksa ulang crash kami untuk memastikan tidak ada kesalahan dalam kode kami (saya melakukan fuzzing pada program yang rentan dengan semua pemeriksaan diaktifkan dalam mode QEMU (untuk mensimulasikan tidak memiliki kode sumber) dengan AFL selama 14 jam dan tidak dapat membuat program crash jadi saya harap tidak ada bug yang tidak saya ketahui ğŸ˜¬).</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing/ccrashes$ vuln 998636.11 <font></font>
+[&gt;] Analyzing file: 998636.11.<font></font>
+[&gt;] 998636.11 is 7958 bytes.<font></font>
+[&gt;] Check 1 no.: 2626<font></font>
+[&gt;] Check 2 no.: 3979<font></font>
+[&gt;] Check 3 no.: 5331<font></font>
+[&gt;] Passed all checks!<font></font>
+Segmentation fault<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi, memasukkan salah satu input crash ke program yang rentan sebenarnya akan membuatnya crash. Keren.</font></font></p>
+
+<p><strong><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Penafian</font></font></em></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> : Di sinilah matematika berperan, dan saya tidak menjamin matematika ini benar. Saya bahkan meminta bantuan dari beberapa orang yang sangat pintar seperti</font></font><a href="https://twitter.com/Firzen14"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> @Firzen14</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> dan masih belum 100% yakin dengan matematika saya lol. Tapi! Saya terus maju dan mensimulasikan sistem yang terlibat di sini ratusan juta kali dan hasil data empiris sangat mendekati apa yang mungkin dikatakan matematika yang salah. Jadi, jika tidak benar, setidaknya cukup dekat untuk membuktikan poin yang saya coba tunjukkan.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mari kita coba dan cari tahu seberapa besar kemungkinan kita lolos pemeriksaan pertama dan mengalami crash. Kendala pertama yang perlu kita lewati adalah kita perlu </font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">memilih indeks untuk mutasi. Jika tidak dimutasi, kita tahu bahwa secara default indeks tersebut tidak akan menyimpan nilai yang kita perlukan dan kita tidak akan lolos pemeriksaan. Karena kita memilih byte untuk dimutasi 159 kali, dan kita memiliki 7958 byte untuk dipilih, peluang kita untuk memutasi byte pada indeks </font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mungkin mendekati </font></font><code class="language-plaintext highlighter-rouge">159/7958</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">angka </font></font><code class="language-plaintext highlighter-rouge">0.0199798944458407</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kendala kedua adalah kita membutuhkannya untuk menahan secara tepat </font></font><code class="language-plaintext highlighter-rouge">\x6c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">dan fuzzer memiliki 255 nilai byte untuk dipilih. Jadi peluang byte ini, setelah dipilih untuk mutasi, untuk dimutasi secara tepat </font></font><code class="language-plaintext highlighter-rouge">\x6c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">adalah </font></font><code class="language-plaintext highlighter-rouge">1/255</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, yaitu </font></font><code class="language-plaintext highlighter-rouge">0.003921568627451</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi peluang terjadinya kedua hal ini seharusnya mendekati </font></font><code class="language-plaintext highlighter-rouge">0.0199798944458407</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">* </font></font><code class="language-plaintext highlighter-rouge">0.003921568627451</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, (sekitar 0,0078%), yang jika dikalikan dengan 1 juta, akan menghasilkan sekitar 78 kecelakaan. Kami cukup mendekati angka itu dengan 88. Mengingat kami melakukan ini secara acak, akan ada beberapa varians.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi sebagai kesimpulan untuk Eksperimen 1, kami berhasil melewati satu jenis pemeriksaan ini dengan andal dan mencapai fungsi rentan kami dengan fuzzer bodoh kami. Mari kita lihat bagaimana keadaan berubah saat menambahkan pemeriksaan kedua.</font></font></p>
+
+<h2 id="experiment-2-passing-two-checks"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Percobaan 2: Melewati Dua Pemeriksaan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Di sinilah matematika menjadi masalah yang lebih besar; namun, seperti yang saya katakan sebelumnya, saya menjalankan simulasi kejadian ratusan juta kali dan hasilnya cukup dekat dengan apa yang saya pikir </font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">seharusnya</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> menjadi matematika.</font></font></p>
+
+<p><font style="vertical-align: inherit;"></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Menurut saya,</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> memiliki nilai byte yang benar cukup mudah </font><font style="vertical-align: inherit;">dan akan selalu menjadi 1/255, tetapi memilih kedua indeks untuk mutasi dengan hanya 159 pilihan yang tersedia membuat saya bingung. Saya menjalankan simulator untuk melihat seberapa sering kedua indeks dipilih untuk mutasi dan membiarkannya berjalan selama beberapa saat, setelah lebih dari 390 juta iterasi, hal itu terjadi sekitar 155.000 kali secara total.</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;snip&gt;<font></font>
+Occurences: 155070    Iterations: 397356879<font></font>
+Occurences: 155080    Iterations: 397395052<font></font>
+Occurences: 155090    Iterations: 397422769<font></font>
+&lt;snip&gt;<font></font>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">155090/397422769</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">== </font></font><code class="language-plaintext highlighter-rouge">.0003902393423261565</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Saya kira matematikanya mendekati </font></font><code class="language-plaintext highlighter-rouge">(159/7958) * (158/7958)</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, yang akan berakhir menjadi </font></font><code class="language-plaintext highlighter-rouge">.0003966855142551934</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">. Jadi Anda dapat melihat bahwa keduanya cukup dekat, dengan beberapa varians acak, keduanya tidak terlalu jauh. Ini seharusnya cukup dekat untuk menunjukkan masalahnya.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sekarang setelah kita harus melewati dua pemeriksaan, kita dapat secara matematis meringkas peluang terjadinya hal ini dengan fuzzer bodoh kita sebagai berikut:</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>((159/7958) * (1/255)) == odds to pass first check<font></font>
+odds to pass first check * (158/7958) == odds to pass first check and have second index targeted for mutation<font></font>
+odds to pass first check * ((158/7958) * (1/255)) == odds to have second index targeted for mutation and hold the correct value<font></font>
+((159/7958) * (1/255)) * ((158/7958) * (1/255)) == odds to pass both checks<font></font>
+((0.0199798944458407 * 0.003921568627451â€¬) * (0.0198542347323448 * 0.003921568627451)) == 6.100507716342904e-9<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi peluang kita memilih kedua indeks untuk mutasi dan memutasi kedua indeks tersebut agar memiliki nilai yang dibutuhkan adalah sekitar </font></font><code class="language-plaintext highlighter-rouge">.000000006100507716342904</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, yaitu </font></font><code class="language-plaintext highlighter-rouge">.0000006100507716342904%</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Untuk satu pemeriksaan yang diaktifkan, kita seharusnya memperkirakan SATU kerusakan setiap ~12.820 iterasi.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Untuk dua pemeriksaan yang diaktifkan, kita harus memperkirakan SATU kerusakan setiap </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">~163 juta iterasi.</font></font></strong></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ini adalah masalah yang cukup besar. Fuzzer kami perlu berjalan dalam waktu yang sangat lama untuk mencapai iterasi sebanyak itu secara rata-rata. Seperti yang ditulis dan dilakukan dalam VM, fuzzer melakukan sekitar 1.600 iterasi per detik. Saya akan membutuhkan waktu sekitar 28 jam untuk mencapai 163 juta iterasi. Anda dapat melihat bagaimana peluang kami menemukan bug berkurang secara eksponensial hanya dengan satu pemeriksaan lagi yang diaktifkan. Bayangkan pemeriksaan ketiga ditambahkan!</font></font></p>
+
+<h2 id="how-code-coverage-tracking-can-help-us"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Bagaimana Pelacakan Cakupan Kode Dapat Membantu Kita</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jika fuzzer kami mampu melacak cakupan kode, kami dapat mengubah masalah ini menjadi sesuatu yang jauh lebih mudah dikelola.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Secara umum, sistem pelacakan cakupan kode dalam fuzzer kami akan melacak input apa saja yang mencapai kode baru dalam aplikasi. Ada banyak cara untuk melakukan ini. Terkadang ketika kode sumber tersedia untuk Anda, Anda dapat mengompilasi ulang biner dengan instrumentasi tambahan yang memberi tahu fuzzer ketika kode baru dicapai, ada emulasi, dll. @gamozolabs memiliki sistem cakupan kode userland Windows yang sangat keren yang memanfaatkan debugger yang sangat cepat yang menetapkan jutaan breakpoint dalam biner target dan perlahan-lahan menghapus breakpoint saat dicapai yang disebut ' </font></font><a href="https://github.com/gamozolabs/mesos"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">mesos</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> '. Setelah fuzzer Anda menyadari bahwa input yang bermutasi mencapai kode baru, ia akan menyimpan input tersebut sehingga dapat digunakan kembali dan dimutasi lebih lanjut untuk mencapai lebih banyak kode. Itu adalah penjelasan yang sangat sederhana, tetapi mudah-mudahan itu memberikan gambaran yang jelas.</font></font></p>
+
+<p><img src="https://h0mbre.github.io/assets/images/AWE/coverage.PNG" alt=""></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Saya belum menerapkan teknik cakupan kode untuk fuzzer, tetapi kita dapat dengan mudah mensimulasikannya. Katakanlah fuzzer kita mampu, 1 dari ~13.000 kali, untuk melewati pemeriksaan pertama dan mencapai pemeriksaan kedua dalam program.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Pertama kali input mencapai pemeriksaan kedua ini, input tersebut akan dianggap sebagai cakupan kode baru. Hasilnya, fuzzer pintar kita sekarang akan menyimpan input tersebut karena menyebabkan kode baru tercapai. Input ini kemudian akan diumpankan kembali melalui mutator dan diharapkan mencapai kode baru yang sama lagi dengan kemungkinan tambahan untuk mencapai lebih banyak kode.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Mari kita tunjukkan ini. Mari kita ubah file kita </font></font><code class="language-plaintext highlighter-rouge">Canon_40D.jpg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">sehingga byte pada </font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">indeks adalah </font></font><code class="language-plaintext highlighter-rouge">\x6c</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, dan masukkan ke aplikasi kita yang rentan.</font></font></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing$ vuln Canon_altered.jpg <font></font>
+[&gt;] Analyzing file: Canon_altered.jpg.<font></font>
+[&gt;] Canon_altered.jpg is 7958 bytes.<font></font>
+[&gt;] Check 1 no.: 2626<font></font>
+[&gt;] Check 2 no.: 3979<font></font>
+[&gt;] Check 2 failed.<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Seperti yang Anda lihat, kami lulus pemeriksaan pertama dan gagal pada pemeriksaan kedua. Mari kita gunakan </font></font><code class="language-plaintext highlighter-rouge">Canon_altered.jpg</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">berkas ini sekarang sebagai masukan dasar yang kita gunakan untuk simulasi mutasi yang mensimulasikan fakta bahwa kita memiliki pelacakan cakupan kode di fuzzer kita dan melihat berapa banyak kerusakan yang kita dapatkan ketika hanya ada pengujian untuk dua pemeriksaan total.</font></font></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>h0mbre@pwn:~/fuzzing$ ./fuzzer Canon_altered.jpg 1000000<font></font>
+[&gt;] Size of file: 7958 bytes.<font></font>
+[&gt;] Flipping up to 159 bytes.<font></font>
+[&gt;] Fuzzing for 1000000 iterations...<font></font>
+[&gt;] Crashes: 86<font></font>
+[&gt;] Fuzzing completed, exiting...<font></font>
+</code></pre></div></div>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi dengan menggunakan berkas yang membuat cakupan kode meningkat, yaitu berkas yang lolos pemeriksaan pertama, sebagai berkas dasar dan mengirimkannya kembali melalui mutator, kami mampu lolos pemeriksaan kedua sebanyak 86 kali. Kami pada dasarnya mengambil masalah eksponensial yang sulit yang kami hadapi sebelumnya dan mengubahnya kembali ke masalah awal kami yang hanya perlu lolos satu pemeriksaan. Ada banyak pertimbangan lain yang harus diperhitungkan oleh para fuzzer sejati, tetapi saya hanya mencoba untuk menunjukkan dengan jelas bagaimana hal itu membantu mengurangi masalah eksponensial menjadi masalah yang lebih mudah dikelola.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kami mengurangi</font></font><code class="language-plaintext highlighter-rouge">((0.0199798944458407 * 0.003921568627451â€¬) * (0.0198542347323448 * 0.003921568627451)) == 6.100507716342904e-9</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> masalah kami menjadi sesuatu yang mendekati </font></font><code class="language-plaintext highlighter-rouge">(0.0199798944458407 * 0.003921568627451)â€¬</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">, yang merupakan kemenangan besar bagi kami.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Beberapa hal yang perlu diperhatikan di sini adalah bahwa memasukkan kembali file yang diubah melalui proses mutasi dapat melakukan beberapa hal. Hal ini dapat mengubah ulang byte pada indeks</font></font><code class="language-plaintext highlighter-rouge">2626</code><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> dan kemudian kita bahkan tidak akan lulus pemeriksaan pertama. Ia dapat mengubah berkas sedemikian rupa (ingat, ia sudah berbeda hingga 2% dari jpeg yang valid dari putaran mutasi pertama) sehingga aplikasi yang rentan menolak masukan dan kita membuang siklus fuzz.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Jadi ada banyak hal lain yang harus dipertimbangkan, tetapi semoga ini dengan jelas menunjukkan bagaimana cakupan kode membantu fuzzer menyelesaikan pengujian biner target yang lebih komprehensif.</font></font></p>
+
+<h2 id="conclusion"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Kesimpulan</font></font></h2>
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Ada banyak sumber daya di luar sana tentang berbagai teknik cakupan kode, pastikan untuk menindaklanjuti dan membaca lebih lanjut tentang subjek tersebut jika Anda tertarik. </font></font><a href="https://twitter.com/carste1n"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">@carste1n</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> memiliki seri hebat di mana ia membahas peningkatan fuzzer secara bertahap, Anda dapat membaca artikel terbarunya di sini: https://carstein.github.io/2020/05/21/writing-simple-fuzzer-4.html</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Di masa mendatang, kita dapat menambahkan beberapa logika cakupan kode ke fuzzer bodoh kita dari artikel ini dan kita dapat menggunakan program yang rentan sebagai semacam tolok ukur untuk menilai efektivitas teknik cakupan kode.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Beberapa catatan menarik, saya mengaburkan aplikasi yang rentan dengan ketiga pemeriksaan yang diaktifkan dengan AFL selama sekitar 13 jam dan tidak dapat membuatnya macet! Saya tidak yakin mengapa itu begitu sulit. Dengan hanya dua pemeriksaan yang diaktifkan, AFL dapat menemukan kerusakan dengan sangat cepat. Mungkin ada yang salah dengan pengujian saya, saya tidak begitu yakin.</font></font></p>
+
+<p><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Sampai jumpa lagi!</font></font></p>
+
+  </div>
+</article>
+      </div>
+    </main><footer class="site-footer">
+    <div class="wrapper">
+      <div class="social-links"><ul class="social-media-list"><li><a href="https://github.com/h0mbre"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">pria</font></font></span></a></li><li><a href="https://www.twitter.com/h0mbre_"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">h0mbre_</font></font></span></a></li></ul>
+</div>
+    </div>
+  </footer><div id="goog-gt-tt" class="VIpgJd-yAWNEb-L7lbkb skiptranslate" style="border-radius: 12px; margin: 0 0 0 -23px; padding: 0; font-family: 'Google Sans', Arial, sans-serif;" data-id=""><div id="goog-gt-vt" class="VIpgJd-yAWNEb-hvhgNd"><div class=" VIpgJd-yAWNEb-hvhgNd-l4eHX-i3jM8c"><img src="https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg" width="24" height="24" alt=""></div><div class=" VIpgJd-yAWNEb-hvhgNd-k77Iif-i3jM8c"><div class="VIpgJd-yAWNEb-hvhgNd-IuizWc" dir="ltr">Teks asli</div><div id="goog-gt-original-text" class="VIpgJd-yAWNEb-nVMfcd-fmcmS VIpgJd-yAWNEb-hvhgNd-axAV1"></div></div><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid ltr"><div class="VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od ltr" dir="ltr"><div class="VIpgJd-yAWNEb-hvhgNd-UTujCb">Beri rating terjemahan ini</div><div class="VIpgJd-yAWNEb-hvhgNd-eO9mKe">Masukan Anda akan digunakan untuk membantu meningkatkan kualitas Google Terjemahan</div></div><div class="VIpgJd-yAWNEb-hvhgNd-xgov5 ltr"><button id="goog-gt-thumbUpButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Terjemahan bagus" aria-label="Terjemahan bagus" aria-pressed="false"><span id="goog-gt-thumbUpIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7H2v13h16c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM7 18H4V9h3v9zm14-7l-3 7H9V8l4.34-4.34L12 9h9v2z"></path></svg></span><span id="goog-gt-thumbUpIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M21 7h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 0S7.08 6.85 7 7v13h11c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9c0-1.1-.9-2-2-2zM5 7H1v13h4V7z"></path></svg></span></button><button id="goog-gt-thumbDownButton" type="button" class="VIpgJd-yAWNEb-hvhgNd-bgm6sf" title="Terjemahan buruk" aria-label="Terjemahan buruk" aria-pressed="false"><span id="goog-gt-thumbDownIcon"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7h5V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zM17 6h3v9h-3V6zM3 13l3-7h9v10l-4.34 4.34L12 15H3v-2z"></path></svg></span><span id="goog-gt-thumbDownIconFilled"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="VIpgJd-yAWNEb-hvhgNd-THI6Vb NMm5M"><path d="M3 17h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 24s7.09-6.85 7.17-7V4H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2zm16 0h4V4h-4v13z"></path></svg></span></button></div></div><div id="goog-gt-votingHiddenPane" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><form id="goog-gt-votingForm" action="https://translate.googleapis.com/translate_voting?client=te_lib" method="post" target="votingFrame" class="VIpgJd-yAWNEb-hvhgNd-aXYTce"><input type="text" name="sl" id="goog-gt-votingInputSrcLang"><input type="text" name="tl" id="goog-gt-votingInputTrgLang"><input type="text" name="query" id="goog-gt-votingInputSrcText"><input type="text" name="gtrans" id="goog-gt-votingInputTrgText"><input type="text" name="vote" id="goog-gt-votingInputVote"></form><iframe name="votingFrame" frameborder="0"></iframe></div></div></div>
+</body></html>
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/assets/main.css
+
+@charset "utf-8";
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap");
+
+@font-face { font-family: "GNU Unifont"; src: url("/assets/fonts/unifont-15.1.05.otf") format("opentype"); }
+
+@font-face { font-family: "Perfect DOS VGA 437"; src: url("/assets/fonts/Perfect DOS VGA 437.ttf") format("truetype"); }
+
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0px; padding: 0px; }
+
+body { font-style: normal; font-variant: normal; font-optical-sizing: auto; font-variation-settings: normal; font-weight: 400; font-stretch: normal; font-size: 16px; line-height: 1.5; font-family: "GNU Unifont", monospace; color: rgb(17, 17, 17); background-color: rgb(253, 253, 253); text-size-adjust: 100%; font-feature-settings: "kern"; font-kerning: normal; display: flex; min-height: 100vh; flex-direction: column; }
+
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, ul, ol, dl, figure, .highlight { margin-bottom: 15px; }
+
+main { display: block; }
+
+img { max-width: 100%; vertical-align: middle; }
+
+figure > img { display: block; }
+
+figcaption { font-size: 14px; }
+
+ul, ol { margin-left: 30px; }
+
+li > ul, li > ol { margin-bottom: 0px; }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+
+a { color: rgb(42, 122, 226); text-decoration: none; }
+
+a:visited { color: rgb(23, 86, 169); }
+
+a:hover { color: rgb(17, 17, 17); text-decoration: underline; }
+
+.social-media-list a:hover { text-decoration: none; }
+
+.social-media-list a:hover .username { text-decoration: underline; }
+
+blockquote { color: rgb(130, 130, 130); border-left: 4px solid rgb(232, 232, 232); padding-left: 15px; font-size: 18px; letter-spacing: -1px; font-style: italic; }
+
+blockquote > :last-child { margin-bottom: 0px; }
+
+pre, code { font-size: 15px; border: 1px solid rgb(232, 232, 232); border-radius: 3px; background-color: rgb(238, 238, 255); }
+
+code { padding: 1px 5px; }
+
+pre { padding: 8px 12px; overflow-x: auto; }
+
+pre > code { border: 0px; padding-right: 0px; padding-left: 0px; }
+
+.wrapper { max-width: calc(940px); margin-right: auto; margin-left: auto; padding-right: 30px; padding-left: 30px; }
+
+@media screen and (max-width: 800px) {
+  .wrapper { max-width: calc(970px); padding-right: 15px; padding-left: 15px; }
+}
+
+.wrapper::after, .footer-col-wrapper::after { content: ""; display: table; clear: both; }
+
+.svg-icon { width: 16px; height: 16px; display: inline-block; fill: rgb(130, 130, 130); padding-right: 5px; vertical-align: text-top; }
+
+.social-media-list li + li { padding-top: 5px; }
+
+table { margin-bottom: 30px; width: 100%; text-align: left; color: rgb(63, 63, 63); border-collapse: collapse; border: 1px solid rgb(232, 232, 232); }
+
+table tr:nth-child(2n) { background-color: rgb(247, 247, 247); }
+
+table th, table td { padding: 10px 15px; }
+
+table th { background-color: rgb(240, 240, 240); border-width: 1px; border-style: solid; border-color: rgb(222, 222, 222) rgb(222, 222, 222) rgb(201, 201, 201); border-image: initial; }
+
+table td { border: 1px solid rgb(232, 232, 232); }
+
+.site-header { border-top: 5px solid rgb(66, 66, 66); border-bottom: 1px solid rgb(232, 232, 232); min-height: 55.95px; position: relative; }
+
+.site-title { font-size: 26px; font-weight: 300; line-height: 54px; letter-spacing: -1px; margin-bottom: 0px; float: left; }
+
+.site-title, .site-title:visited { color: rgb(66, 66, 66); }
+
+.site-nav { float: right; line-height: 54px; }
+
+.site-nav .nav-trigger { display: none; }
+
+.site-nav .menu-icon { display: none; }
+
+.site-nav .page-link { color: rgb(17, 17, 17); line-height: 1.5; }
+
+.site-nav .page-link:not(:last-child) { margin-right: 20px; }
+
+@media screen and (max-width: 600px) {
+  .site-nav { position: absolute; top: 9px; right: 15px; background-color: rgb(253, 253, 253); border: 1px solid rgb(232, 232, 232); border-radius: 5px; text-align: right; }
+  .site-nav label[for="nav-trigger"] { display: block; float: right; width: 36px; height: 36px; z-index: 2; cursor: pointer; }
+  .site-nav .menu-icon { display: block; float: right; width: 36px; height: 26px; line-height: 0; padding-top: 10px; text-align: center; }
+  .site-nav .menu-icon > svg { fill: rgb(66, 66, 66); }
+  .site-nav input ~ .trigger { clear: both; display: none; }
+  .site-nav input:checked ~ .trigger { display: block; padding-bottom: 5px; }
+  .site-nav .page-link { display: block; padding: 5px 10px; margin-left: 20px; }
+  .site-nav .page-link:not(:last-child) { margin-right: 0px; }
+}
+
+.site-footer { border-top: 1px solid rgb(232, 232, 232); padding: 30px 0px; }
+
+.footer-heading { font-size: 18px; margin-bottom: 15px; }
+
+.contact-list, .social-media-list { list-style: none; margin-left: 0px; }
+
+.footer-col-wrapper { font-size: 15px; color: rgb(130, 130, 130); margin-left: -15px; }
+
+.footer-col { float: left; margin-bottom: 15px; padding-left: 15px; }
+
+.footer-col-1 { width: calc(35% - 15px); }
+
+.footer-col-2 { width: calc(20% - 15px); }
+
+.footer-col-3 { width: calc(45% - 15px); }
+
+@media screen and (max-width: 800px) {
+  .footer-col-1, .footer-col-2 { width: calc(50% - 15px); }
+  .footer-col-3 { width: calc(100% - 15px); }
+}
+
+@media screen and (max-width: 600px) {
+  .footer-col { float: none; width: calc(100% - 15px); }
+}
+
+.page-content { padding: 30px 0px; flex: 1 1 0%; }
+
+.page-heading { font-size: 32px; }
+
+.post-list-heading { font-size: 28px; }
+
+.post-list { margin-left: 0px; list-style: none; }
+
+.post-list > li { margin-bottom: 30px; }
+
+.post-meta { font-size: 14px; color: rgb(130, 130, 130); }
+
+.post-link { display: block; font-size: 24px; }
+
+.post-header { margin-bottom: 30px; }
+
+.post-title { font-size: 42px; letter-spacing: -1px; line-height: 1; }
+
+@media screen and (max-width: 800px) {
+  .post-title { font-size: 36px; }
+}
+
+.post-content { margin-bottom: 30px; }
+
+.post-content h2 { font-size: 32px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h2 { font-size: 28px; }
+}
+
+.post-content h3 { font-size: 26px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h3 { font-size: 22px; }
+}
+
+.post-content h4 { font-size: 20px; }
+
+@media screen and (max-width: 800px) {
+  .post-content h4 { font-size: 18px; }
+}
+
+.highlight { background: rgb(255, 255, 255); }
+
+.highlighter-rouge .highlight { background: rgb(238, 238, 255); }
+
+.highlight .c { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .err { color: rgb(166, 23, 23); background-color: rgb(227, 210, 210); }
+
+.highlight .k { font-weight: bold; }
+
+.highlight .o { font-weight: bold; }
+
+.highlight .cm { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .cp { color: rgb(153, 153, 153); font-weight: bold; }
+
+.highlight .c1 { color: rgb(153, 153, 136); font-style: italic; }
+
+.highlight .cs { color: rgb(153, 153, 153); font-weight: bold; font-style: italic; }
+
+.highlight .gd { color: rgb(0, 0, 0); background-color: rgb(255, 221, 221); }
+
+.highlight .gd .x { color: rgb(0, 0, 0); background-color: rgb(255, 170, 170); }
+
+.highlight .ge { font-style: italic; }
+
+.highlight .gr { color: rgb(170, 0, 0); }
+
+.highlight .gh { color: rgb(153, 153, 153); }
+
+.highlight .gi { color: rgb(0, 0, 0); background-color: rgb(221, 255, 221); }
+
+.highlight .gi .x { color: rgb(0, 0, 0); background-color: rgb(170, 255, 170); }
+
+.highlight .go { color: rgb(136, 136, 136); }
+
+.highlight .gp { color: rgb(85, 85, 85); }
+
+.highlight .gs { font-weight: bold; }
+
+.highlight .gu { color: rgb(170, 170, 170); }
+
+.highlight .gt { color: rgb(170, 0, 0); }
+
+.highlight .kc { font-weight: bold; }
+
+.highlight .kd { font-weight: bold; }
+
+.highlight .kp { font-weight: bold; }
+
+.highlight .kr { font-weight: bold; }
+
+.highlight .kt { color: rgb(68, 85, 136); font-weight: bold; }
+
+.highlight .m { color: rgb(0, 153, 153); }
+
+.highlight .s { color: rgb(221, 17, 68); }
+
+.highlight .na { color: teal; }
+
+.highlight .nb { color: rgb(0, 134, 179); }
+
+.highlight .nc { color: rgb(68, 85, 136); font-weight: bold; }
+
+.highlight .no { color: teal; }
+
+.highlight .ni { color: purple; }
+
+.highlight .ne { color: rgb(153, 0, 0); font-weight: bold; }
+
+.highlight .nf { color: rgb(153, 0, 0); font-weight: bold; }
+
+.highlight .nn { color: rgb(85, 85, 85); }
+
+.highlight .nt { color: navy; }
+
+.highlight .nv { color: teal; }
+
+.highlight .ow { font-weight: bold; }
+
+.highlight .w { color: rgb(187, 187, 187); }
+
+.highlight .mf { color: rgb(0, 153, 153); }
+
+.highlight .mh { color: rgb(0, 153, 153); }
+
+.highlight .mi { color: rgb(0, 153, 153); }
+
+.highlight .mo { color: rgb(0, 153, 153); }
+
+.highlight .sb { color: rgb(221, 17, 68); }
+
+.highlight .sc { color: rgb(221, 17, 68); }
+
+.highlight .sd { color: rgb(221, 17, 68); }
+
+.highlight .s2 { color: rgb(221, 17, 68); }
+
+.highlight .se { color: rgb(221, 17, 68); }
+
+.highlight .sh { color: rgb(221, 17, 68); }
+
+.highlight .si { color: rgb(221, 17, 68); }
+
+.highlight .sx { color: rgb(221, 17, 68); }
+
+.highlight .sr { color: rgb(0, 153, 38); }
+
+.highlight .s1 { color: rgb(221, 17, 68); }
+
+.highlight .ss { color: rgb(153, 0, 115); }
+
+.highlight .bp { color: rgb(153, 153, 153); }
+
+.highlight .vc { color: teal; }
+
+.highlight .vg { color: teal; }
+
+.highlight .vi { color: teal; }
+
+.highlight .il { color: rgb(0, 153, 153); }
+
+body { font-family: "GNU Unifont", monospace; color: rgb(29, 30, 32); }
+
+body.post-page { background-color: rgb(123, 146, 191); }
+
+body.home-page { background-color: rgb(0, 128, 128); }
+
+.main-content { max-width: 1000px; margin: 0px auto; padding: 1rem; background-color: rgb(197, 201, 199); box-shadow: rgb(102, 102, 102) 5px 5px 0px; border-radius: 0px; width: 100%; box-sizing: border-box; }
+
+.post-meta { color: black; margin-top: 0.1rem; font-size: 0.875rem; }
+
+.home-content a { color: black; }
+
+body.post-page h1, body.home-page h1, body.post-page h2, body.home-page h2, body.post-page h3, body.home-page h3, body.post-page h4, body.home-page h4, body.post-page h5, body.home-page h5, body.post-page h6, body.home-page h6, .post-title { font-family: "GNU Unifont", monospace; color: rgb(29, 30, 32); }
+
+body.post-page h1, body.home-page h1 { font-size: 1.2rem; }
+
+body.post-page h2, body.home-page h2 { font-size: 1.1rem; }
+
+body.post-page h3, body.home-page h3 { font-size: 1rem; }
+
+body.post-page h4, body.home-page h4 { font-size: 0.9rem; }
+
+body.post-page h5, body.home-page h5 { font-size: 0.8rem; }
+
+body.post-page h6, body.home-page h6 { font-size: 0.7rem; }
+
+body.post-page h1, body.post-page h2, body.post-page h3, body.post-page h4, body.post-page h5, body.post-page h6 { text-decoration: underline; }
+
+.home-content .post-link { font-family: "Perfect DOS VGA 437", sans-serif; }
+
+.site-header { background-color: rgb(51, 51, 51); padding: 1rem 0px; border-bottom: 2px solid rgb(102, 102, 102); display: flex; justify-content: center; align-items: center; }
+
+.wrapper { display: flex; justify-content: center; align-items: center; width: 100%; padding: 0px 1rem; position: relative; }
+
+.social-links { position: absolute; left: 1rem; display: flex; align-items: center; }
+
+.social-links a { color: white; margin-right: 1rem; text-decoration: none; }
+
+.site-footer { background-color: rgb(51, 51, 51); padding: 3rem 0px; border-top: 2px solid rgb(102, 102, 102); }
+
+.site-title { font-family: "GNU Unifont", monospace; font-size: 2rem; text-align: center; display: block; color: rgb(240, 240, 240) !important; }
+
+.highlight pre, .highlight code { font-family: "JetBrains Mono", Consolas, "Courier New", monospace; font-size: 0.95em; }
+
+p code, li code, span code { font-size: 0.875em; font-family: "JetBrains Mono", Consolas, "Courier New", monospace; }
+
+.doc-icon { width: 24px; height: 24px; min-width: 24px; min-height: 24px; margin-right: 0.5rem; vertical-align: middle; }
+
+.post-item { margin-bottom: 1rem; }
+
+.post-details { display: flex; align-items: center; }
+
+.post-details .post-link { margin-left: 0.5rem; font-size: 1rem; color: white; }
+
+.post-list .post-meta { margin-left: 0.5rem; font-size: 0.875rem; color: white; }
+
+.post .post-header, .post .post-content { padding: 0px 1rem; }
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .site-header { flex-direction: column; align-items: center; padding: 0.5rem 0px; }
+  .social-links { position: static; margin-bottom: 1rem; }
+  .site-title { font-size: 1.5rem; width: 100%; text-align: center; }
+  .wrapper { padding: 0px; }
+  .doc-icon { width: 24px; height: 24px; }
+  .post-details { display: flex; align-items: center; }
+  .post-item { margin-bottom: 1rem; }
+  .main-content { margin: 0px; padding: 0.5rem; width: calc(100% - 1rem); box-shadow: rgb(102, 102, 102) 3px 3px 0px; }
+  .post .post-header, .post .post-content { padding: 0px 0.5rem; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+  .post-title { font-size: 1.5rem; }
+  .post-content h2 { font-size: 1.25rem; }
+  .post-content h3 { font-size: 1.1rem; }
+  .post-content h4 { font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .main-content { width: calc(100% - 1rem); margin: 0.5rem auto; padding: 0.5rem; }
+  .post-title { font-size: 1.3rem; }
+  .post-content h2 { font-size: 1.2rem; }
+  .post-content h3 { font-size: 1.1rem; }
+  .post-content h4 { font-size: 1rem; }
+}
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap
+
+@charset "utf-8";
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2") format("woff2"); unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2") format("woff2"); unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 700; font-display: swap; src: url("https://fonts.gstatic.com/s/jetbrainsmono/v20/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: https://www.gstatic.com/_/translate_http/_/ss/k=translate_http.tr.26tY-h6gH9w.L.W.O/am=DAY/d=0/rs=AN8SPfrCcgxoBri2FVMQptvuOBiOsolgBw/m=el_main_css
+
+@charset "utf-8";
+
+.VIpgJd-ZVi9od-ORHb-OEVmcd { left: 0px; top: 0px; height: 39px; width: 100%; z-index: 10000001; position: fixed; border-top: none; border-right: none; border-left: none; border-image: initial; border-bottom: 1px solid rgb(107, 144, 218); margin: 0px; box-shadow: rgb(153, 153, 153) 0px 0px 8px 1px; }
+
+.VIpgJd-ZVi9od-xl07Ob-OEVmcd { z-index: 10000002; border: none; position: fixed; box-shadow: rgb(153, 153, 153) 0px 3px 8px 2px; }
+
+.VIpgJd-ZVi9od-SmfZ-OEVmcd { z-index: 10000000; border: none; margin: 0px; }
+
+.goog-te-gadget { font-family: arial; font-size: 11px; color: rgb(102, 102, 102); white-space: nowrap; }
+
+.goog-te-gadget img { vertical-align: middle; border: none; }
+
+.goog-te-gadget-simple { background-color: rgb(255, 255, 255); border-width: 1px; border-style: solid; border-color: rgb(155, 155, 155) rgb(213, 213, 213) rgb(232, 232, 232); font-size: 10pt; display: inline-block; padding-top: 1px; padding-bottom: 2px; cursor: pointer; }
+
+.goog-te-gadget-icon { margin-left: 2px; margin-right: 2px; width: 19px; height: 19px; border: none; vertical-align: middle; }
+
+.goog-te-combo { margin-left: 4px; margin-right: 4px; vertical-align: baseline; }
+
+.goog-te-gadget .goog-te-combo { margin: 4px 0px; }
+
+.VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-l4eHX-hSRGPd:link, .VIpgJd-ZVi9od-l4eHX-hSRGPd:visited, .VIpgJd-ZVi9od-l4eHX-hSRGPd:hover, .VIpgJd-ZVi9od-l4eHX-hSRGPd:active { font-size: 12px; font-weight: bold; color: rgb(68, 68, 68); text-decoration: none; }
+
+.VIpgJd-ZVi9od-ORHb .VIpgJd-ZVi9od-l4eHX-hSRGPd, .VIpgJd-ZVi9od-TvD9Pc-hSRGPd { display: block; margin: 0px 10px; }
+
+.VIpgJd-ZVi9od-ORHb .VIpgJd-ZVi9od-l4eHX-hSRGPd { padding-top: 2px; padding-left: 4px; }
+
+.goog-te-combo, .VIpgJd-ZVi9od-ORHb *, .VIpgJd-ZVi9od-SmfZ *, .VIpgJd-ZVi9od-xl07Ob *, .VIpgJd-ZVi9od-vH1Gmf *, .VIpgJd-ZVi9od-l9xktf * { font-family: arial; font-size: 10pt; }
+
+.VIpgJd-ZVi9od-ORHb { margin: 0px; background-color: rgb(228, 239, 251); overflow: hidden; }
+
+.VIpgJd-ZVi9od-ORHb img { border: none; }
+
+.VIpgJd-ZVi9od-ORHb-bN97Pc { color: rgb(0, 0, 0); }
+
+.VIpgJd-ZVi9od-ORHb-bN97Pc img { vertical-align: middle; }
+
+.VIpgJd-ZVi9od-ORHb-Tswv1b { color: rgb(102, 102, 102); vertical-align: top; margin-top: 0px; font-size: 7pt; }
+
+.VIpgJd-ZVi9od-ORHb-KE6vqe { width: 8px; }
+
+.VIpgJd-ZVi9od-LgbsSe { border-color: rgb(231, 231, 231); border-style: none solid solid none; border-width: 0px 1px 1px 0px; }
+
+.VIpgJd-ZVi9od-LgbsSe div { border-color: rgb(204, 204, 204) rgb(153, 153, 153) rgb(153, 153, 153) rgb(204, 204, 204); border-style: solid; border-width: 1px; height: 20px; }
+
+.VIpgJd-ZVi9od-LgbsSe button { background: transparent; border: none; cursor: pointer; height: 20px; overflow: hidden; margin: 0px; vertical-align: top; white-space: nowrap; }
+
+.VIpgJd-ZVi9od-LgbsSe button:active { background: none 0px 0px repeat scroll rgb(204, 204, 204); }
+
+.VIpgJd-ZVi9od-SmfZ { margin: 0px; background-color: rgb(255, 255, 255); white-space: nowrap; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd { text-decoration: none; font-weight: bold; font-size: 10pt; border: 1px outset rgb(136, 136, 136); padding: 6px 10px; white-space: nowrap; position: absolute; left: 0px; top: 0px; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd img { margin-left: 2px; margin-right: 2px; width: 19px; height: 19px; border: none; vertical-align: middle; }
+
+.VIpgJd-ZVi9od-SmfZ-hSRGPd span { text-decoration: underline; margin-left: 2px; margin-right: 2px; vertical-align: middle; }
+
+.goog-te-float-top .VIpgJd-ZVi9od-SmfZ-hSRGPd { padding: 2px; border-top-width: 0px; }
+
+.goog-te-float-bottom .VIpgJd-ZVi9od-SmfZ-hSRGPd { padding: 2px; border-bottom-width: 0px; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed { text-decoration: none; color: rgb(0, 0, 204); white-space: nowrap; margin-left: 4px; margin-right: 4px; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed span { text-decoration: underline; }
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed img { margin-left: 2px; margin-right: 2px; }
+
+.goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed { color: rgb(0, 0, 0); }
+
+.goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed span { text-decoration: none; }
+
+.VIpgJd-ZVi9od-xl07Ob { background-color: rgb(255, 255, 255); text-decoration: none; border: 2px solid rgb(195, 217, 255); overflow: hidden scroll; position: absolute; left: 0px; top: 0px; }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b { padding: 3px; text-decoration: none; }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b, .VIpgJd-ZVi9od-xl07Ob-ibnC6b:link { color: rgb(0, 0, 204); background: rgb(255, 255, 255); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:visited { color: rgb(85, 26, 139); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:hover { background: rgb(195, 217, 255); }
+
+.VIpgJd-ZVi9od-xl07Ob-ibnC6b:active { color: rgb(0, 0, 204); }
+
+.VIpgJd-ZVi9od-vH1Gmf { background-color: rgb(255, 255, 255); text-decoration: none; border: 1px solid rgb(107, 144, 218); overflow: hidden; padding: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-KrhPNb { width: 16px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-hgDUwe { margin: 6px 0px; height: 1px; background-color: rgb(170, 170, 170); overflow: hidden; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd div { padding: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b .uDEFge { display: none; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd .uDEFge { }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd .fmcmS { padding-left: 4px; padding-right: 4px; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd { text-decoration: none; }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:link div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:visited div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b:active div { color: rgb(0, 0, 204); background: rgb(255, 255, 255); }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b:hover div { color: rgb(255, 255, 255); background: rgb(51, 102, 204); }
+
+.VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:link div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:visited div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:hover div, .VIpgJd-ZVi9od-vH1Gmf-ibnC6b-gk6SMd:active div { color: rgb(0, 0, 0); font-weight: bold; }
+
+.VIpgJd-ZVi9od-l9xktf { background-color: rgb(255, 255, 255); overflow: hidden; padding: 8px; border: none; border-radius: 10px; }
+
+.VIpgJd-ZVi9od-l9xktf-OEVmcd { background-color: rgb(255, 255, 255); border: 1px solid rgb(107, 144, 218); box-shadow: rgb(153, 153, 153) 0px 3px 8px 2px; border-radius: 8px; }
+
+.VIpgJd-ZVi9od-l9xktf img { border: none; }
+
+.VIpgJd-ZVi9od-l9xktf-fmcmS { margin-top: 6px; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc { margin-top: 6px; white-space: nowrap; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc * { vertical-align: middle; }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc .DUGJie { background-image: url("https://www&google.com/images/zippy_minus_sm.gif"); }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc .TdyTDe { background-image: url("https://www&google.com/images/zippy_plus_sm.gif"); }
+
+.VIpgJd-ZVi9od-l9xktf-VgwJlc span { color: rgb(0, 0, 204); text-decoration: underline; cursor: pointer; margin: 0px 4px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp { margin: 6px 0px 0px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp form { margin: 0px; }
+
+.VIpgJd-ZVi9od-l9xktf-I9GLp form textarea { margin-bottom: 4px; width: 100%; }
+
+.VIpgJd-ZVi9od-l9xktf-yePe5c { margin: 6px 0px 4px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf { z-index: 1000; position: fixed; transition-delay: 0.6s; left: -1000px; top: -1000px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf-ti6hGc { transition-delay: 0s; left: -14px; top: -14px; }
+
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO { display: flex; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; width: 104px; height: 104px; border-radius: 50px; background: url("https://www.gstatic.com/images/branding/product/2x/translate_24dp.png") 50% 50% no-repeat rgb(255, 255, 255); transition: all 0.6s ease-in-out 0s; transform: scale(0.4); opacity: 0; }
+
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO-ti6hGc { transform: scale(0.5); opacity: 1; }
+
+.VIpgJd-ZVi9od-aZ2wEe { margin: 2px 0px 0px 2px; animation: 1.4s linear 0s infinite normal none running spinner-rotator; }
+
+@-webkit-keyframes spinner-rotator { 
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(270deg); }
+}
+
+@keyframes spinner-rotator { 
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(270deg); }
+}
+
+.VIpgJd-ZVi9od-aZ2wEe-Jt5cK { stroke-dasharray: 187; stroke-dashoffset: 0; stroke: rgb(66, 133, 244); transform-origin: center center; animation: 1.4s ease-in-out 0s infinite normal none running spinner-dash; }
+
+@-webkit-keyframes spinner-dash { 
+  0% { stroke-dashoffset: 187; }
+  50% { stroke-dashoffset: 46.75; transform: rotate(135deg); }
+  100% { stroke-dashoffset: 187; transform: rotate(450deg); }
+}
+
+@keyframes spinner-dash { 
+  0% { stroke-dashoffset: 187; }
+  50% { stroke-dashoffset: 46.75; transform: rotate(135deg); }
+  100% { stroke-dashoffset: 187; transform: rotate(450deg); }
+}
+
+.VIpgJd-yAWNEb-L7lbkb html, .VIpgJd-yAWNEb-L7lbkb body, .VIpgJd-yAWNEb-L7lbkb div, .VIpgJd-yAWNEb-L7lbkb span, .VIpgJd-yAWNEb-L7lbkb iframe, .VIpgJd-yAWNEb-L7lbkb h1, .VIpgJd-yAWNEb-L7lbkb h2, .VIpgJd-yAWNEb-L7lbkb h3, .VIpgJd-yAWNEb-L7lbkb h4, .VIpgJd-yAWNEb-L7lbkb h5, .VIpgJd-yAWNEb-L7lbkb h6, .VIpgJd-yAWNEb-L7lbkb p, .VIpgJd-yAWNEb-L7lbkb a, .VIpgJd-yAWNEb-L7lbkb img, .VIpgJd-yAWNEb-L7lbkb ol, .VIpgJd-yAWNEb-L7lbkb ul, .VIpgJd-yAWNEb-L7lbkb li, .VIpgJd-yAWNEb-L7lbkb table, .VIpgJd-yAWNEb-L7lbkb form, .VIpgJd-yAWNEb-L7lbkb tbody, .VIpgJd-yAWNEb-L7lbkb tr, .VIpgJd-yAWNEb-L7lbkb td { margin: 0px; padding: 0px; border: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-family: inherit; font-optical-sizing: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-size: 100%; vertical-align: baseline; text-align: left; line-height: normal; }
+
+.VIpgJd-yAWNEb-L7lbkb ol, .VIpgJd-yAWNEb-L7lbkb ul { list-style: none; }
+
+.VIpgJd-yAWNEb-L7lbkb table { border-collapse: collapse; border-spacing: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb caption, .VIpgJd-yAWNEb-L7lbkb th, .VIpgJd-yAWNEb-L7lbkb td { text-align: left; font-weight: normal; }
+
+div > .VIpgJd-yAWNEb-L7lbkb { padding: 10px 14px; }
+
+.VIpgJd-yAWNEb-L7lbkb { color: rgb(34, 34, 34); background-color: rgb(255, 255, 255); border: 1px solid rgb(238, 238, 238); box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px; display: none; font-family: arial; font-size: 10pt; width: 420px; padding: 12px; position: absolute; z-index: 10000; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-nVMfcd-fmcmS, .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-pbTTYe { clear: both; font-size: 10pt; position: relative; text-align: justify; width: 100%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-r4nke { color: rgb(153, 153, 153); font-family: arial, sans-serif; margin: 4px 0px; text-align: left; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TvD9Pc-LgbsSe { display: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-l4eHX { float: left; margin: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-PLDbbf { display: inline-block; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-fw42Ze-Z0Arqf-haAclf { display: none; width: 100%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-H9tDt { margin-top: 20px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-LK5yu { float: left; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-qwU8Me { float: right; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-cGMI2b { min-height: 15px; position: relative; height: 1%; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-jOfkMb-Ne3sFf { background: rgb(41, 145, 13); border-radius: 4px; box-shadow: rgb(30, 102, 9) 0px 2px 2px inset; color: white; font-size: 9pt; font-weight: bolder; margin-top: 12px; padding: 6px; text-shadow: rgb(30, 102, 9) 1px 1px 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-hSRGPd { color: rgb(17, 85, 204); cursor: pointer; font-family: arial; font-size: 11px; margin-right: 15px; text-decoration: none; }
+
+.VIpgJd-yAWNEb-L7lbkb > textarea { font-family: arial; resize: vertical; width: 100%; margin-bottom: 10px; border-radius: 1px; border-width: 1px; border-style: solid; border-color: silver rgb(217, 217, 217) rgb(217, 217, 217); border-image: initial; font-size: 13px; height: auto; overflow-y: auto; padding: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb textarea:focus { box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px inset; border: 1px solid rgb(77, 144, 254); outline: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-Z0Arqf-IbE0S { margin-right: 10px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp { min-height: 25px; vertical-align: middle; padding-top: 8px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp { margin-bottom: 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input { display: inline-block; min-width: 54px; border: 1px solid rgba(0, 0, 0, 0.1); text-align: center; color: rgb(68, 68, 68); font-size: 11px; font-weight: bold; height: 27px; outline: 0px; padding: 0px 8px; vertical-align: middle; line-height: 27px; margin: 0px 16px 0px 0px; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px; border-radius: 2px; transition: all 0.218s ease 0s; background-color: rgb(245, 245, 245); background-image: -webkit-linear-gradient(top, rgb(245, 245, 245), rgb(241, 241, 241)); user-select: none; cursor: default; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:hover { border: 1px solid rgb(198, 198, 198); color: rgb(34, 34, 34); transition: all 0s ease 0s; background-color: rgb(248, 248, 248); background-image: -webkit-linear-gradient(top, rgb(248, 248, 248), rgb(241, 241, 241)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active { border: 1px solid rgb(198, 198, 198); color: rgb(51, 51, 51); background-color: rgb(246, 246, 246); background-image: -webkit-linear-gradient(top, rgb(246, 246, 246), rgb(241, 241, 241)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus:active { box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px inset; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe { outline: none; border: 1px solid rgb(77, 144, 254); z-index: 4 !important; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.gk6SMd { background-color: rgb(238, 238, 238); background-image: -webkit-linear-gradient(top, rgb(238, 238, 238), rgb(224, 224, 224)); box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px inset; border: 1px solid rgb(204, 204, 204); color: rgb(51, 51, 51); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf { color: white; border-color: rgb(48, 121, 237); background-color: rgb(77, 144, 254); background-image: -webkit-linear-gradient(top, rgb(77, 144, 254), rgb(71, 135, 237)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf.AHmuwe .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:active { border-color: rgb(48, 121, 237); background-color: rgb(53, 122, 232); background-image: -webkit-linear-gradient(top, rgb(77, 144, 254), rgb(53, 122, 232)); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover { box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.1) 0px 1px 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input.AHmuwe, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input:hover, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:focus, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf.AHmuwe, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:active, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-L4Nn5e-I9GLp .VIpgJd-yAWNEb-Z0Arqf-I9GLp input .VIpgJd-yAWNEb-Z0Arqf-sFeBqf:hover { border-color: rgb(48, 121, 237); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-mrxPge { color: rgb(153, 153, 153); font-family: arial, sans-serif; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-W0vJo-fmcmS { color: rgb(153, 153, 153); font-size: 11px; font-family: arial, sans-serif; margin: 15px 0px 5px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-u0pjoe-fmcmS { color: rgb(136, 0, 0); display: none; font-size: 9pt; }
+
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q { background-color: rgb(201, 215, 241); box-shadow: rgb(153, 153, 170) 2px 2px 4px; box-sizing: border-box; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-xl07Ob { background: rgb(255, 255, 255); border: 1px solid rgb(221, 221, 221); box-shadow: rgb(153, 153, 170) 0px 2px 4px; min-width: 0px; outline: none; padding: 0px; position: absolute; z-index: 2000; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb { cursor: pointer; padding: 2px 5px 5px; margin-right: 0px; border-style: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb:hover { background: rgb(221, 221, 221); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb h1 { font-size: 100%; font-weight: bold; margin: 4px 0px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-xl07Ob .VIpgJd-yAWNEb-VIpgJd-j7LFlb strong { color: rgb(52, 90, 173); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-VIpgJd-eKm5Fc-hFsbo { text-align: right; position: absolute; right: 0px; left: auto; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-VIpgJd-j7LFlb-SIsrTd .VIpgJd-yAWNEb-VIpgJd-eKm5Fc-hFsbo { text-align: left; position: absolute; left: 0px; right: auto; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-fmcmS, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { background-color: rgb(241, 234, 0); border-radius: 4px; box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 4px; box-sizing: border-box; color: rgb(241, 234, 0); cursor: pointer; margin: -2px -2px -2px -3px; padding: 2px 2px 2px 3px; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { color: rgb(34, 34, 34); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-Vy2Aqc-pbTTYe { color: white; position: absolute !important; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf, .VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-ppHlrf .VIpgJd-yAWNEb-TVLw9c-ppHlrf-sn54Q { background-color: rgb(201, 215, 241); border-radius: 4px 4px 0px 0px; box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 4px; box-sizing: border-box; cursor: pointer; margin: -2px -2px -2px -3px; padding: 2px 2px 3px 3px; position: relative; }
+
+.VIpgJd-yAWNEb-L7lbkb span:focus { outline: none; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-TVLw9c-DyVDA { background-color: transparent; border: 1px solid rgb(77, 144, 254); border-radius: 0px; margin: -2px; padding: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-TVLw9c-sn54Q-LzX3ef { border-left: 2px solid red; margin-left: -2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-yAWNEb-TVLw9c-sn54Q-YIAiIb { border-right: 2px solid red; margin-right: -2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf { padding: 2px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS { font-size: 11px; padding: 2px 2px 3px; margin: 0px; background-color: rgb(255, 255, 255); color: rgb(51, 51, 51); border-width: 1px; border-style: solid; border-color: rgb(192, 192, 192) rgb(217, 217, 217) rgb(217, 217, 217); border-image: initial; display: inline-block; vertical-align: top; height: 21px; box-sizing: border-box; border-radius: 1px; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS:hover { border-width: 1px; border-style: solid; border-color: rgb(160, 160, 160) rgb(185, 185, 185) rgb(185, 185, 185); border-image: initial; box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px inset; }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-fmcmS:focus { box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px inset; outline: none; border: 1px solid rgb(77, 144, 254); }
+
+.VIpgJd-yAWNEb-L7lbkb .VIpgJd-yAWNEb-IFdKyd-YPqjbf-sFeBqf { font-size: 11px; padding: 2px 6px 3px; margin: 0px 0px 0px 2px; height: 21px; }
+
+.VIpgJd-yAWNEb-hvhgNd { font-family: "Google Sans", Arial, sans-serif; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-l4eHX-i3jM8c { position: absolute; top: 10px; left: 14px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-l4eHX-SIsrTd { position: absolute; top: 10px; right: 14px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-i3jM8c, .VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-SIsrTd { margin: 16px; padding: 0px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-IuizWc { margin: 0px 0px 0px 36px; padding: 0px; color: rgb(116, 119, 117); font-size: 14px; font-weight: 500; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-k77Iif-SIsrTd .VIpgJd-yAWNEb-hvhgNd-IuizWc { text-align: right; margin: 0px 36px 0px 0px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-axAV1 { width: auto; padding: 12px 0px 0px; color: rgb(31, 31, 31); font-size: 16px; text-align: initial; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-axAV1 .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid { border-radius: 0px 0px 12px 12px; margin: 0px; background: rgb(241, 244, 249); position: relative; min-height: 50px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od { display: inline-block; width: 77%; padding: 12px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-UTujCb { color: rgb(31, 31, 31); font-size: 12px; font-weight: 500; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd .VIpgJd-yAWNEb-hvhgNd-UTujCb { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-eO9mKe { color: rgb(68, 71, 70); font-size: 12px; padding-top: 4px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-N7Eqid-B7I4Od .VIpgJd-yAWNEb-SIsrTd .VIpgJd-yAWNEb-hvhgNd-eO9mKe { text-align: right; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-xgov5 { position: absolute; top: 10px; right: 5px; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-xgov5 .VIpgJd-yAWNEb-SIsrTd { left: 5px; right: auto; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-THI6Vb { fill: rgb(11, 87, 208); }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-bgm6sf { margin: -4px 2px 0px 0px; padding: 2px 0px 0px; width: 48px; height: 48px; border: none; border-radius: 24px; cursor: pointer; background: none; }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-bgm6sf:hover { background: rgb(232, 235, 236); }
+
+.VIpgJd-yAWNEb-hvhgNd .VIpgJd-yAWNEb-hvhgNd-aXYTce { display: none; }
+
+sentinel { }
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: image/png
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/assets/images/AWE/tree.PNG
+
+‰PNG
+
+   IHDR  ñ  »   JÊv   sRGB ®Îé   gAMA  ±üa   	pHYs  Ã  ÃÇo¨d  xIIDATx^í½¿k\gŞ÷?ÆT‚_CŠ¸³Š"HAŠ¸¸Åº0"…O±èN‘Ì¦1"…)ŒØ"á‘—;Ë¸(¹7 7»(E@[Ä«ÜÏ=B…³ÌBŠë{ŞçÇèÌ¼ÏœyË¹â9ºô~Á‡Äã—æzëèÌåÏŒ®sŞÿı¿ÿ7 şßÿû­¥z¨gÏ5>^¯ØãªÊù¸T•J¾^¯çr%UMçúty~áR=”óq©Êù¸Tå|\ª‡J%øÇ?şz¿üòK@ÍCõ ™GìqU8£z •|hzŒIõ|öüÂ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€šÏM¼I	7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æsoRÂM<ÛÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|nâMJ¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •| oâG£Q@UƒÌ*ÕCa#ú¦Çë{\ÕC9—ê¡RÉç&Ş¤Îç¦s}º<¿p©Êù¸Tå|\ª‡r>.ÕC¥’¸‰o©ØãªÊù¸T¥æsoRÂM<Wlå|\ª‡r>.ÕC9—ê¡RÉ¼œ¦…Øãªp>Fõ€šÏM¼I	õ|öüÂ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€šÏM¼I	7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æsoRÂM<ÛÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|nâMJ¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •| oâ¹Y}ÌqUå|\ª‡J%Ÿ›x“8Ÿ›ÎõéòüÂ¥z(çãR=”óq©Êù¸T•J>à&¾¥b«z(çãR=”šÏM¼I	7ñ\±=”óq©Êù¸Tå|\ª‡J%ğršb«zÀùÕj>7ñ&%ÔóÙó£zÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5Ÿ›x“nâ™Øp>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€šÏM¼I	7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æsoRÂM<ÛÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò¼‰_äfõ1ÇU=”óq©*•|nâMJà|n:×§Ëó—ê¡œKõPÎÇ¥z(çãR=T*ù€›ø–Š=®ê¡œKõPj>7ñ&%ÜÄsÅöPÎÇ¥z(çãR=”óq©*•|ÀËiZˆ=®êçcT¨ùÜÄ›”PÏgÏ/ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|i6ñgáøÑNØ¼¹–²ïßcÿÕ•°qwÏJ¥âévş÷kOË^"åØÛOË?¿ßî„ë½Íp0ş¾Âv¿6?ŸşF+NÂş­şb¾ß—€›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æK®‰ÿá l½ÙÏ¾¯¥°zg'ìq„ı{a%kn{ı•¬i.ÖÒå\ò&şô³õĞ{k/kÍK~Øk½•°÷}ùç:ÏÃŞí¥Å}¿/7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Í—T?:
+Û7Ğ¨¯‡ıÊÇêœ=)ÿ~3üT>vÉ›ø'fßÏ‡OÊ?e‡à«­ì9áüpN¾Ø	k¯¿•XØ÷ûPÏgÏ/ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÔ¦ç2pò`5û~úaë«Ú'íSŒ¾„å77Âî7¥s©›ø“°÷V/¬vıèãë¡wkêßÍéÃµ|übğIÖÌ/êû}	¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj¾tšø¢¡íõ·§>…CÕÄzn…ÕW±§–nl„ÇMîYxrsìõ^Y÷ÃiÃåì»aØ¾]­Ëï‡kïl†İús64ñ£owÂj¿ú·öÃIãú4ìß,>MŸWÕó~¶Öï„,“ÿËmÜÄ{~aT8£zÀùÕÎÇ¨H%pßBìqU8£z@Í§6=çtÖÑ¼¾wfß@ÙH÷ûıĞÇ'ôÃá{åºú~<®?[qQ(_yw7†áıb­}Şt—eÏ»Œç?ç~Ø¾‰õèıóOÎ§šøÑß÷ÂzkFáô¬óÏêÏÙ×¯…|İ?j7ldÏ·öñAşçãjÉP7ñ9_ÕÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó%ÓÄ—Íiïî…>‡7Ò½·k‡‚Ÿ†yC\¾³Ghšñ©ı„9nØWT…×o²F~ù?öÂ1şXoâØ?oàñwtQk~f\ÔZá&>Çó£zÀùÕÎÇ¨p>Fõ@*ù@ŞÄãîP(|a[©êÙ³g×+ö¸ª‡r>.ÕC¥’ÏM|ÑHO7æyÃıûìùnî—ëËOÃğVöçŞV8¤úË%.UCoûØ¶ÍcI9öàÓ¢ÇXjÜÍ¾¦ş›‡¯ÙóM_Ô:Åhâ›ÎõéòüÂ¥z(çãR=”óq©Êù¸T•J>àOâ[ˆ=®êçcT¨ù’iâÏÂfö½¼èrnjËÆ|ÜÄû¯÷ŞäËhŠå+çµûnöwU]ÿ„½ÒW=,ÿn.Å›Œú›“OVBï÷sŞø“øÏ/ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÔ¦§û”M÷¼[³fëÆZØüô¸höå&şIØF£İZkaMø›ø¥ÛÃp2^N3¹³sñ['pŸãù…Q=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5ŸÚô\”-&«í7•K]ä&¾\N3ï“nĞ²œŸ–/İ„ÃçÙ¦šı“O‘­vák#å…­ùE­«aÍæ¿˜¼¨å[gãù…Q=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5_JMü¼›=U»¿ônì„£ò1½‰¯Ş$,gM÷Ô›„çÅM¤–Ş)/X­.l^ãy<~{òö>±?	{o#ífT3¸ĞZë¸‰ÏñüÂ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€š/©&ü0ùI—Âê°Ÿo¿8{ï­ûµ¿²†õÿM<šìb‹É¥°vw?<>wÂF¾ådsO[L>Ú-¼şJØı¶”¨‰Ïøv§øº;E£ßÈ(¾—e›¾S«²G¾›øÏ/ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ù’kâÁ/§áğşfX{óZègß¾Ç%¬ƒ¿ßpS¦5ñÕsßÀïÙß÷¯…•ÛÛaø·Ü“7{Z
+Ë™wĞğbríú(}´œ=ŞoÙİ¦ø¤¿ş÷ùZ[ÿ7ñ9_ÕÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó©M1—7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’äMüh4
+¨jY¥z(lDßôx½b«z(çãR=T*ùÜÄ›”ÀùÜt®O—ç.ÕC9—ê¡œKõPÎÇ¥z¨Tò7ñ-{\ÕC9—ê¡Ô|nâMJ¸‰çŠí¡œKõPÎÇ¥z(çãR=T*ù€—Ó´{\ÕÎÇ¨Pó¹‰7)¡Ï_ÕÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|nâMJ¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5Ÿ›x“nâ™Øp>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€šÏM¼I	7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’äMü"7«9®ê¡œKõP©äsoRçsÓ¹>]_¸Tå|\ª‡r>.ÕC9—ê¡RÉÜÄ·TìqUå|\ª‡Ró¹‰7)á&+¶‡r>.ÕC9—ê¡œKõP©ä^NÓBìqU8£z@Íç&Ş¤„z>{~aT8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æsoRÂM<ÛÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|nâMJ¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5Ÿ›x“nâ™Øp>Fõ€ó1ªœQ=J>7ñ‹Ü¬>æ¸ª‡r>.ÕC¥’ÏM¼I	œÏMçúty~áR=”óq©Êù¸Tå|\ª‡J%pßR±ÇU=”óq©JÍç&Ş¤„›x®ØÊù¸Tå|\ª‡r>.ÕC¥’x9M±ÇU=à|Œê5Ÿ›x“êùìù…Q=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œê5Ÿ›x“nâ™Øp>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€šÏM¼I	7ñLl8£zÀùÕÎÇ¨H%pßBìqU8£z@Íç&Ş¤„›x&¶œQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ= æsoRÂM<ÛÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨Pó¹‰7)á&‰íçcT8£zÀùÕ©änâ[ˆ=®êçcT¨ùÜÄ›”pÏÄö€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªÔ|nâMJ¸‰gb{ÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕj>7ñ&%ÜÄ3±=à|ŒêçcT8£z •| oâqw(¾°­TõìÙ³ÆÇë{\ÕC9—ê¡RÉ‡¦ÇåJ©šÎõéòüÂ¥z(çãR=”óq©Êù¸T•J¾q¿Èw1ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€’ïŞ½{áéÓ§åŸf³¨|±ÇU=à|ŒêEåÃù¼³³S>2?Fõ€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ª”|¯¿şzøòË/Ë?ÍfQùb«zÀùÕ‹Ê‡óù7Ş(™£zÀùÕÎÇ¨p>Fõ@*ù€›øb«zÀùÕóòF£|ığóçÏËGf³ˆ| ö¸ªœQ=°¨|8Ÿq^ãünÃÇQ=à|ŒêçcT8£z •|ÀM|±ÇU=à|Œêyù¾úê«ğ‡?ü¡³ù@ìqU8£z`‘ùnİº•Ÿßmøø1ªœQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªÔ|ÀM|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ= ænâ[ˆ=®êçcT´åû÷¿ÿƒAøùçŸ;™¯"ö¸ªœQ=°È|ÕùÿÎÂÇQ=à|ŒêçcT8£z •| oâqªdV©
+Ñ7=^¯ØãªÊù¸Tu™óaìL{\ÕCùçË¥z(çãª{ÕÎKÓNU>~\ª‡r>.ÕC9—ê¡œKõP©äsßğx½b«z(çãR=T[¾>ø ¯ØãªÊ?_.ÕC9Wİ«Îñi§*?.ÕC9—ê¡œKõPÎÇ¥z¨Tò›øêÁy¨ğ¯SÕÎÇ¨hË÷×¿ş5üío‹>®êÿ|ÕÎÇÔ=œß8ÏgáãÇ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€š¸‰o!ö¸ªœQ=0+ßŸşô§¼@ìqUøçË¨p>fÚ«ŸëÓøø1ªœQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ=0+ßo¼1¾›eìqUøçË¨p>fÚÃyó½	?Fõ€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªšòaßì^¯7Ş?;ö¸ªüóeT83íMŸïu|üÕÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨hÊ‡f¦úÄWõ€¾Œêçcš<œïnâ¯‰Øãªp>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>7ñ‹Ü¬>æ¸ª‡r>.ÕC9—ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡J%Ÿ›ø†Çë{\ÕC9—ê¡¦óıüóÏáw¿û]şßê±ØãªÊ?_.ÕC9W“×tŞ£|ü¸Tå|\ª‡r>.ÕC9—ê¡RÉ7nâ«ç¡zÀ¿NaT8£z`:_ÓN±ÇU=àŸ/£zÀù˜Y^}G¦
+?Fõ€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ª¦ó5í™{\Õşù2ªœ™å5û>~ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcT4åûæ›oÊÿ+ˆ=®êÿ|ÕÎÇÌò¦Ï{àãÇ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªêù>}Zşß$±ÇU=àŸ/£zÀù˜y^ıuàãÇ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ@=_Óš`{\Õşù2ªœió¦_>~ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcTÔó5íÎb«zÀ?_Fõ€ó1mŞôîL>~ŒêçcT8£zÀùÕ©änâ[ˆ=®êçcTTùpËù¥¥¥Æ[ÏÇWõ€¾ŒêçcÚ¼é×£zÀùÕÎÇ¨p>Fõ@*ù@ŞÄ/r³ú˜ãªÊù¸Tå|\ª‡r>.ÕC9—ê¡œKõPÎÇ¥z(çãR=”óq©*•|nâ¯WìqUå|\ª‡r>.ÕC9—ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸T¥æ7ñÕƒóP=à_§0ªœQ=PåûòË/Ã¿şõ¯üÿ§‰=®êÿ|ÕÎÇÌóğ:Àëøø1ªœQ=à|ŒêçcT¤’¸‰o!ö¸ªœQ=€|XÿÛëõÆïX§‰=®êÿ|ÕÎÇÌóğ:Àë¯?Fõ€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªozGib«zÀ?_Fõ€ó1ŠWíÔäãÇ¨p>Fõ€ó1ªœQ=J>à&¾…Øãªp>Fõ òa_ìÁ`P>ÂÄWõ€¾Œêçc¯¼.|üÕÎÇ¨p>Fõ€ó1ªRÉÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªşë¿ş+üå/)ÿÔLìqUøçË¨p>FõğºÀëc±ÇU=àŸ/£zÀùÕÎÇ¨p>Fõ€š¸‰o!ö¸ªœQ=ğÇ?ş1_ûÛFìqUøçË¨p>FõğºÀëc±ÇU=àŸ/£zÀùÕÎÇ¨p>Fõ€š¸‰o!ö¸ªœQ=pãÆ|6b«zÀ?_Fõ€ó1ª‡×^óˆ=®êÿ|ÕÎÇ¨p>Fõ€ó1ªÔ| oâqw(ììr¥Tÿüç?óÃ¬Âyjú»zÅöPÏ=k|¼^±ÇU=”óq©ªËùğºhz½¸\—¹šÎõz©¯”ç.ÕC9—ê¡Ô|ã&=^Æ¤‚r>«ïŒc{ /ÂyÄWõ€ó1ªºÏó½I‰˜ó=ğüÂ¨p>Fõ€š¸‰7Iâ&Q=à|Œê®çó|oRÂM<{\ÕÎÇ¨Pó7ñ&IÜÄ3ªœQ=Ğõ|ïMJ¸‰gb«zÀùÕj>à&Ş$‰›xFõ€ó1ªºÏó½I	7ñLìqU8£z@ÍÜÄ›$qÏ¨p>Fõ@×óy¾7)á&‰=®êçcT¨ù€›x“$nâÕÎÇ¨èz>Ï÷&%ÜÄ3±ÇU=à|Œê5po’ÄM<£zÀùÕ]ÏçùŞ¤„›x&ö¸ªœQ= ænâM’¸‰gT8£z ëù<ß›”pÏÄWõ€ó1ªÔ| oâG£‘'u“8Ÿ«Í¬Âyjú»zÅöP¸QCÓãõŠ=®ê¡œKõP]ÏçùŞ¤DÌùåù…KõPÎÇ¥z(5po’ÄM<—ê¡œKõP]ÏçùŞ¤„›x®ØãªÊù¸T¥æ^Nc’D9Ÿ«Ã<b{À¿ndT8£zÀó½I‰˜ó=ğüÂ¨p>Fõ€š¸‰7Iâ&Q=à|Œê®çó|oRÂM<{\ÕÎÇ¨Pó7ñ&IÜÄ3ªœQ=Ğõ|ïMJ¸‰gb«zÀùÕj>à&Ş$‰›xFõ€ó1ªºÏó½I	7ñLìqU8£z@ÍÜÄ›$qÏ¨p>Fõ@×óy¾7)á&‰=®êçcT¨ù€›x“$nâÕÎÇ¨èz>Ï÷&%ÜÄ3±ÇU=à|Œê5¸œMüÙqŞÛk7–òÜ½^?\{s#l?:g¥Rqúp-w¶Ÿ–¼DÜE¶íğ¤üóE(¾¶½Ö–¶ÊiØ¿™}íÍıìÿšş‡_ó}ÇÇgê‹*¶<É1ªœQ= ¼>Œ¹,ÄœïçFõ€ó1ªÔ|àÒ5ñ'Ÿo…•~Ö$¾²6ïí‡ƒÇ‡áğ‹ı°óîJègßCÿÍ¬y|^Ê—»‰¿Ößß	;÷škïéô[–y¸‰¯£¾¨b{À“£zÀùÕnâMJ¸‰gb«zÀùÕj>7ñØ4ş2Lê£o¶Ãr–³k?œ4‹³¯Ë¿¿s0şDşr7ñkaÿÇòß„´›øêE3«Ô›/ÄöP¾—ê¡œKõPnâMJÄœïQ_¸Tå|\ª‡RóKÔÄŸ„½·³æ°¿kŸ´O2
+‡ï/‡•Û»á¨tÜÄ·á&^yQÅöPä¸Tå|\ª‡roRÂM<WìqUå|\ª‡RóË³œæû½°’eìß½Xk8nâŸ†Ã{aù4˜ıpí­°ÿ/Gı}¶o/‡¥ìkÚ¼ÎÂñ£í°Q­Ëï_«wvÃa­æfv>^ıìy×?=)kæÂMüéaØ½³V^íyzKaùæfØıº]]NsÜß«Õs½²6î†Ó†ß~œ>Şƒş««aëáq8èH?êÅ0Øğ¯ÕÎÇ¨P^Æ\bÎ÷Àó£zÀùÕj>pišøÓÏÖóŒ[_ï>Tª&¾ßï‡¥›Ûaÿ‹Ãpøh'¬åÍüjØû¾3FO‹å8½WÖÂöÃƒ|­ıöM4¨Ëaûi}ÜQÖd/g÷ÃÊ»»aøø0<Ü.³¿†eã=ÙÄÂñ'ëR.ÔÄÿ8ëıì{|s#ì w–gø`«ü—Ãîw¥'5ñ'aÿš÷óïmx#¿!_ÆTZàä!¾ŸŞø¸Ç Ÿëú÷½bNê±=àIQ=à|Œê®Ï÷Æ\„˜ó=ğüÂ¨p>Fõ€š\&ş—ÅŒ›ø÷³6ºÆ·;ázöøù/Gaçµ¬ù|m0qaì¸©íÂaõå×®~2ÕŒÿ°Ÿ5±ËaıÁqşÇzòiÙÀ?œßÀƒâkgW}gšãkáZ#*¨ ïq~öh£xş©7ÕœÕåã£Ã0hhìqğ†ÂM|;äÕÎÇ¨P^Æ\bÎ÷Àó£zÀùÕj>pešøÁ×åc„Aöx¯ZóÍvş©òÊtc²WıàèãëÙsn†ƒ9›Ãø ì—ŸXO7Æm_;{wigš³7WnâOÃğÆİ:Ã2¦tßÚ+šö¯3k–ıC<‡›ø6<É1ªœQ=ĞõùŞ˜‹s¾_ÕÎÇ¨PóKÓÄŸ}¾™g|Ñå4Üü?	ÛÙãU_-×Ùøóa¾e¢>äëñ«&¼ş	{ÓŸ¦÷oËfy>Å×^ğÂÖçgáäÛ,ïûa÷Ãó}ôõ&ş(lãSô·ù2šéã°û.2òï»8®ÍùŠ¿sß†'9Fõ€ó1ª”×‡1—…˜ó=ğüÂ¨p>Fõ€š\[ËO•ç]ØzöùV~AçşwE³/7ñ¥×Z¥{±&~)l|vR®ï‡õÏ´6şBMüÙQØÍ×î—9û×ÂJvmo>ä&¾<&­UdrÏ¨ğ$Ç¨p>Fõ€òú0æ²s¾_ÕÎÇ¨PóËÓÄe‹É²)í¯W›øj9MÓòif/§É2¾µ–?,ÖßO6û'E¶Ú…¯mèMüY8¸ƒ5ûëaïÛÓ0ªŸ#/ºœæ÷SëÜ›˜ZbTçÉ]\ë&¾OrŒêçcT¸‰7)á&‰=®êçcT¨ùÀ%jâÃœ›=U»¿ôÂòÇGåchâg]¨™‘ŠŞ¿UÃZ]0:}ñç×ƒüñGEwOŸØ¿V³¿¯ßŒjz_~÷Éƒâ{¿>>óšx|Íjö5Ó»ñd<ÏÆ¹ÑKïì…ü²İòxák'Æ}~¶|aë\<É1ªœQ=pæ{cTbÎ÷Àó£zÀùÕj>7ñØ4ş²Lê'Ÿm{¸¿²6ïí‡¬×~´¶Êå$K·‡M¥ÜÄgT;°`«ÆİGX>{ï­åãM6÷¼ÅäxÆ7wCÕ2SŸqôqñu›Ÿ··ñz\[B®şq¯XËãñ×òm5ñ¦æü{œßÄç¿1È·˜\
+kw‹ã{ğp'l¼‰Ç&›ûññzgPÛb2ûs6nšøêE3«Ô›/ÄöP¾—ê¡œKõP—e¾7F!æ|òüÂ¥z(çãR=”š\º&>gÖŸ·¢iâÁÙw¸ÙÓJ¸–šœ½)¸±6ï7İèhêfO¸!Òİƒ‰ß45ñat”¢İëo†ƒé-!kèM|Æ/'áànu#«¬‰~u%lÜË²œ•KxŞ.w”‘šøŒ_NÃáıócó5ö··Ã°á¦Wgßí‡­w²7Õ1¸÷$}Šcî&¾­<Éq©Êù¸T…×‡1©s¾Gy~áR=”óq©JÍ.ÕrcT”ó¹z1Ì#¶üëFFõ€ó1ª<ß›”ˆ9ßÏ/ŒêçcT¨ù€›x“$nâÕÎÇ¨èz>Ï÷&%ÜÄ3±ÇU=à|Œê5po’ÄM<£zÀùÕ]Ï—æ|%;aóærqİTVùÒÂ»Ãp<½ğévş÷ç;w½DÊ±y‰çÈ7W¨ïVÜãcòZ«ìx<ÜšZ¹ğ-ÿÖ(çóE^_ÕÎÇ¨Pó7ñ&IbNê±=àIQ=à|ŒêäæûÂV~ñıRX½³“_høø ìß+6èõW&wÜºäM|~sÂêîÙàl'¼ö¾/ÿ°]p¹AÁ{Å†ÕÆ½şjØû{©%BÌùx~aT8£z@ÍÜÄ›$‰9©Çö€'9Fõ€ó1ª’šïÇ›¬‡ıÊÇêœÛãNl&pÉ›ø'fßÏ‡ç[Œ¾ÚÊ³¸›vÎŒmÇ[ ßÎİæø2s¾_ÕÎÇ¨Pó7ñ&IbNê±=àIQ=à|Œê”æûâŞıÆÏUŒ¾„elüMé\ê&7ìMÜı;¿á­áx—±“‡áZ¿yw³üÀ‚w‹MÌùx~aT8£z@ÍÜÄ›$‰9©Çö€'9Fõ€ó1ªÒ™ï‹†¶×¿`SZ5ñŸçëÆWËíŠ—nl„†­Š±¾üÉıÍ±Wl§Û´õ0¶İÅ6ÅÕºü~¸öÎÔöÇMüèÛ°ŠûŒ4ŞÈ”ÛçÏÙ^íop‡oxnâÛğüÂ¨p>Fõ€š¸‰7IsRíOrŒêçcT$3ßŸÃzö½ôŞ;³?‡o l¤óâU7÷ûb¯\WßƒÇõg«n€×ps¿©;|Ó¿ØÛùûçŸœO5ñ£¿ï…õÖŒÂé7XçŸÕŸ7²¯_;ùºÔnØÈoíãƒüÏÇ-÷)ÖÎgc½ÁãÕqbÎ÷Àó£zÀùÕj>à&ş‚7ašWâMšj4Şª…³Ï7C|“¦Q8|¯Ïë¯0ø9ÌC}QÅö€'9Fõ€ó1ª”×Ç¥àÇ¢)¾iß\ÊFúüFx%?ó†¸ş|gĞ4óúòªa_}P=~v^kxN¼	ÈùåÿØÇøc½‰Ïšêq¿ ‹ZócP¿¨uÏ«kf\;p‰‰9ßÏ/ŒêçcT¨ù@ŞÄãîPÉLê¿1E³}=¬¿¿vîÍª½ğä‚WqN¾Ø	Û~µ›_œt=ì|[şäyöæ!±ÉùEÁùŒB[á¼G5ı]½b{¨gÏ5>^¯ØãªÊù¸TÕõ|ÉÌ÷¿²‰ç>²†û÷ÙóÕîj=¼…¹y+ÒG×å—ª¡./&Üæ±rìÁ§E±ÔäÿVÔóğõ {¾ÚE­M<?{ùo–³7)}_s¾Gy~áR=”óq©JÍüIü)ší‹Ò~aÊœøÂ«Q–ázÃîÅãı;Ií:ğ¢(ç³úÎ8¶ğ"œGìqU8£z ëù’™ïÏÂfö½¼èr_ËÆ|ÜÄû¯÷ŞäËhŠå+çµû.ş=(èú'ìm”Ş¸úëa(ÿ{R¼É¨¿ù8ùd%ô~ßòF »óäË„²şë4ÿuÀqœÇE^_ÕÎÇ¨Pó7ñdáM|şëŞé5›%ßï…•l¢ø„şŠsRíOrŒêçcT¤3ß—M÷¼[³fëÆZØüô¸höå&>k€3îì*ÿ=¸`¿t{NÆËiÎw–iæ/lÍ#ß~=ìı=½Oà+ğ}Ïã"¯Ï/ŒêçcT¨ù€›ør±&¾X«Rmm–S=¾:^Ç8±œfú“šÚxùvjıAÃ¯vA±SCÿ¢¿ZN˜“zlx’cT8£z ¥ù^ÙbòôáZş=o<*?‰–›ør9MÛ'İ-ËiğiùÒlŞ~ıaªÙ?ùÙj¾6R^Øš_Ôº¶qÑlşÛ€É‹ZQã[Ë7½›á ñe–1ç{àù…Q=à|Œê5pA.üIüó'a€‹nl‡£òß\˜ÔÇ¤ığüŸ…‰&ş§ãpøÙ ¬d?“•‡ÙÄ|Nó¯-·SkY2sôQöæà¢Û­%HÌI=¶<É1ªœQ=Ô|?çfOÕî/½;á¨|Loâ«7	kÉËE—Ş)/X­.l^ã^ıP-œjâóyımä¯İŒjóïÔZR]ÄŠ7s3bÎ÷Àó£zÀùÕj>à&ş‚Íöœšú$¼ÚÅ`ùãìŸ¿>hâAÓršrıçÊ'³?Â®5=e§‚ÄÁÏaê‹*¶<É1ªœQ= ¼>.?‹e#½¥°zg'ìçÛ/ÃŞ{kÅ~í¯l„a½Á¿@&»Øbr)¬İİÃÁÃ°Q­3¯5÷´Åä£İÂë¯„İj™#5ñßî_×zM~ƒ›e›¾SkÃ‡6G/çc\»¹Õ°ñê`òÆ%'æ|<¿0ªœQ= ænâ/HÑlÏÙæóéébR]+ù„¾UüZµ†ÔÄ+»”ÿ@¾.ÿ|E‰9©Çö€'9Fõ€ó1ª’œï9‡÷7ÃÚ›×B?ûşğ=.aüı†›2]¨‰Ï¨ûö|Ïş¾-¬ÜŞÃïx.¼ÙÓRXÎ¼‰å,MM|öoÄÑGø7¢ß2¿Ÿô×ÿ>¿S+5şå;ùø³*­ßÖâ{šÇE^_ÕÎÇ¨Pó7ñ¤h¶_àÂÖÑ“°_©ö®5^”*5ñ“ÿe£Ïÿ8]-bNê±=àIQ=à|ŒêÏ÷&%ÜÄ3±ÇU=à|Œê5pA^¸‰/]ŠãÜô+ÓhM|¾C›ø˜“zlx’cT8£zÀó½I‰˜ó=ğüÂ¨p>Fõ€šäMüh4ò¤.òbMüQØÉ/2ÚÃÅE­Ó¿2•šx/§‘Á1¨^4³
+ç=ªéïêÛCáFM×+ö¸ª‡r>.ÕCu=Ÿç{“1ç{”ç.ÕC9—ê¡Ô|ÀMü¹x_­u¬¶™Ä–eX?yƒjâO‡a=û™LÜQP¸°5ß½À¶æçsÓ‰_/õEÛCy’ãR=”óq©Êó½I	7ñ\±ÇU=”óq©JÍ¼œæ‚Íöœ[³Ú{Z|Z>Ş™æ££¬/ïPs¾5ñÙÿå7y{;¿S`±÷oyÑUËOîâBıy®&Êù\½æÛşu#£zÀùÕïMJÄœïçFõ€ó1ªÔ|ÀMü)šíù•/ƒïÕ{¾G|Åøå^ñÜÄgÎç[a5ß6­7¾‘I±gñÖŒ›=»\¿7ŞùÊ‚c6õEÛäÕÎÇ¨P^Æ\bÎ÷Àó£zÀùÕj>à&ş²ñÓ0ldÍÓ7Åšùó»À^eÜÄ3ªœQ=Ğõ|ïMJ¸‰gb«zÀùÕj>à&şrtïúùİÿÆŒÂáûı97¹:¸‰gT8£z ëù<ß›”pÏÄWõ€ó1ªÔ|ÀMüeä§ƒ°Ù¿vª; ‚|7
+_á&Q=à|Œê®çó|oRÂM<{\ÕÎÇ¨Pó7ñ—”³Ï7C|WAÜ»?¹“ÍÇM<£zÀùÕ]ÏçùŞ¤„›x&ö¸ªœQ= ænâM’¸‰gT8£z ëù<ß›”pÏÄWõ€ó1ªÔ|ÀM¼I7ñŒêçcTt=Ÿç{“nâ™Øãªp>Fõ€šäM<6÷¤nRçsõ¢™UêÍb{(ßƒKõPÎÇ¥z(Ï÷&%bÎ÷(Ï/\ª‡r>.ÕC©ù€›x“$nâ¹Tå|\ª‡êz>Ï÷&%ÜÄsÅWõPÎÇ¥z(5ğr“$Êù\½æÛşu#£zÀùÕïMJÄœïçFõ€ó1ªÔ|ÀM¼I7ñŒêçcTt=Ÿç{“nâ™Øãªp>Fõ€š¸‰7Iâ&Q=à|Œê®çó|oRÂM<{\ÕÎÇ¨Pó7ñ&IÜÄ3ªœQ=Ğõ|ïMJ¸‰gb«zÀùÕj>à&Ş$‰›xFõ€ó1ªºÏó½I	7ñLìqU8£z@ÍÜÄ›$qÏ¨p>Fõ@×óy¾7)á&‰=®êçcT¨ù€›x“$nâÕÎÇ¨èz>Ï÷&%ÜÄ3±ÇU=à|Œê5po’ÄM<£zÀùÕ]ÏçùŞ¤„›x&ö¸ªœQ= æyMã=©›”Àù\½hf•zó…ØÊ7ÃàR=”óq©Êó½I‰˜ó=Êó—ê¡œKõPj>à&Ş$‰›x.ÕC9—ê¡ºÏó½I	7ñ\±ÇU=”óq©JÍ¼œÆ$‰r>W/†yÄö€İÈ¨p>Fõ€ç{“1ç{àù…Q=à|Œê5po’ÄM<£zÀùÕ]ÏçùŞ¤„›x&ö¸ªœQ= ænâM’¸‰gT8£z ëù<ß›”pÏÄWõ€ó1ªÔ|ÀM¼I7ñŒêçcTt=Ÿç{“nâ™Øãªp>Fõ€š¸‰7Iâ&Q=à|Œê®çó|oRÂM<{\ÕÎÇ¨Pó7ñ&IÜÄ3ªœQ=Ğõ|ïMJ¸‰gb«zÀùÕj>à&Ş$‰›xFõ€ó1ªºÏó½I	7ñLìqU8£z@ÍÜÄ›$qÏ¨p>Fõ@×óy¾7)á&‰=®êçcT¨ù€›x“$nâÕÎÇ¨èz>Ï÷&%ÜÄ3±ÇU=à|Œê5È›xÜ
+/—+¥Â¡­pŞ£šş®^±=Ô³gÏ¯WìqUå|\ª‡êz¾¦×‹Ëu™«é<¯×E^_¸Tå|\ª‡Ró›øE¾“ˆ9®êçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêTò7ñ-ÄWõ€ó1ªœQ=à|Œê.çÛÙÙ	ÿıßÿ]şi6±ÇU=àŸ/£zàªå{úôi~^·±È|1=à|ŒêTò7ñ-ÄWõ€ó1ªœQ=à|Œê.ç{ã7Âı×•šMìqUøçË¨¸jù¾üòËü¼nc‘ùbzÀùÕ©änâ[ˆ=®êçcT8£zÀùÕ]Í7òõÃÿçÿüŸò‘ÙÄ¨ğÏ—Q=pÕòıüóÏùyó{‹ÌÓÎÇ¨H%pßBìqU8£zÀùÕÎÇ¨èj¾¯¾ú*ÜºuËÇ¯ÕÎÇ¨ø-òıáÈÏïY¨ÏüóeT8£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|Œê.æû÷¿ÿƒAş_?Fõ€ó1ª~‹|õó»	õù€¾ŒêçcT¨ù@ŞÄãbT5È¬R=6¢oz¼^±ÇU=”óq©Êù¸Tå|\ª‡r>®yvğxıõ×óÿ÷ñãR=”óq©ê·Ê‡óçù´ƒRŸåŸ/—ê¡œKõPj>7ñ×+ö¸ª‡r>.ÕC9—ê¡œKõP]Ì÷Áä…ÿ÷ñãR=”óq©ê·ÊW?Ç§K}>”¾\ª‡r>.ÕC©ùÆM|õà<Tø×)ŒêçcT8£zÀùÕ]Ì÷×¿ş5üíoËÿßÇQ=à|Œêß*ÎoœçM¨ÏüóeT8£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|Œê®åûÓŸş”W…£zÀùÕ¿e¾és½B}>àŸ/£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=Ğµ|o¼ñÆÄİ,}üÕÎÇ¨ø-óá<Çù>ú|À?_Fõ€ó1ªÔ|ÀM|±ÇU=à|ŒêçcT8£z Kù°ov¯×›Ø?ÛÇQ=à|Œêß2_ÓùÔçşù2ªœQ= ænâ[ˆ=®êçcT8£zÀùÕ]Ê‡f¦ş)<ğñcT8£zà·Î‡óİM¼óÍ"•|ÀM|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ= æy¿ÈÍêc«z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC9—ê¡œKõPÎÇ¥z¨Tò¹‰ox¼^±ÇU=”óq©Êù¸Tå|\ª‡êJ¾Ÿş9üîw¿Ëÿ[ÜÇKõPÎÇ¥z¨ß:_Óy¯>Ê?_.ÕC9—ê¡Ô|ã&¾zpªüëFõ€ó1ªœQ=à|Œê®ä›µS‡£zÀùÕ/#ßôLêó?Fõ€ó1ªÔ|ÀM|±ÇU=à|ŒêçcT8£z +ùfí™íãÇ¨p>FõÀËÈ7}î«Ï|üÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|Œê.åûæ›oÊÿ;ÇÇQ=à|Œê—‘oú¼WŸøø1ªœQ= ænâ[ˆ=®êçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ=à|Œê5pßBìqU8£zÀùÕÎÇ¨èB¾§OŸ–ÿÇøø1ªœQ=ğ2óU¯õù€£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=Ğ…|³ÖÃ?Fõ€ó1ª^V¾úk@}>àãÇ¨p>Fõ€š¸‰o!ö¸ªœQ=à|ŒêçcTt!ßôîu|üÕÎÇ¨xYùê»3©Ï|üÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|ŒêEçÃ-ç—––èÖó>~ŒêçcT¼¬|õ×ú|ÀÇQ=à|Œê5È›øEnVs\ÕC9—ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC¥’ÏM|ÃãõŠ=®ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC9—ê¡Ô|ã&¾zpªüëFõ€ó1ªœQ=à|ŒêEçûòË/Ã¿şõ¯üÿ›ğñcT8£zàeæÃë ¯õù€£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=°È|XÿÛëõÆŸÔ4áãÇ¨p>FõÀËÌ‡×^ÏŸ?ïd¾
+ÕÎÇ¨H%pßBìqU8£zÀùÕÎÇ¨Xd¾ú³ğñcT8£zàeçÃë¡ú4^ÁÇQ=à|Œê5pßBìqU8£zÀùÕÎÇ¨Xd>ì‹=ÊG›ññcT8£zàeçÃëáƒ>èl> zÀùÕ©änâ[ˆ=®êçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ=à|Œê5pßBìqU8£zÀùÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT¨ù€›øb«zÀùÕÎÇ¨p>FõÀ¢òaİï_şò—ò‘Ùøø1ªœQ=°ˆ|ÿûÿïüõ¡àãÇ¨p>Fõ€š¸‰o!ö¸ªœQ=à|ŒêçcT,*ÖıbMü<|üÕÎÇ¨XD>¼6P
+>~ŒêçcT¨ù€›øb«zÀùÕÎÇ¨p>FõÀ¢ò½şúëùî4óğñcT8£z`ùğ)<^
+>~ŒêçcT¨ù@ŞÄãîP(|a[©êÙ³g×+ö¸ª‡r>.ÕC¥’û»\)Õ?ÿùÏÆó½^_¸Tå|\ª‡ZD¾ÿùŸÿi|½¸\—¹üI|±ÇU=à|Œê5^Æ¤‚z>{~aT8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”p?‡Øãªp>Fõ€šÏ“ºI	7ñLl8£z`Qù<ß›”7ñ£Ñ( ªÃ¬R=n¾Ğôx½b«z(çãR=T*ù<©›”ÀùÜt®O—ç.ÕC9—ê¡•Ïó½I	7ñ×+ö¸ª‡r>.ÕC©ù<©›”pÏÛC9—ê¡•Ïó½I‰q_äóP=à_ç1ªœQ= æó¤nRB=Ÿ=¿0ªœQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJ¸‰ŸCìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|ïMJŒ›øØ7U@ùf\ª‡r>.ÕC©ù:;©Ÿ‡á½Í°vc)ÏØëõÃµ77Âö£ãpV*§×rgûiùÀKäÉ]dÛOÊ?_„âkÛkíáii«œ†ı›Ù×ŞÜÏş¯éÏqø5ß÷o	YÓ¹>]_¸Tå|\ª‡ZT>¼>ŒIœÏnâ[*ö¸ª‡r>.ÕC©ùº8©Ÿ|¾VúY“øÊjØ¼·†Ã/öÃÎ»+¡Ÿåí¿™5ÏK9ãr7ñ×Ãúû;aç^sí=~Ë27ñMçúty~áR=”óq©jQùÜÄ›”7ñÕI>Õşu£zÀùÕj¾®Mê£o¶Ãr–©k?œ4|«g_—ç`ü‰üånâ×Âşå¿	W¯‰WğüÂ¨p>FõÀ¢ò¹‰7)á&~±ÇU=à|Œê5_·&õ“°÷vÖö·Âaí“öIFáğıå°r{7•›ø6ÜÄ7áù…Q=à|ŒêEåsoRÂMüb«zÀùÕj¾NMêßï…•,OÿîÅZÃqÿø4ŞÛË¯ Áì‡kïl…ıïx9ÊèïÃ°}{9,e_Óæ…pm‡j]~ÿZX½³kİ07³£pôñjègÏ»şéIùX3nâOÃîµ°òj¿ÈÓ[
+Ë77Ãî×õìêrš³ğäşfX­ë•å°qï0œ6œ^§wÆÇ ÿêjØzxÜÄ‰íçcT8G}}sÀùì&¾…Øãªp>Fõ€š¯K“úégëy­¯Få#Ußï÷ÃÒÍí°ÿÅa8|´Öòf~5ì}_Š£§ÅrœŞ+kaûáA¾Ö~û&Ôå°ı´>î(k²—³Çûaåİİ0||nÏÙ_Ã²ñlâGáø“u©jâ†õ~ö=¾¹v;Ë3|°U~Ëa÷»Ò“šø“°Íûù÷6¼¿‘_‡/c*-pòßOo|\‹cĞÏuıûîêùìù…Q=à|ŒêEåëÒ|oÌ¯ç³›øb«zÀùÕj¾.Mê/º,fÜÄ¿w˜µÑ5¾İ	×³ÇÏwx9
+;¯eÍçkƒ‰cÇMm«'(¿võ“©fü‡ı¬‰]ëó?Ö›ø“OËşáü_;»ê;Ó?X×úaøSù@}ó›ø³GÅóO½Ñ¨Şà¬>(†ACcc€7nâb{ÀùÕÎÇÀQ_Æ\p>»‰o!ö¸ªœQ= æëÒ¤şk›øÁ×åc„Aöx¯ZóÍvş©òÊtc²WıàèãëÙsn†ƒ9›Ãø ì—ŸXO7Æm_;{wigš³7WnâOÃğÆİ:Ã2¦tßÚ+šö¯3k–ıC<‡›xÛÎÇ¨p>N—æ{c~-8ŸİÄ·{\ÕÎÇ¨PóuiR?û|3Ïó¢Ëi¸ù¶³Ç«&¾Z®³ñçÃ|9ÊD}6È×ãWMxıö6¦?Mïß–Íò|Š¯½à…­ÏÏÂÉ·YŞ/öÃî‡çûèëMüQØÆ§èoòe4ÓÇa÷]däßwq\›óç&Äö€ó1ªœ£¾>Œ¹à|vßBìqU8£z@Í×©I½üTyŞ…­gŸoåtîW4ûr_z­Uºkâ—ÂÆg'åúñ~XÿLkã/ÔÄŸ…İ|í~™³-¬dÇ`ğÑfñæCnâËcÒZE&7ñİıÆWõ€ó1ª•O}}sÀùœ7ñ±oª€òÍ&¸Tå|\ª‡RóukRW¶˜,›ÒŞùúpµ‰¯–Ó4-™förš,ã[KaùÃbııd³Rd«]øÚ†ŞÄŸ…ƒ;X³¿ö¾=£ú¿×/ºœæ÷SëÜ›˜ZbTçÉ]\ÛÍ&¾é\Ÿ.Ï/\ª‡r>.ÕC-*Ÿ›x“nâ¯WìqUå|\ª‡RóumRo¿ÙSµûK/,|T>v&~Ö…šù§èıkaP5¬Õ£Ó~=ÈßxTt÷ô‰ı÷{a5ûûúÍ¨f¡7ñå÷ÑĞxŸ<(¾÷ëãã1¯‰Ç×¬f_3½OÆólœ½°ôÎ^È/Û-¾vbÜç‡a«Ã¶6ëÓåù…KõPÎÇ¥z¨EåëÚ|oÌ¯ç³—Ó´{\ÕÎÇ¨PóuqR?ùl£ØÃı•Õ°yo?`½ö£½°U.'Yº=œh*å&>£Ú[5î>Â:ğaØ{o-o²¹ç-&ÇÛ0¾¹ª–™šøŒ£‹¯Ûü¼½×›xÜàªØrõ{ÅZvÿ¸–o«‰75çßãü&>ÿA¾ÅäRX»[ßƒ‡;aãM<6ÙÜ×;ƒÚ“ÙŸ³q»ÚÄ+x~aT8£z`Qùº8ßó¢à|vßBìqU8£z@Í×ÙI}ÖŸ·¢iâÁÙw¸ÙÓJ¸–šœ½)¸±6ï7İèhêfO¸!Òİƒ‰ß45ñat”¢İëo†ƒé-!kèM|Æ/'áànu#«¬‰~u%lÜË²œ•KxŞ.w”‘šøŒ_NÃáıócó5ö··Ã°á¦Wgßí‡­w²7Õ1¸÷$}Šcî&Äö€ó1ªœ£¾>Œ¹à|vßBìqU8£z@ÍçIİ¤„›x&¶œQ=°¨|iÎ÷ø°e'lŞ¬îÂ]~Èqw§?“xºÿıù5D/‘rlş°éäË<ë×j»MşÖw”ø´^~ †»loŞ2wyçeßŸ›øb«zÀùÕj>¼ŒIõ|öüÂ¨p>FõÀ¢ò%7ßÿp¶òe€KaõÎNq·îÇaÿ^±ô±×_™¼öç’7ñù6ÉÕ}< n>Ø[©İ•|>*—şq/_*‰e ÅufúöÇ—O7ñ-ÄWõ€ó1ªÔ|ÉMêæJ£Ï_ÕÎÇ¨XT¾¤æûñ²Åõ°ÿCùX³âBı‰e—¼‰Ïo²÷áù"ÆÑW[Ùs÷õÈ)7V¸9õmŠ%§ı_÷[€‚ãé&¾…Øãªp>Fõ€š/©Iİ\yÔóÙó£zÀùÕ‹Ê—Ò|_ì²Õo½9àè«AXÆ&ß”Î¥nâ±½qoâ>$ùVÈµOØq••WWkŸÌ—ĞVÄi€ãé&¾…Øãªp>Fõ€š/¥Iİõ|öüÂ¨p>FõÀ¢ò¥3ßm¯Á‹ë«&şÓãpüp+¬–ëÆ—nl„†M°ŞşÉıÍ±W\Øß´	6 À†	Õºü~¸öÎÔFMüèÛ°ŠÏ·TåÆùs¶Wë›ƒlllL0oÇ´Ë¾o7ñ-ÄWõ€ó1ªÔ|x“
+êùìù…Q=à|ŒêEåKf¾?†õì{é½WÜtO¦l¤ó­y«m†¿Ø+×Õ÷ÃàqıÙª­x¶º×m]üÅ~ØÎ·D®İÁ{ª‰ı}/¬·6ğ`N¿Á:ÿ¬ş¼‘}ıZØÉ×ı£vÃFö|kä>nÜ	mÎ¾İ›XVtc;]è`uO7ñ-ÄWõ€ó1ªÔ|ÉLêÆd¨ç³çFõ€ó1ª•/™ù¾\2½}ğ\ÊFú|KŞ’Ÿ†yC\¾³Ghšñ©ı„9nØWT…×o²F~ù?Ê›çÕ›øöÏxü ]ÔšƒúE­S”w(Ï¿ßÿo#›®¸äà{Ë›xÜ=…V[©êÙ³g×+ö¸ª‡r>.ÕC¥’/cRçsÓ¹>]_¸Tå|\ª‡ZT¾dæû_ÙÄO7æyÃıûìùj÷×ŞB¼éÓër‰KÕP—w÷»T¥{ğiÑÀc,µù}Eê¿yøz=_í¢Öi¾’ÿö`|#¿éz ÇÓŸÄ·{\ÕÎÇ¨Pó%3©“¡Ï_ÕÎÇ¨XT¾dæû³ƒ°™}//ºœ†/ğœ¾)^±ÿzï­Aq‡ì©Ú}7û»ª®ÂŞFé«¿†ÊşrŠ7õ7'Ÿ¬„ŞïÅ7ÏŸ„~[ğÚÎønã)€ãè&¾…Øãªp>Fõ€š/cRA=Ÿ=¿0ªœQ=°¨|éÌ÷eÓ=ïÂÖ¬ÙßÂ¹?=.š}¹‰/ïöİZåİ¶/ØÄ/İ†“ñršy{·Gº°5#ßÉF½Cø%ß·›øb«zÀùÕj>¼ŒIõ|öüÂ¨p>FõÀ¢ò¥4ß+[Lû£÷ÂÆ£r©‹ÜÄ—Ëi”Oº[–ÓàÓò¥ƒpø<ûÃT³òi±w{}ËH¦¼°5¿¨u5lã¢Ùü·“µ¢paëÑı•pûâ7¬ì9úé®‡aû»†K§›øb«zÀùÕj¾”&ucÔóÙó£zÀùÕ‹Ê—Ô|?çfOÕî/½µ%$r_½IXæuäÏ‹›H-½S^°Z]Ø:½Æ½ZÂr{òš>±?	{o#ífT3˜§Ö‚ÑãA~1+­ù/?ùç‹o/78nâ[ˆ=®êçcT¨ù’šÔÍ•G=Ÿ=¿0ªœQ=°¨|ÉÍ÷?ÃÆ+YsÚ[
+«wvÂ~¾ıâ0ì½·Vì×şÊÔ®,hâÑd[L.…µ»ûáàqí"Ñ©æ¶˜|´;¾˜t÷ÛR¢&>ãÛâëî~#£pø^–múN­K‰NÃğv±µåêûEæáƒ­°†c4ëÎ¶—O7ñ-ÄWõ€ó1ªÔ|ÉMêæJ£Ï_ÕÎÇ¨XT¾$çû_NÃáıÍ°öæµñ–ŠKX¿á¦Ljâ3ªç¾Æğµ°r{;¿ã–{òfOKa9óŞ@L®]…£–³Çû-»ÛŸô×ÿ>_ß>³ñ?›¸‘nPµöŞ~8ı.áÒ‚ïÏM|±ÇU=à|Œê5^f’|+¯|"n«‹_ T<¯~‡Á³Ï7Cü
+>é7lfêàg£àù…Q=à|ŒêEåS_Æ\p>»‰o!ö¸ªœQ= æó¤ÎÍöõ°şşNØ¹7«öÂ“~²ÁMüY8ùb'l?šşT(ãùaØê_;Õ¯bA¾7röæ!Á›vÄÂM<ÛÎÇ¨XT>Ï÷&%ÆMüh4
+¨êÅ0«T…+4=^¯ØãªÊù¸T•J>OêLÑl¿„­¸Ê–ğ¯vGY†ëçD)o_?yµÁùÜt®O—ç.ÕC9—ê¡•Ïó½I	7ñ×+ö¸ª‡r>.ÕC©ù<©3oâó[€÷ÃàqÃÖißï…•Şòä'ôfŒ›x®ØÊù¸Tµ¨|ïMJŒ›øê$Ÿ‡êÿ:Q=à|Œê5Ÿ'uæbM|±V=ß­à›zÓ]=¾:Şlb9My‘Óy—omÖ4Üîœ„½·z¡ÑÛ_ÔóÙó£zÀùÕ‹ÊçùŞ¤Îg7ñ-ÄWõ€ó1ªÔ|Ô™_í|c;•7öõíãFÏ/Dhâ:‡ŸÂJvüW>†ÃÇGá4ÿÚ¢IŸ½ó@yÓyw*¼¢¸‰gb{ÀùÕ‹ÊçùŞ¤„›ø9ÄWõ€ó1ªÔ|Ô™¢ÙSSŸ„Wû/|4¾±Æô-µ'šxĞ´œæì lf­|2{ìZÓk¸Ñ‡qßDl8£z`QùÔ×‡1—œÏnâ[ˆ=®êçcT¨ù<©3E³=gwšÏ§›l\tŠı~—ÃJ~“­âVÛ5¤&¾åŞcÊ¥8ƒ¯Ë?›1nâ™Øp>FõÀ¢òy¾7)á&~±ÇU=à|Œê5Ÿ'u¦h¶_àÂÖÑ“°e5½k¥JM|ãA¦(}ŞÕÆ¸‰gb{ÀùÕ‹ÊçùŞ¤„›ø9ÄWõ€ó1ªÔ|Ô™nâË[hã˜6m­‰Ïw¨qß„z>{~aT8£z`Qù<ß›”Àùì&¾…Øãªp>Fõ€šÏ“:óbMüQØ¹‘}İí0|P\Ô:½$Fjâ½œæWá&‰íçcT,*Ÿç{“nâç{\ÕÎÇ¨PóyRg.ŞÄÂÑGÅzøb›ÉÓ0¼…uñëaX{jâO‡a=;şkŸÖÖ×¶bç_ØÚŒ›x&¶œQ=°¨|ïMJŒ›øØ7U@ùf\ª‡r>.ÕC©ù<©3E³=çÂÖ¬öŸ–w¦ùè(kçKÆ;Ôì‡ª§&>û¿íìëzoo‡áãÃpü;û7³ÇZ¶˜|r×[LÎçsÓ¹>]_¸Tå|\ª‡ZT>Ï÷&%ÜÄ7<^¯ØãªÊù¸T¥æó¤ÎÍöüÊ—Á<ÏñrMµG|ÅÉ§k™w¾W<7ñ™óùVX}¥x¾­¯Š'ÈoöÔÛšq³§£°óZ/\¿wTşÙÔÁql:×§Ëó—ê¡œKõP‹Ê‡×‡1©€óÙËiZˆ=®êçcT¨ù<©wŸ†a#kş›v¸)ÖÌŸßÖL¢Ï_ÕÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤ŞMî]½ÛÃ©%5£pø~¿qçSà&‰íçcT,*Ÿç{“nâç{\ÕÎÇ¨PóyRï(?„Íşõ°ómùgïfãOáÛpÏÄö€ó1ª•Ïó½I	7ñsˆ=®êçcT¨ù<©w—³Ï7Cÿæ~(6 …Ã÷ú“;ÙÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÆM|ì›* |³	.ÕC9—ê¡Ô|ÔMJà|n:×§Ëó—ê¡œKõP‹ÊçùŞ¤„›ø†Çë{\ÕC9—ê¡Ô|ÔMJ¸‰çŠí¡œKõP‹ÊçùŞ¤Ä¸‰¯Nòy¨ğ¯óÕÎÇ¨PóyR7)¡Ï_ÕÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÜÄÏ!ö¸ªœQ= æó¤nRÂM<ÛÎÇ¨XT>Ï÷&%ÆM<î†Â«­TõìÙ³ÆÇë{\ÕC9—ê¡RÉ‡Ë•R5ëÓåù…KõPÎÇ¥z¨Eåkz½¸\—¹üI|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªşó?ÿ³ü¿ÙÄWõ@*?_à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8sïŞ½ğôéÓòOíøø1ªğ	ñ<b«z •Ÿ/pßBìqU8£zÀùÕÎÇ¨p>Fõ€ó1ªœyıõ×Ã—_~Yş©?Fõ€›xFõ€š¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕÎ7Éh4ÊËçÏŸ—´ããÇ¨ğrFõ€š¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕÎ7ÉW_}şğ‡?t6P=à|ŒêTò7ñ-ÄWõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€š¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€—Ó0ªÔ|ÀM|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p¾sşıï‡Á`~şùçNæ«P=Ğõ|¾°•Q= æy‹>PÕ ³JõP¸±BÓãõŠ=®ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡z™ù°#v¦QŸåãÇ¥z(4ñM×+ö¸ª‡Jåçë&¾áñzÅWõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡r¾óúàƒòRŸåãÇ¥z¨­­­ÆÇë{\ÕC¥òó7ñÕƒóP=à_G1ªœQ=à|ŒêçcT8£zÀùÕÎwÎ_ÿú×ğ·¿ıM~>àãÇ¨p>Fõ€š¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ªÔ|ÀM|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨p>Fõ€ó1ª¼;£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|Œêç+øÓŸş”PŸøø1ª¼;£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|Œêç+xã7ò»µõù€£zÀM<£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|Œêç+ö‡G3‰ÿõù€£zÀËiÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8_ÑÄWŸÂõù€£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó¼‰_äfõ1ÇU=”óq©Êù¸Tå|\ª‡r>.ÕC9—ê¡œKõPÎÇ¥z¨®çóÍ¸T¥æsßğx½b«z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC]õ|?ÿüsøİï~—ÿ·Í›Uşùr©
+×"4=^¯Øãª*•Ÿï¸‰¯œ‡êÿ:…Q=à|ŒêçcT8£zÀùÕÎÇ¨¸êù°;ÓÔQŸøçË¨ğî4Œê5pßBìqU8£zÀùÕÎÇ¨p>Fõ€ó1ª®z¾úşğêóÿ|ÕŞ†Q= ænâ[ˆ=®êçcT8£zÀùÕÎÇ¨p>Fõ€ó…ğÍ7ß”ÿW >ğñcT8£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT\å|OŸ>-ÿoõù€¾Œê/§aT¨ù€›øb«zÀùÕÎÇ¨p>Fõ€ó1ªœQ=p•ó5­‡êóÿ|Õ¾°•Q= ænâ[ˆ=®êçcT8£zÀùÕÎÇ¨p>FõÀUÎ‡]iêwj­PŸøçË¨pÏ¨Pó7ñ-ÄWõ€ó1ªœQ=à|ŒêçcT8£zàªæû÷¿ÿ–––òÿN£>ğÏ—Q=àå4Œê5È›øEnVs\ÕC9—ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC¥’ÏM|ÃãõŠ=®ê¡œKõPÎÇ¥z(çãR=”óq©Êù¸Tå|\ª‡r>.ÕC9—ê¡Ô|ã&¾zpªüë(Fõ€ó1ªœQ=à|ŒêçcT8£zàªæûòË/Ã¿şõ¯üÿ§QŸøçË¨ğrFõ€š¸‰o!ö¸ªœQ=à|ŒêçcT8£zÀùÕW1ÖÁã‚ÊêÊiÔçşù2ª|a+£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|Œê«˜;Ò`gšY¨ÏüóeT¸‰gT¨ù€›øb«zÀùÕÎÇ¨p>Fõ€ó1ªœQ=póaoøÁ`P>Ê¨ÏüóeTx9£z@ÍÜÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Pó7ñ-ÄWõ€ó1ªœQ=à|ŒêçcT8£zàªåÃ®4ùË_ÊGšYd¾˜èz>/§aT¨ù€›øb«zÀùÕÎÇ¨p>Fõ€ó1ªœQ=pÕò}ğÁùšø6™/¦ºÏ¶2ªÔ|ÀM|±ÇU=à|ŒêçcT8£zÀùÕÎÇ¨¸jù^ıõ|wš6™/¦ºÏM<£z@Íò&w‡BáÛJõPÏ=k|¼^±ÇU=”óq©Êù¸Tå|\ª‡r>.ÕCáY—+¥úç?ÿÙx®W…×FÓ×¹\—¹üI|±ÇU=à|ŒêçcT8£z ëù0ù“
+ÊùŒ×†Ï{“nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*2nâG£Q@UÿÌ*ÕCáÆ
+M×+ö¸ª‡r>.ÕC9—ê¡œKõPÎÇ¥z(73&%p>7çõÂkÃç½I	7ñ×+ö¸ª‡r>.ÕC9—ê¡œKõP]ÏçfÆ¤„›xs7ñÕI>Õşu7£zÀùÕÎÇ¨p>Fõ@×ó¹™1)¡œÏxmø¼7)á&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"nâç{\ÕÎÇ¨p>Fõ€ó1ªºÏÍŒI	7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ˜”po®"ã&ş·¸™ˆoÆÂ¥z(çãR=”óq©Êù¸TÕõ|mfÎÃğŞfX»±”gìõúáÚ›aûÑq8+•ŠÓ‡k¹³ı´|à%òä.²m‡'åŸ/Bñµíµöğ´´UNÃşÍìkoîgÿ×ôç8üšïû·Ç¬é<¯^ğŒIœÏnâ[*ö¸ª‡r>.ÕC9—ê¡œKõP]Ï×Åfæäó­°ÒÏšÄWVÃæ½ıpğø0~±vŞ]	ı,oÿÍ¬y|^Ê—»‰¿Ößß	;÷škïéô[–y¸‰o:Ïë…×†›x“ã&¾:Éç¡zÀ¿îfT8£zÀùÕÎÇ¨èz¾®53£o¶Ãr–©k?œ4|g_—ç`ü‰üånâ×Âşå¿	W¯‰Ÿ^nâMJ¸‰ŸCìqU8£zÀùÕÎÇ¨èz¾n53'aïí¬9ìo…ÃÚ'í“ŒÂáûËaåön8*7ñm¸‰Ÿ¯7ñ&%ÜÄÏ!ö¸ªœQ=à|ŒêçcTt=_§š™ï÷ÂJ–§÷b­á¸‰|ïm„åWĞ`öÃµw¶Âşw¼eô÷aØ¾½–²¯ióB8Ç¶ÃFµ.¿-¬ŞÙ‡µn˜›ÙQ8úx5ô³ç]ÿô¤|¬™7ñ§‡a÷ÎZXyµ_äé-…å››a÷ëzvu9ÍYxr3¬VÏõÊrØ¸wNN›ÓÇ;ãcĞu5l=<nâé8ŸİÄ·{\ÕÎÇ¨p>Fõ€ó1ªº¯KÍÌégëy­¯Få#Ußï÷ÃÒÍí°ÿÅa8|´Öòf~5ì}_Š£§ÅrœŞ+kaûáA¾Ö~û&Ôå°ı´>î(k²—³Çûaåİİ0||nÏÙ_Ã²ñlâGáø“u©jâ†õ~ö=¾¹v;Ë3|°U~Ëa÷»Ò“šø“°Íûù÷6¼¿‘_‡/c*-pòßOo|\‹cĞÏuıûîÊùŒ×F—Î{c~-8ŸİÄ·{\ÕÎÇ¨p>Fõ€ó1ªº¯KÍÌ‹.‹7ñïfmtowÂõìñó^ÂÎkYóùÚ`âÂØqSÛ„Ãê	Ê¯]ıdªÿa?kb—Ãúƒãüõ&şäÓ²8¿Å×Î®úÎ4ÇÖÂµşFşT>PAßãü&şìÑFñüSo4ª78«ÊÇG‡aĞĞØãà…›xcºÎg7ñ-ÄWõ€ó1ªœQ=à|Œê®çëR3ók›øÁ×åc„Aöx¯ZóÍvş©òÊtc²WıàèãëÙsn†ƒ9›Ãø ì—ŸXO7Æm_;{wigš³7WnâOÃğÆİ:Ã2¦tßÚ+šö¯3k–ıC<‡›xcº Îg7ñ-ÄWõ€ó1ªœQ=à|Œê®çëR3söùfçE—Ópóÿ$lgWM|µ\gãÏ‡ùr”‰úl¯Ç¯šğú'ìmLšŞ¿5,›åù_{Á[ŸŸ…“o³¼_ì‡İÏ÷Ñ×›ø£°OÑßäËh¦Ãî»È4È¿ïâ¸6ç+şÎM¼1] ç³›øb«zÀùÕÎÇ¨p>Fõ@×óuª™)?UwaëÙç[ùûßÍ¾ÜÄ—^k•îÅšø¥°ñÙI¹~¼Ö?ÓÚø5ñgGa7_»_æì_+Ù1|´Y¼ù›øò˜´V‘ÉM¼1—œÏyÿ[ÜLÄ7cáR=”óq©Êù¸Tå|\ª‡êz¾n53Ê“eSÚ;_®6ñÕrš¦å!ÓÌ^N“e|k),X¬¿ŸlöOŠlµ_ÛĞ›ø³ppkö×ÃŞ·§aTö¢Ëi~?µÎ½‰©%FuÜÅ…±İlâ›Îózáµá&Ş¤„›ø†Çë{\ÕC9—ê¡œKõPÎÇ¥z¨®çëZ3Ó~³§j÷—^Xşø¨|ìMü¬53òOÑû×Â jX«F§/şüz?¾ñ¨èîéûï÷Âjö÷õ›QÍBoâËï£¡ñ>yP|ï×ÇÇc^¯YÍ¾fz7ŒçÙ87zaé½_¶[/|íÄ¸ÏÃV‡/lm:Ïë…×F×Î{c~8Ÿ½œ¦…Øãªp>Fõ€ó1ªœQ=Ğõ|]lfN>Û(öpe5lŞÛX¯ıh/l•ËI–n'šJ¹‰Ï¨v`ÁV»°|öŞ[ËÇ›lîy‹Éñ6Œoî†ªe¦&>ãèãâë6?ooãõ&7¸*¶„\ıã^±–Çã?®åÛjâMÍù÷8¿‰Ïco1¹ÖîÇ÷àáNØxM6÷ããõÎ ¶ÅdöçlÜ®6ñóÀk£‹ç½1/
+Îg7ñ-ÄWõ€ó1ªœQ=à|Œê®çël33ëÆFÏ[ÑŠ‹4ñàì;Üìi%\Ë?MÎŞÜX›÷›nt4u³'ÜéîÁÄoššø0:Ê?Ñîõ7ÃÁô–5ô&>ã—“pp·º‘UÖD¿º6îeYÎÊ%<o—;ÊHM|Æ/§áğşù…±ùûÛÛaØpÓ«³ïöÃÖ;Ù†êÜ{>Å1woLÀùì&¾…Øãªp>Fõ€ó1ªœQ=Ğõ|nfLJüº&¾º&£v¿€×LŞHl.O·óqùÍf×h~óÛDñZ|#ªP^ãã4»º÷æ±`Ææ— ‹›øb«zÀùÕÎÇ¨p>Fõ@×óaò7&”ó¯Y^q½@?·tñÕµ·‡s¯{˜ÀMü|ª&şíÍÆ{'u0±œnQœ>İ[>¿6ÇM|ÄqU8£zÀùÕÎÇ¨p>Fõ€›x“¿¶‰?ÃšÈé»ÿÖ=ÌÜµ§7ñó©šxaìÅ¢£—›ø9ÄWõ€ó1ªœQ=à|Œê®çsoRâW7ñá,ogÍYãmÁ(¾—ı½°ä†p?7ñ/„›ø9ÄWõ€ó1ªœQ=à|Œê®çsoRâ×7ñçŸ´7î.tv6³¿»~o¼?ÑÌf.znâ«?}l†Õò"î¥a§án¼ÁxrÿÜ+.2¾ »È³öğ8<¹·ZìºôêZØû{ñ·§wÃæÍó‹ºñkwvÃ“‰°Ï¿§³¯wÆv#×ö£ã‰ßP47ñ£ÉÂû×Âê{ûáXY{t¡&ş½z¬óëWk¿ß{ş-4¬Û/~¦3–Ó´=WÅ…Ï…Iàº‰o!ö¸ªœQ=à|ŒêçcTt=&cRA9ŸñÚhõª5ï{ıŸ=ÚÈ¾özØù¶|àEÉ©&~ùÆòù–§vË­>¯g^½]®¶mØòtbkÔ"Ïõì9—ŞÙÎ¼ƒ°o?ßõô³âÂ+ïîäÛ…Ö·WíİØ-îS~OÙs,÷WÂÆıaîîŞÆÖ©M÷h¨7ñÕÖ¬Yzs{b[ÒŞìXÌ¼‰[ÉoÜÄKÇú‡ı°Ÿÿ+kaûáAñ½¿»’¿±[şè(ŒF§á({3”/»Ê~‡ÙÏâ8ÄM<¶hÅÏ¨ñ¹ş×Áy³¡sÁ×º‰o!ö¸ªœQ=à|ŒêçcTt=&cRA9ŸñÚ˜çİÃ{Ïï
+\P.µoç	~}¦oâBÍj]~í9‹77Ëûø¯>¨/óPöã°wóZè7\Œ[|¯õF¼zé‚eú‡“Ç…šøò&i×?|2ñ‰}Õ÷ßŸ}­ANÃ§Ü“U;/pìçëògLwÆ÷¾®½9(o{º‰/w;zm@o^Nò-ZkP_à\h_›7ñ¸» 
+ÿğ´•ê¡={Öøx½b«z(çãR=”óq©Êù¸Tå|\ª‡ÂäoL*à|n:Ïë…×ÆÜó¾lF«;óæ”wã=o˜Á¯oâ§ó¬­;¯e_{kX6ƒ§axÏÕ´N¿lßªŞX”yjŸÏƒ?M/Ÿ£i÷ò¸¬V&›úÚ£ğÉñJãÖ›Å¶œ³®5(©šø™»ÓÔw¦¹ø±Ÿ{¬«åRµß64#4ñÙù²’9+ŸL™1:[øúêjù\h_ëOâ[ˆ=®êçcT8£zÀùÕ]Ï‡Éß˜TPÎg¼6æ{å§¨µF¶Ø~rúîMüÃéölúİ£°%oŠ»õNÕî»gPSæùóTŒÎNÂQöuwÃàÎZy±†&¾éÓß²ÉîT4¹“M|õfc#ìNeD?\)Üò/mæ7^N3÷X—ã³7ĞÄOÿ¼'hvçŸÍàkİÄ·{\ÕÎÇ¨p>Fõ€ó1ªº“¿1© œÏxm(^Ñ VM{ÖÔ¿•5S´õäËhâË1Z«j¤gç9ûf·X›^~îú»vg¶ï”Íõšøê“êé&>Ï]>ÿ¬jnjK®LöÏ®›øÕÎÇ¨p>Fõ€ó1ªœQ=€Éß˜TPÎg¼6¤ó¾\œ7Vù2’¦›@•Í5÷åV”QšøòîßO­—ndFcûÓAØÌ/‚İG§“Ig.§i¸°·ZNSíÜÓ¼œ¦ú­Àğ"MüıÜcİ²œfôÕVm§¡‰‘å4nâT8£zÀùÕÎÇ¨p>Fõ &cRA9ŸñÚĞÎû³pp§h >¾z¯íä»¼LR6YÓw:Ì›æ8M|µ”gúBÓŒçY3y£–ŞÙ+w—™ÑÄWcM¯¹şå$ìa¬¦wĞœO,}ÉÇ{hÒg_ØZlÏÙë§×bwş«Õ…¡3¸Pñc?ÿX—¶ÒÅ¨Yş‰±Ê%NË–¦Ÿkş…­›_”o“ÜÄO¢zÀùÕÎÇ¨p>Fõ€ó1ª0ù“
+ÊùŒ×†zŞMéõpıµ^moøIŠ[*îäkÖ‹-ûaùvr‰ÓÄWMp¯·Öîfo*òqvÊ-ëÍıŒ&¾Ú6³¿¶`ËÈÃ0|°Ö_Íë>£¾ì£|l1YmøÅ~Ø¾‰}ß'tş¿Úbò|+ÌÃG{a«ák¹Pñc/ëé-&ÇßûÒyÓ]}İk›aï‹Ãpô#??WÛ“K·‡ç¿Yq?‰êçcT8£zÀùÕÎÇ¨ÀäoL*(ç3^úyŸ5´ù§º«;®œ…ã‡[“7èùú,œän¬&>ã—Ópx3¬Õn¢´r{;¿«/z™ÑÄƒÂöíåb_ø¬¡¾öf–ó‹“p–5­hœi›Êì9p³'4úù÷õöfØÍ¾¯:ÜÄƒìxàfOo^Ë›U4¿Ë7³¯nZtÑ&ş¢Ç^>Ö7hÊÕ;Y³şÍä÷>úvw|lŠ%3ÊsgİìÉM|‰êçcT8£zÀùÕÎÇ¨Àäo&).Š›WÓË|èb»9œ}¾úã¼±Î·ß°©ƒŸÍ<ğÚP<c.8ŸİÄ·{\ÕÎÇ¨p>Fõ€ó1ªºÏÍS4Û×ÃúûMûTWµL~07nâÏÂÉ;aûQÃglÏÃV¿¾N9#ÿ”rz²©ã&Ş\EÆMüh4
+¨êY¥z(ÜX¡éñzÅWõPÎÇ¥z(çãR=”óq©Êù¸Tåf†)ší‹Ò~aÊ¥ü+t¬+¾Şp³âñ~Ó®!&çsÓy^/¼6|Ş›”pßğx½b«z(çãR=”óq©Êù¸TÕõ|nf˜…7ñùÖ†MÛfäÛÖ-O~BoÆ¸‰7W‘q_äóP=à_w3ªœQ=à|ŒêçcTt=Ÿ›æbM|±V=ß!ä›zÓ]=~~AäÄršòB¶ó:/ßq£?˜q{úâ¦C}ùÂ¿«…r>ãµáóŞ¤Îg7ñ-ÄWõ€ó1ªœQ=à|Œê®çs3Ã\ø“øçOÂàµìknl‡£²ñ>ılöËhâ:‡ŸŠ›Á|ˆ-ÿBqòÎ -Kfòêôõd¯nâÍUÄMüb«zÀùÕÎÇ¨p>Fõ@×ó¹™aŠf{NM}ı —³Ç—q§ÇrŸéş­áÄ¶pM<hZNSŞ1²ñ.%Øµ¦×[iÙòğê‚ŸÍ<ğÚP<c.8ŸİÄ·{\ÕÎÇ¨p>Fõ€ó1ªºÏÍS4Ûsv§ù|ºÉ®nr³Vpşİ™Rjâ§nkßH¹gğuùg3ÆM¼¹Š¸‰ŸCìqU8£zÀùÕÎÇ¨èz>73LÑl¿À…­£'aËjz×/J•šø²A?¿{fe£Ï»Ú7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌ0/ÜÄgÍ5–Ôà˜6m­‰Ïw¨qß„r>ãµáóŞ¤Îg7ñ-ÄWõ€ó1ªœQ=à|Œê®çs3Ã¼Xvnd_wc;µN/‰‘šx/§ùU¸‰7W7ñsˆ=®êçcT8£zÀùÕ]Ïçf†¹x?
+Gëá‹m&OÃğÖÅ¯‡aí9¨‰?†õìø¯}Z[_/\ØŠo|ak3nâÍUdÜÄÿ7ñÍX¸Tå|\ª‡r>.ÕC9—ê¡ºÏÍS4Ûs.lÍjïiñiùxgš²v¾d¼CÍ~¨Úqjâ³ÿÛÎ¾®÷öv>>Ç?á±Ó°3{¬e‹É'w½Åä,p>7çõÂkÃç½I	7ñ×+ö¸ª‡r>.ÕC9—ê¡œKõP]Ïçf†)šíù•/ƒy5âå2šjøŠ“O×2ï|¯xnâ3çó­°úJñ|[_Oßì©·5ãfOGaçµ^¸~ï¨ü³©ƒãØt×¯xÆ¤Îg/§i!ö¸ªœQ=à|ŒêçcTt=Ÿ›™òÓ0ldÍÓ7Åšùó»ÀšI”ó¯Ÿ÷&%ÜÄÏ!ö¸ªœQ=à|ŒêçcTt=Ÿ›™nrtïzèİN-©…Ã÷û;ß˜7ñæ*â&~±ÇU=à|ŒêçcT8£z ëùÜÌt”ŸÂfÿzØù¶ü3Èw³ñ§ğm¸‰7W7ñsˆ=®êçcT8£zÀùÕ]Ïçf¦»œ}¾ú7÷C±å(¾×ŸÜÉÆnâÍUÄMüb«zÀùÕÎÇ¨p>Fõ@×ó¹™1)á&Ş\EÜÄÏ!ö¸ªœQ=à|ŒêçcTt=Ÿ›“nâÍUÄMüb«zÀùÕÎÇ¨p>Fõ@×ó¹™1)á&Ş\EÜÄÏ!ö¸ªœQ=à|ŒêçcTt=Ÿ›“nâÍUdÜÄÿ7ñÍX¸Tå|\ª‡r>.ÕC9—ê¡ºÏÍŒI	œÏMçy½ğÚğyoRÂM|ÃãõŠ=®ê¡œKõPÎÇ¥z(çãR=T×ó¹™1)á&Ş\EÆM|u’ÏCõ€İÍ¨p>Fõ€ó1ªœQ=Ğõ|nfLJ(ç3^>ïMJ¸‰ŸCìqU8£zÀùÕÎÇ¨èz>73&%ÜÄ›«ˆ›ø9ÄWõ€ó1ªœQ=à|Œê®çs3cRÂM¼¹Š¸‰ŸCìqU8£zÀùÕÎÇ¨èz>73&%ÜÄ›«ˆ›ø9ÄWõ€ó1ªœQ=à|Œê®çs3cRÂM¼¹Š¸‰ŸCìqU8£zÀùÕÎÇ¨èz>73&%ÜÄ›«ˆ›ø9ÄWõ€ó1ªœQ=à|Œê®çs3cRÂM¼¹Š¸‰ŸCìqU8£zÀùÕÎÇ¨èz>73&%ÜÄ›«ˆ›ø9ÄWõ€ó1ªœQ=à|Œê®çs3cRÂM¼¹ŠŒ›xÜ]…xÚJõPÏ=k|¼^±ÇU=”óq©Êù¸Tå|\ª‡r>.ÕCaòw¹Rª¦ó¼^xm4}Ëu™ËŸÄ·{\ÕÎÇ¨p>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕj>à&¾…Øãªp>Fõ€ó1ªœQ=à|ŒêçcT8£zÀùÕÎÇ¨Póüãáÿ¤OgÊÂX    IEND®B`‚
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: image/png
+Content-Transfer-Encoding: binary
+Content-Location: https://h0mbre.github.io/assets/images/AWE/coverage.PNG
+
+‰PNG
+
+   IHDR  Æ  &    J‰j   sRGB ®Îé   gAMA  ±üa   	pHYs  Ã  ÃÇo¨d  \™IDATx^í½ÌW}¿ï„„¸¡•ZnâÚ*T·"¡Ò4NâäMÒ‹Mp)…
+hJ!$TÈ©k*YD44©Ô¤Iœ‰Rê_L±”[$T¢ø^Õ¦*‰U\H%æ¿gæÌî™3g>ß™½¼ïÎÎóH_Ù;»;g¹œ9ŸÙ}·dßûŞ÷üÿºñ£ıÈÿ¯?şñóš†iÛtà©ÁSƒ§6xjğÔàiƒ§<5xÚài³Lãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³Ï-naÊzàÆÿïRëëëÉéV;v,¯ÔsVMÛ¦+<uá©O»ğ´O]xêÂÓ.<íÂSºğ´O»–É“+ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³O‚qğÔàiƒ§<5xÚàiƒ§O6xÚà©Y„'Á¸xjğ´ÁÓO<mğ´ÁSƒ§O<mğÔ,Â“`Ü<5xÚàiƒ§O6xÚà©ÁSƒ§6xjáI0î <mğ´ÁSƒ§O<mğÔà©ÁÓO<5‹ğ$w O6xÚà©ÁSƒ§6xjğÔàiƒ§šExŒ;€§O<mğÔà©ÁÓO<5xjğ´ÁÓOÍ"<	ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³O‚qğÔàiƒ§<5xÚàiƒ§O6xÚà©Y„'Á¸xjğ´ÁÓO<mğ´ÁSƒ§O<mğÔ,Â“`Ü<5xÚàiƒ§O6xÚà©ÁSƒ§6xjá¹ÅÍ´¬õõõñÿ»Ô‰'’Ó­:yòd^©ç¬š¶MWxêÂSváiºğÔ…§]xÚ…§.<uáiv-“'WŒ;€§O<mğÔà©ÁÓO<5xjğ´ÁÓOÍ"<	ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³O‚qğÔàiƒ§<5xÚàiƒ§O6xÚà©Y„'Á¸xjğ´ÁÓO<mğ´ÁSƒ§O<mğÔ,Â“`Ü<5xÚàiƒ§O6xÚà©ÁSƒ§6xjáI0î <mğ´ÁSƒ§O<mğÔà©ÁÓO<5‹ğ$w O6xÚà©ÁSƒ§6xjğÔàiƒ§šExŒ;€§O<mğÔà©ÁÓO<5xjğ´ÁÓOÍ"<	ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³O‚qğÔàiƒ§<5xÚàiƒ§O6xÚà©Y„'Á¸xjğ´ÁÓO<mğ´ÁSƒ§O<mğÔ,ÂsKù¤«cÇÿß¥N<™œnÕ£>šWê9«¦mÓºğÔ…§]xÚ…§.<uáivá©O]xÚ…§]Ëä9U0>räHvİu×eo}ë[³K.¹$Û±cG¶¶¶Ö¹.¸à‚¼RÏY5m›®¶oßœnºæåyñÅgo~ó›³|àÙç?ÿùä>‡®ğœWŸàŠãS×=»ô	Ÿvm„'ã„n…§]a›ŒÒÅ8AÇ§®>{ÎkœĞúVêüàÙ_şå_fÏ}îs³-[¶äõ¬g=+{éK_š½üå/§¨¹ÕË^ö²Ê~ö´§=-»úê«ó?·šhåIŸ@mTué8>måIŸ@mT1NHÃ8jÍkœĞ*ßpÃÙ“Ÿüä¼¡ßıİßÍşñÿ1;qâ„`1üğ‡?Ì<˜íÜ¹3ß÷÷¸Çe{÷îõÏNà„§Y„'}lmúO›ExÒ'ÀfÀ8¡
+ã:³Ì`|ùå—ç3şíßşíì[ßú–Ÿ
+°±<ôĞCÙ›Şô¦|_t·y¸¿„fŞô	°4õ	C?>Û0oOúX'0N ™fœ ƒñyç—ÏìÃş°Ÿ°¹ÜvÛmÙ)§œ’½â¯È¿ãà„§™§'},qŸ0äã³-óô¤O€eƒqBwæéIŸ ËF—qBc0.?íùèG?ê§ ,wİuWvê©§fç{nş˜f^ô	°¬„}ÂPÏ.ÌË“>–Æ	İ˜—'},+mÇ	É`ì¾À§=°ÌÜqÇù>º{÷nNxóğ¤O€e§ì®¹æšÁŸ]™‡'},;ŒÚ3OúXvÚŒjÁØı‚œû²¼û^ À2ó¶·½-ßÁï½÷^?¥œğ4¥'}ô…²Oøÿø?¥}veVOúèŒÚ1«'}ôkœPÆîgÕİø²<,;ßÿş÷³Ç?şñù/ÏM'<MéIŸ }¡ìşøÿØOéFÏi˜Õ“>úã„vÌêIŸ }Á'Ô‚±ûPîgÕúÀW\‘=ñ‰OÌ~ò“Ÿø)íá„§)=é O¸>á´ÓNÛĞ>Á1¤`LŸ }‚q‚Í¬ô	Ğ'Ô8¡Œ?õ©OåŸø¸¿5Ğî¹ç|Ÿ=pà€ŸÒNxçxäÈúè›Ñ'8†Œ'@ß`œ`3‹'ãèªO¨ã÷¿ÿıùùÜĞ'N?ıôìê«¯öÚÃ	Oã¯»î:úèİ'8†Œ'@aœ ™Å“qô‘¦>¡ŒßøÆ7fÏzÖ³ü#€~pÖYgekkkşQ{8áiœã[ßúVúèİ'8†Œ'@aœ ™Å“qô‘¦>¡ŒÏ?ÿüì¥/}©ĞvìØ‘½êU¯òÚÃ	Oã/¹äúèİ'8†Œ'@aœ ™Å“qô‘¦>a‹;Ê:çœs²—¿üåş)€~pÑEeÛ¶mïÇmËİö“šnÕÉ“'óJ=gÕ´mºZ__ON·jO×qĞ'@ßØè>ÁÕfŸ›Ñ1N€>Â8A×,Œ 4õ	•+Æç{.;7ô·sO³ßº`†ôI°»Í„>úÆF÷	¡\1fœ }„q‚fOÆ	ĞGšú‚1ôNxNx04ÆšY<'@aœ ™Å“qô‚1¬,œğ4œğ`hŒ5³x2N€>Â8A3‹'ãè#cXY8ái8áÁĞ kfñdœ }„q‚fOÆ	ĞGÆ°²pÂÓpÂƒ¡A0ÖÌâÉ8úãÍ,Œ Œaeá„§á„Cƒ`¬™Å“qôÆ	šY<'@!ÃÊÂ	OÃ	†ÁX3‹'ãè#Œ4³x2N€>B0†•…†‚±fOÆ	ĞG'hfñdœ }„`+'<'<cÍ,Œ 0NĞÌâÉ8úÁVNxNx04ÆšY<'@aœ ™Å“qô‚1¬,œğ4œğ`hŒ5³x2N€>Â8A3‹'ãè#cXY8ái8áÁĞ kfñdœ }„q‚fOÆ	ĞGÆ°²pÂÓpÂƒ¡A0ÖÌâÉ8úãÍ,Œ Œaeá„§á„Cƒ`¬™Å“qôÆ	šY<'@iÆî *ëì³Ïfç†Şávî3Ï<s¼·­õõõät«;–Wê9«¦mÓÕ<œnÕ,Û·o§O€Ş±Ñ}‚«Í8>7£ÚèqÂáİ[²-[škÏÿÂUáÈ‘×ì°¸äËd¯k·­–u{0NĞ5‹ç¦ü~ÖÚíÇı“óáøík£ù®eû×ı„¹p<ÛIu¹—î˜ M}WŒ¡÷4}êcÁ'Á>	†¾²Ñ}‚c3ÏÍè‡6zœPã¡g{Fƒä¥—m‚ñúşlm—İÃ8A3‹çÆÊ`V¿n¹dÿèóaîÁ¸ó»«=Zùà²?«HSŸ@0†ŞÃ	OÓ¯ÀìŒ5³xŒGî˜—‚qg',Ù'øıp^WçŒeÖ‡€›ÁVNxš>ğ æÁX3‹çòãâjk<è¬lS·0N*u‰Û3Ç]‰*æ<‡Ú|^{²ıÁëƒcS°,¯‚UŸGİ+~M±¬£õÍ/5H¯zÖİíF0×Ye=Ûeòü¯¾u€q‚fÏ'˜Á÷xvøÈñìøzü|»ı°èoÊ*İøµöñ–ÂìË=ç–İ?Î1ÚjúĞ*µäqêğw¬Üôã>-^ásµşåp±üÑkÍ¾s ÃÊÂ	OÓ›Àœ kfñìw0Ná|âöËr>‹å
+çëçğÊh‹[;ÇÁÕ?ÎiÜ&ÚÛH–ÇÑàu­¼‚nmğâ_WyMùŞ`¤ÚÜ'hfñÜĞqBST´ÚË ƒã Ùıx«ãçß¢/˜ĞÜÖ¤OHô;#âş¤Ñ·²<~^µş²˜^é‡û¦pZêƒåkÕwn cXY8áizsÂ˜cÍ,›ŒÓUˆ&o#Ša<Ğ+I†cjƒ½©A¡# ·0äñ 9Ó²4ùë-Ş¶^)ü{Ã×$ÊuŞ) ÌãÍ,9NĞÇsšVûaÃ>·×öx«Ó=ümÕç™>¶Ã×y·q[m×÷ôëärŒ×kÃqíÛÏs–>fÎŒaeá„§éË	`^Œ5³x®Òcõ\(¦Ş-C‹`[dK|û‰e(!3j;=¸m¹¼‰Ğ[£öš&§¦eY,Œ4³x.w0n·6î“•c¢ıñV'İ—(Ò~DÜV|ìÅó×§ßxİDıA
+?ï¼Or5^¾¦÷V½›·_‹¶çÁVNxš¾œğ æÁX3‹çÊãÆÁbIó ¸˜§&Êš5ªƒÇ˜b5~_Æğ¹JMÚNü»Z›×ÕˆZ0nvJ/Ëbaœ ™ÅsCÇ	æqÓn?lìgòıº<&ÚouD¨N"^_ëWük+Çqàâ×Yc×M±®ÃmôúJp÷Çı½©eæÁ`pÂÓôæ„0'ÆšY<W"—W=ƒå’¢İô@·u°kŒ«ƒGÅx`™¿¶ëûâeBCÓòÖBo‚Úkš—­õú›#Œ4e›'NœÈvíÚ•ÿÛ†'4…·	Õ>£İ~Ø¸OV‰öÇ[
+s¿Âe%x†$ÓÉ¼‹e¬¬ŸÖıPzİ6õÁÕåkÚ.Õ>f3ı&Æ°²pÂÓ„'¼;vd‡Ê[lü	`>Œ5Óö	¾ãâıá ĞÔÄ•›bğ&‚`SPŒ§·úåË4ÁÎık›šñôôëªƒÖx`>&÷èŒËu·Y]ş‚q‚&ló²Ë.Ë¶nİš]sÍ5f@ŞŒq‚ìü~†×VûaÃ>^7“c¸íñ–¤éøòÄ}UÜvIÚ§8–‹_”ß“îëÓS¯k:^}ß1Şğºx{$ú‰œ¦éd ÁØo¨)?Í™n±O†ÅÎİ\ã$>¹v8ÙNxš°M÷I°Û·^óš×˜ƒáÍ8ám¾S»$M'‰6´ë’¸c~Óûµş@0ÖLÛ'8–7'^ë»áùÒœŸ1x-)æÏ‰¾¡Ã¹:9°öË_é“jËPG$Ò÷ú˜©>÷¯•î‹×UÖ›_úü7v ì`œ 	Û<zôh¾\~úé2 oÎ8¡<_GÇV¹¿ÅûyËı°Ö7Œç—8Œã­‘²OŠÎçEÛñ<mù÷§Ú*ç‘Ÿ´òõíÅó®÷umÕ–m2®
+çYŸß,ãªé!o$-O†õ²%-ç?8áiÂ6İÉí‰O|bŞQ¹RƒáÍ9ámeÇ¼6:Á5[“N~ª|êãÖ·»ÙıZ k¦íËŒ+Çhyœ†Çİx ›.7xø’U]r°9®øítÌã—Z`Ìç´1ªú 8òU<ŸbYãõ˜3Å^åß5µÂìdİÕÛ“ùM1æ™Œ4q›îªñd›5äÍ'Ô¿QÕ’vûaõø»ùßğaûxÓÄËâªé¸ˆÛı‰ï+×AÜ—ÔÆ1År¥Ş÷‹î5Åú–'êcË¿cÏÓì;7 ‚ñFÒòdØí„Ğéd»úpÂÓÄm–Wˆ\=ö±ÍÿM†7ó„·ñø“ÏèD±t\&O,®Ã¿dO¶Ç¿®áÔÓÌÔÇ­_6‚qkÆšiûGÿÇ	ËK>&˜¦oÆ	š¸ÍğªqXq@Ö8ºSä²nlƒÆãOIkŸb„§òS’â“q'Ÿ ’ÛÉ€Ú½¶Ë§ ­ƒqÜnr9¼û¸ğÄ§åË¸³v…&n3¾Bä*5Ö	/8İñ•œºc{Ï‘êñ3c¿P{®2/u\û6‚ç“W‰FËàÂ~ıı«ÁX3mŸà /’åDöÆ	šT›îªñ©§ZéÊ*òÿ÷ŒaDbl4bê€@c0vCYçœsNÏwî¦`\İXå´ÉÉg2øœæéÀ9É×Õ™[0.oÍ»şšÊ-—sÙq;÷¯şê¯f_ùÊW:Õ=÷Ü“œnÕ½÷Ş›Wê9«¦mÓÕ]wİ•œnUªÍ?üÃ?mûbŸ«¿úÕ¯Î>ùÉOæ?Ì3Œ^pçÇJ|\¸çİ±:ß~¡8N«}@½_ğóª|Èæû¬Úü«Çø¸ÿĞ­"İ'¸šçñÙ¦æİµé>õ©O­À8aÉÉãåHö×'<îqËúÔ§vª§<å)Éé‹¬YÚü¹Ÿû¹ät«RmşìÏşl¥/H•È¿ôK¿DŸ #âòGQ–×'lÛ¶mœËÈãxĞZ¼n2€¬¿/Ç‡Éq€a œ¢ §«ò‰q<¿èq:`GËÕr™úˆÛ¹ó˜Çäëšo=ó™Ï^0öÿ¯|ˆäú‚¼h{¼·y]Üyâ~§œW­_«ã¾ İÿ­>ô	‹«§?ıé‚¡w¸>Á…½w¾óêïxGrºUW\qE^©ç¬š¶MWoyË[’Ó­Jµù›¿ù›É>ÀUùÙïÿşïggŸ}6}ô×'¤öÛáÜJí¤ƒqm€Ïoêpšù\1®;—Tİıë^ÛgÜÎıüç??ûô§?İ©8œn•»’ê*õœUÓ¶éê;îHN·*Õæë_ÿúb_ˆª<Ù=ãÏÈnºé¦aŞJí¹c'8¦İ±ZÕyã*ñe*ç¯ç]µÑ Wî\ÍóølSóî‡Úô	ûöíãVjè%Mƒ`wiVáVjwÌ—ÇÜ¸Û¬İ÷#·RC!ûÇñëŠÇ•«´9Ñ€tNà’¹ãÆªÎ?|¯BHæ„§‰Ûtß't·?…ûA<øuë„Ç•Û©İ1VGm÷v¯+ú§r;øçÌ+Æ‰y—Dm9odŸàèûwŒÛô	‚1ôÆ	š¸MwÌ§úƒ2—kœ «ÁØ?.Hã>_1®/»ÍxPŞópÌ	O·™úÚxğëÖ	/>‹Çùqå7J§í| ®»-n¥æŠ±†`¬™¶OpŒ¡0NĞÄmºã?ìâ@\2¬q¬cÿ¸ Œk1 &Àş½›Œı|ƒäÆÁó˜Äà½‡pÂÓ„mÆW†š¿ağêÇBŞwŒ»_t®…Ôğ˜™¶_È×ïT)?°RÁ¸xM½‰û‚q7–a@Ú–yõC]úÁúãMØfxµ¸)—kœ «ÁØ?.hÆ£šFÛÄü‹hôºÚŸ4ó
+Æe{•`ºSƒğ¦+V=ƒ&l³¼2d~Ã:á%oy\UÑÔ‡ISö©ãvÜfõX­È•èŸü1ÏãnlöñÙ…yõC]úÇĞƒ±;­sû¦áúJ?QôWK»¼ãMØ¦ûÑM+—¬Ô8ÁŸC+<W/œx\Q<Ş¸ñúF··ñŒıã‚¦n1½¬ÔA\]¹¦>hõƒg÷šÊô*sÆ9Şi\õ«I©ƒ~vzNxš²Mweè…/|a«Á¯c¥Nx&íoúu#¦í¢÷ıA¢İàØrƒùåU?æ	ÆİØìiæÑuíƒÆşx]Ö YïsFäËœÆ	š²M†Ûâ’•'øóìrßM9¥rt/noãH0–ÕßVNxš²M7îÂJğ`PŒ5Óö	‚qÏ‚ñˆ|zêƒşÁ8A3‹'ÁxŒÁXB0î3œğ4œğ`hŒ5³xvœßqĞÚñx¢¸»£rWZğşâî±²öd‡ó¶â«¼ñ"êî‘hpÏUcÆ	³x6«>! ¸s+x]êCª¨÷µ`İÙÚĞfµOq•ºsÌ‡ïäk¹hì»w¡Œ%ã>Ã	OÃ	†ÁX3‹'WŒS¡3šV`O‚kuĞ]NšãÁgdı 6'ñMWŒÇíøª1ãÍ,CÆeØ­ãÑñWÔÄ±‹¾İI	>èŠ‚qòu©6+Ó¯+ƒx°Å²–}Q”‹Ê~i…ú‚1¬,œğ4œğ`hŒ5³xŒÛ„Ñ8ˆ¦°Mñx0]ÂëW|«Ù¦e)PÏÆ	šY<W-'«áÖáû‡q˜Œ—Tû†¾¡Ö†nsÜ‡$ú¨œ¼ÍI’îŠ6Š÷ÁxC±ƒ`+'<'<cÍ,ãÄ ³$X’qP.húq¼jn8h5Ø-hjk(0NĞÌâ9¸+Æ¯«çMhUBgåÿ!qŸÑöu!ş¹ÑûŠŠú”ä{J|{»÷ä}Ş*~¨F0†•…†‚±fO‚q4 öÓÊÁg1péh|ÅwL%ğÆƒÛ¸Æm`œ ™Ås¨Á¸±üq^s‰ç}å}…ï?ê×Ïã>£ªVwıJYş˜¯ô)Å¼âş¨ŠMP©eì3Á¸<x]mß¾}¸'<è-nç>ë¬³ÆûqÛ:yòdrºU>úh^©ç¬š¶MWÇKN·jÏ.¸€>zÇF÷	®6ãøÜŒ~hĞã„Z0öƒÒZmŒ›ÂjõJSú½)ÆÍ0NĞ5‹çÊŒ:ãÉRM´;æÚ^	nùº&‡)ƒqÙ^¶mç>ÑÔ'Œ¡÷pÂÓÅ	†ÁX×,ãpĞÙ0À,¯"§7„Û†Al<Õz2]cõÜ`œ kÏÁã(4Nˆ¦×úOeºïjÇfÜ·è¾¦l£ú¡Ú„¸OI÷a?;6´ßcƒ±>‡[©¡¸{šı–[¤4Î‘[©¡ltŸààVê!ı@²ZËiá ²!§ŞïçÕyúAi8õâppŞ|…ª©ıáÀ8A3‹çàn¥QkÕ×á³züÅt|,Çrñ¾ğ˜õ}@¥ÍD¿àÂyMú”`9|›aŸPÕq_—vî3M}Áz'<'<cÍ,C'Œ¬ãp„}¹cu¬ƒédş=ù@6¸év*”ƒİQUÆùôúU¤!Á8A3‹çƒqÎ8púª]-(å¸Rı@pì¯ÙõePşqj^©åJ„ïr“×†}N=Oú ÕèKÆ°²pÂÓpÂƒ¡A0ÖÌâÉ8añäé†Aö4äÁ»!”Æ	šY<'@!ÃÊÂ	OÃ	†ÁX3‹'ã„9’ºB•¼²3\-Îaœ ™Å“qô‚1¬,œğ4œğ`hŒ5³x2N˜/µÛ,ã <Å­ó›_aœ ™Å“qô‚1¬,œğ4œğ`hŒ5³x2N€>Â8A3‹'ãè#cXY8ái8áÁĞ kfñdœ }„q‚fOÆ	ĞGÆ°²pÂÓpÂƒ¡A0ÖÌâÉ8úãÍ,Œ Œaeá„§á„Cƒ`¬™Å“qôÆ	šY<'@!ÃÊÂ	OÃ	†ÁX3‹'ãè#Œ4³x2N€>B0†•…†‚±fOÆ	ĞG'hfñdœ }„`+'<'<cÍ,Œ 0NĞÌâÉ8úÁVNxNx04ÆšY<'@aœ ™Å“qô‘Æ`ì†²Î9çvnènçŞ¶mÛx?n['NœHN·êäÉ“y¥³jÚ6]­¯¯'§[5‹ç;è wltŸàj3ÏÍè‡'@aœ kOÆ	ĞGšú®CïiúÔÇÂ ÓÀ'Á ËÍF÷	®,/Œ4³x2N€>ÒÔ'Œ¡÷pÂÓpÂƒ¡A0ÖÌâÉ8úãÍ,Œ ´
+Æçw^ö²—½Ì?è\pAöÊW¾Ò?j'<s¼øâ‹é wltŸàJ0fœ }„q‚fOÆ	ĞGšú„J0¾ì²Ë²ç>÷¹ş@?p;¶ûKW8áiœã›ßüfúèİ'8†Œ'@aœ ™Å“qô‘¦>¡Œ¯¹æšlË–-ÙøC?`ùùéŸşéì]ïz—ÔNxçø|€>zÇF÷	¡cÆ	ĞG'hfñdœ }¤©O¨ãä;÷Áƒı€åæ«_ıj¾Ï~ìcóSÚÃ	Oã?ÿùÏÓ'@¯ØŒ>Á1”`Ì8úã›Y<'@ßP}B%»êiO{Z¶sçN?`¹¹úê«³Ç<æ1Ùÿşïÿú)íá„§)=é OlFŸàJ0fœ }ƒq‚Í¬ô	Ğ'TŸPÆîÅ.E?ôĞC~*Àròè£æ·BüŞïıŸÒNxšÒ“>úBÙ'\~ùå~J7úx|NÃ¬ô	Ğ'´cVOúèÖ8¡Œ;–=îqËŞô¦7ù© ËIÙö³ŸõSºÁ	OSzÒ'@_(ûw›Ô4ôñøœ†Y=é /0NhÇ¬ô	Ğ¬qB-;öîİ›¿é¶ÛnË,ŸúÔ§ò}Ô}q~HÒi˜‡'},;eŸğÎw¾spÇgWæáIŸ Ëã„öÌÃ“>–6ã„d0v¸¿ïtÊ)§dwİu—Ÿ›ÁÑ£G³'NøGàpŸò¸Û Ê¿?Æ	O3/OúXVÂ>a¨ÇgæåIŸ Ë
+ã„nÌË“>–•¶ã„Æ`ì~vı¯xEvê©§fwÜq‡Ÿ
+Á×¿şõìºë®Ë^ô¢e¿şë¿î§‚Ã}Úãvì_şå_Î¾ûİïæÓ8áiæåIŸ ËHÜ'õøìÂ¼<é`aœĞyyÒ'À2ÒeœĞŒ'OÌÎ=÷Üü²óÛŞö¶ìûßÿ¾æÍ¡C‡²+®¸"{úÓŸ¯oW§vW‹=îËòå÷Ü§=åÉÎÁ	O3OOúXšú„!Ÿm™§'},Œ' „L3NÁ¸d÷îİùLÿøÇçáí{îñÏÀ´¸Àû‰O|"ÿU´'=éIùúu?îş-ëŸşéŸü«‡‹»õÁíÔî“·NRŒ›fô	°YX}Ç§Í"<é`³`œ0qÀlã„-î *ëÿ?®{ï½7ÿeO|âóFN?ıôì¬³ÎÊvìØ‘]tÑET‹ú­ßú­ì%/yIöÔ§>5_‡®Üw1Êÿ‡õ¼ç=/9!”ûŠûd§Ü¡İîO-¸_•Lí›j¿Uµ¾¾œn•ûõEW©ç¬š¶MWËæIŸ@mTué8>íZ”'}µQÅ8!]Œ¨¡Ö¼Æ	­®‡üä'?É8'ñµµµìU¯zU¶mÛ¶ìå/yçr‡«ÔsVMÛ¦«3Ï<39İªY=]Ø¯
+Çå‚òğ„ñ{ûè™zÎª°M·c»NÓ}Âó±}Ìü£ümöÛ|¬ië9Ï>ÁU_÷Û®…§®°Í.}Ç§Í¢='¤ŸS…§]a›ŒÒ0NĞÕ·ãóŒ3ÎÈï*M=§ªoË4NèŒSĞqhBO÷ÃZ¿ò+¿’Åe•û{pîçïİ—ÆÃïÊ´…í©ÁSƒ§6xjğÔàiƒ§<5›åé¾«íò@WØåI0îÀ<=ÿäOş$Á}ìckÁøo|cvşùççW˜Ãé?õS?5ÌüàÍÀÌöÔà©ÁÓO<5xjğ´ÁÓOšÍò$káI0îÀ¼=İk¹_o¯v¡¹äá‡Îşíßş-»å–[²«®ºªS`f{jğÔàiƒ§<5xÚàiƒ§OÍfyŒ5‹ğ$w`î×©İß*ƒî^ğÿls›nº˜·nİÚé
+s	ÛSƒ§6xjğÔàiƒ§<5xÚÌâI0Ö,Â“`ÜEzîÚµ«j=šOïÚ¦{}˜ßşö·OuK6ÛSƒ§6xjğÔàiƒ§<5xÚÌâI0Ö,Â“`ÜE{ºæzÆ3‘‡×¿şë¿Î§ÍËÓÍ§í-Ùîo+w¹Â\Âö´ÁÓO<mğ´ÁSƒ§O<mÆšExŒ;°îÖêË.»,¿½Ú±hO7ÿ80?÷¹ÏMfë–l¶§6xjğÔàiƒ§<5xÚàiC0Ö,Â“`ÜôÜ·o_şïfyºêú£_Ì|ğA?—n¬úö,ÁÓO<mğ´ÁSƒ§O<mÆšExŒ;€gñ\×ÀÜæ–l¶§<5xÚàiƒ§O6xÚÅ“`¬Y„'Á¸x6ãŞó¥/})¿Ò=M`f{Úà©ÁSƒ§6xjğÔàiƒ§ÍP<	ÆšExŒ;€§&åéæÕæ
+ó¶mÛ:]aa{jğÔàiƒ§<5xÚàiƒ§¦ocÍ"<	ÆÀSÓÅÓµæíÛ·O}K6ÛSƒ§O<mğÔà©ÁÓO<5}ó$ká¹ÅÍ´¬õõõñÿ»”û%åÔt«N<™Wê9«¦mÓº6Óóá‡Îî¹çìÆoÌŞõ®wå9ş•ì­[·æW˜İŸ•Ú»wovÛm·e÷ßmV±=uáivá©O]xÚ…§]xêÂS×fysÎ9ùx7õœ*¶§.åÉãà©Y¤§{~Ş?úÅöÔàiƒ§<5xÚàiƒ§OÍfyrÅX³O‚qğÔl†§{ßg>ó™©3ÛSƒ§6xjğÔàiƒ§<5›åI0Ö,Â“`Ü<5Ëäéæg]av·dw¹Â\Âö´ÁÓO<mğ´ÁSƒ§O›Y<	ÆšExŒ;€§¦®20»ï0OsK6ÛÓO<5xjğ´ÁÓO<mfñ$káI0î š>{ºÿ·ıóÎ;³k¯½¶õæ¶§<5xÚàiƒ§O6xÚŒ5‹ğ$w OÍ*zº×Ä9ş•ì.?úÅö´ÁSƒ§O<mğÔà©ÁÓO‚±fãà©’ç~ğƒ©~%ÛıY©ia{jğÔàiƒ§<5xÚài3O‚±fãà©Á³˜ç4¹Í-ÙlO<mğ´ÁSƒ§O<m†âI0Ö,Â“`Ü<5x6ãÚrùÆoœ:0³=5xjğ´ÁÓO<mğ´Š'ÁX³O‚qğÔài·é·½Â|é¥—vºÂ\ÂöÔàiƒ§<5xÚàiƒ§¦ocÍ"<	ÆÀSƒ§MÛ6İëâÀüìg?;˜­[²Ù<mğ´ÁSƒ§O<mğÔôÍ“`¬Y„'Á¸xjğ´™ÕÓ½¿ëw˜8Ğé
+s	ÛÓO<5xjğ´ÁÓOšÍò$káI0î <måéæ;ïıb{Úàiƒ§O6xÚà©ÁS³YcÍ"<·”Oº:vìØøÿ]êäÉ“ÉéV=úè£y¥³jÚ6]á©O]}òtVê_øB¶oß¾ìÊ+¯ÌÎ;ï¼äßa>ë¬³²;wf×^{mvğàÁìÁd{¶(<íÂSºğ´O»ğÔ…§®ÍòÜ¾}{>>K=§Ší©KyŒ;ºğ´kY<]`şÒ—¾$óÖ­[³mÛ¶Õs<¯T±=íÂSºğ´O»ğÔ…§.<íšÅ“`¬kÜJİ<5xÚ,»§{myKv˜§¹%›íiƒ§O6xÚà©ÁSƒ§Í,ÜJ­Y„'Á¸xjğ´é«§›G—ï0ïİ»·óŸ•*a{jğÔàiƒ§<5xÚàiC0Ö,Â“`Ü<5xÚ¬š§›÷¼ô‹í©ÁSƒ§6xjğÔàiƒ§ÁX³O‚qğÔài3Ï‡~xêÀÌöÔà©ÁÓO<5xjğ´ÁÓ†`¬Y„'Á¸xjğ´º§›nf÷£_]®0—°=5xÚàiƒ§O6xÚÅ“`¬Y„'Á¸xjğ´Á3{}˜ßşö·OuK6ÛSƒ§6xjğÔàiƒ§ÍP<	ÆšExŒ;€§O<mBO7Ÿ¶·d_~ùå®0—°=mğ´ÁSƒ§O<mğÔôÍ“`¬Y„'Á¸xjğ´ÁÓ¦§›˜ã¿ÃÜöG¿Ø6xÚà©ÁSƒ§6xjúæI0Ö,Â“`Ü<5xÚài3‹§«®?úuğàÁìÁôséÛÓO<mğ´ÁSƒ§f³<	ÆšExŒ;€§O<máéë˜ÛÜ’Íö´ÁSƒ§O<mğÔà©Ù,O‚±fãà©ÁÓO›ôtïùÒ—¾”íÛ·oªÀÌö´ÁSƒ§O<mğÔà©Ù,O‚±fãà©ÁÓO›eğtójs…yÛ¶m®0‡°=5xjğ´ÁÓO<mfñ$káI0î <mğ´YfO×F˜İIkÚ[²Ù<5xÚàiƒ§O6³xŒ5‹ğÜâfZÖúúúøÿ]êÄ‰ÉéV<y2¯ÔsVMÛ¦+<uá©O»†æùğÃg÷ÜsOvã7fïz×»ò“Yü+Ù[·nÍ¯0»?+µwïŞì¶ÛnËî¿ÿşÚ<­b{êÂÓ.<íÂSºğ´O»Î9çœ|ÜzNÛS—òäŠqğÔàiƒ§Í*y>úè£•+Ì;vì˜ùG¿Ø<mğ´ÁSƒ§O<m¸b¬Y„'Á¸xjğ´ÁÓf.0æ3Ÿ™*0³=5xÚàiƒ§O6xÚŒ5‹ğ$w O6xÚÙ³ÍfwKv—+Ì%lO<mğÔà©ÁÓO›¡xŒ5‹ğ$w O6xÚàYÇæ¯~õ«y`vßaæ–l¶§6xjğÔàiƒ§ÍP<	ÆšExŒ;€§O<mğÔ„m†Ùº%{çÎÙµ×^Ûú
+sÛÓO<mğ´ÁSÓ7O‚±fãà©ÁÓO<5mÚLæøW²»üèÛÓO<mğ´ÁSÓ7O‚±fãà©ÁÓO<5³xº?OĞö
+s˜İŸ•š¶§O6xÚà©ÁS³YcÍ"<	ÆÀSƒ§6xjáÙå–ì®?úÅöÔà©ÁÓO<5xj6Ë“`¬Y„'Á¸xjğ´ÁÓOÍFz–ùÆoœ:0³=5xjğ´ÁÓOšÍò$káI0î <mğ´ÁS³]®0_zé¥®0—°=5xÚàiƒ§O6³xŒ5‹ğ$w O6xÚà©YfÏT`~ö³ŸÌÖ-ÙlO6xÚà©ÁSƒ§Í,cÍ"<	ÆÀSƒ§6xjúè9Íw˜8Ğé
+s	ÛÓO<5xjğ´ÁÓ†`¬Y„'Á¸xjğ´ÁÓOÍ*y¦óÏÿüÏËÀlİ’Íö´ÁÓO<mğ´!káI0î <mğ´ÁS3O˜><U`f{Úàiƒ§O6xÚŒ5‹ğÜâ¦¬x`üÿ.µ¾¾œnÕ±cÇòJ=gÕ´mºÂSºğ´O»ğÔ•jó¡‡Êîºë®ìCúPöö·¿=;ûì³³ç<ç9•À|úé§g/yÉKòıú‹¿ø‹ìşá²¯}íkµy¥ŠíiºğÔ…§]xÚ5Ow;óÌ3“Ï©b{êR\1î <mğ´ÁSƒgğ–ì+¯¼2;ÿüó§º%›íiƒ§O6xÚÅ“+ÆšExŒ;€§O<mğÔà©	=»~‡yïŞ½ÿ¬T	ÛSƒ§O<mğÔ,«ç¡C‡òŠi
+Æîµûöíóê°=5Ê“`Ü<5xÚàiƒ§OMÏEüèÛSƒ§O<mğÔ,«ç‰'²­[·f¯|å++9Æî¹×¼æ5ù9êèÑ£~j¶§FyŒ;€§O<mğÔà©™Åó‘G™:0³=5xjğ´ÁÓOÍ2{îÚµk|)rŒÃ@ìê²Ë.óïJÃöÔ(O‚qğÔàiƒ§<5‹ğls…Ù}Úßå
+s	ÛSƒ§6xjğÔl„§»jü¤'=)?Ÿœzê©ù¿O~ò“ós‹ûÿcûØñùF]-v°=5Ê“`Ü<5xÚàiƒ§OÍFz–ùÖ[oÍ%{š[²Ù<mğ´ÁSƒ§f£<Ã«Æ®N9å”ì1yÌø±ÇÖÕbÛS£<	ÆÀSƒ§6xjğÔ,ƒg˜­[²/¿üòNW˜KØ6xÚà©ÁSƒ§M—6Ã«ÆMe]-v°=5Ê“`Ü<5xÚàiƒ§OÍ2{†ùê«¯Îóó÷¼Ê §í~±=mğ´ÁSƒ§O›®mÆWËj{µØÁöÔ(O‚qğÔàiƒ§<5}ôLfë–ìƒf>ø ŸK7Ø6xjğÔàiƒguÕ¸ÍÕbÛS£<	ÆÀSƒ§6xjğÔ¬’ç4¹Í-ÙlO<5xjğ´Á³™øªq—«Å¶§FyŒ;€§O<mğÔà©‚§Ì_şò—³›o¾yªÀÌö´ÁSƒ§O<›I]5n{µØÁöÔ(O‚qğÔàiƒ§<5Cöl{…yÛ¶m®0‡°=5xjğ´ÁÓfåUã®W‹lOò$w O6xÚà©ÁSƒg80Ÿ{î¹Sß’ÍöÔà©ÁÓO›!xº«Æ§vZŞ?w¹Zì`{j”ç7Ó²Ö××ÇÿïRnã¥¦[uòäÉ¼RÏY5m›®ğÔ…§.<íÂÓ.<uá©k<òHvøğáì¦›nÊŞıîwç9ş•ì­[·æW˜İŸ•Ú»wovÛm·e÷ßmV±=uáivõÁó¡‡Ê?¨»ç{²¯|å+SÕ]wİ•œnÕ´mŞ{ï½y¥³jÏ7¼áy¿œzNUß<ç±=İ>å>@Hísq©ı–+ÆÀSƒ§6xjğÔàicµ¹ˆıb{jğ´ÁÓf=ÿïÿş/û»¿û»¼ù™Ÿù™J?BQó.wn:ûì³³}èCù‡¿)Ô~K0î <mğ´ÁSƒ§O›iÛtÙ}²?M`f{jğ´ÁÓfÙ<wïŞßuâú†_ûµ_ËşìÏş,ûû¿ÿûüÏÍ}úÓŸ¦¨¹Õ'?ùÉì#ùHvÕUWe¯xÅ+ò}Î}?ÛİõÃşĞï‘j¿%w O6xÚà©ÁSƒ§Í¼=Û\avƒã.W˜KØ6xÚà©™·ç¿øÅì/xA~ì»cşk_ûš`cøö·¿]qÅù>øÌg>3»óÎ;ı3úø$w O6xÚà©ÁSƒ§ÍFy†Ù}j?Í-ÙlO<mğÔÌÓó;îÈí¾ğ…Ù¾ğ?`søÆ7¾‘½úÕ¯Î÷Én¸!Ÿ¦O‚qğÔàiƒ§<5xÚl¶g—ï0ïÜ¹3»öÚk[_aa{Úà©ÁS{şó?ÿs~üşùùq°,¸?yåöMw+¿:>	ÆÀSƒ§6xjğÔài³¬©ÀÿJv—ıb{Úà©ÁSzº_>ãŒ3²×¾öµùc€eãw~çwòóÈ‘#GO‚qğÔàiƒ§<5xÚôÍÓıYi~%ÛıY©ia{jğÔÑó¢‹.Êƒq×;; 6
+·ŸÿÂ/üBöªW½ªñø$w O6xÚà©ÁSƒ§Íªxv¹%»ë~±=5xj†æé~Øoû·ëŸXN>şñçûê¾}ûü”*ãà©ÁÓO<5xjğ´YuÏ20ßtÓMSf¶§OÍĞ</¼ğÂìñıT€åÆı×YgåU!w O6xÚà©ÁSƒ§ÍP=»\a¾ôÒK;]a.a{jğ´é›çı×åÇÎûßÿ~?`¹qšº}ö[ßú–Ÿ2`Ü<5xÚàiƒ§O6xVIæç<ç9ÉÀlİ’ÍöÔàiÓ7Ï~ô£ù1òÍo~ÓOXnÊs>ô¡ù)ÆÀSƒ§6xjğÔàiƒ§óœæ;Ì˜êÇ‡Ø6xÚl†ç{ßûŞìIOz’ŸĞÜpıÁü4`Ü<5xÚàiƒ§O6xÚ(ÏEüèÛÓO›Íğ|ÃŞ½à/ğS úÁë^÷ºì7~ã7ü£	[Êƒ×Õ±cÇÆÿïRîO)¤¦[åN.®RÏY5m›®ğÔ…§.<íÂÓ.<uá©O»6ÚÓµw÷İwg7ß|sö÷¼';ÿüó“‡ÙıèËÎ;³k¯½6;xğ`öàƒ²=[vm†ç\ĞøCF ËÊÚÚZ¾ßÆû4Á¸Cá©O»ğ´O]xêÂÓ.<íš§§›öå/Yæ­[·fÛ¶m«æx^©b{Ú…§®Y<]0vwG ô	÷w·“ÁØ?ŸÃ­&<5xÚàiƒ§O6xÚl„§å-Ùe`æ–l¶§šY<İ•7‚1ôŒSû-Á¸xjğ´ÁÓO<mğ´ÙLÏ00·ùóŞ½{;ÿY©¶§Os$C!à©ÁSƒ§6xjğÔài³j]s›ıb{jğÔ8G‚1ô‚q <5xÚàiƒ§O6Cñ|ä‘G¦ÌlOçH0†>B0ÀSƒ§O<mğÔà©ÁÓfèm®0»ıJf¶§fHcè#ã <5xjğ´ÁÓO<mğLæw¼ãSİ’ÍöÔÉ“`}„`€§O6xÚà©ÁSƒ§6¡g—ï0_~ùå®0—°=múæI0†>B0ÀSƒ§O<mğÔà©ÁÓO›6©Àÿæ¶?úÅö´é›'ÁúÁ8 O<mVÏóp¶Ç wö6Şóx¶omG¶İ?Lr<ÛI}YWv{Ù“Ì÷)ÎêyüöµÉ€?_‡~ÛçµÖ¸îíY,×¤ı¹oÏh=6qßÛåzhbÚ6çîÙú[ksš_É>xğ`öàƒú¹tƒíi³cè#ã <5xjğ´Y=Ï%	Æy°‚qš•İsÆ‡òí¼vûq?¥¤{F{€fÑãî,õ~±JÓæ6·d³=m6Ã“`}„`€§O6«çI0–…oÏyãïìËÖ‚y9ïm÷Kög“¨œfÑãî,õ~1O˜¿üå/g7ß|óT™íi³cè#ã <5xjğ´Y=Ïz0.‚Ê®ìğúş<L•»ğjcù¾µÛ·7—¯­ûBÏ< ÄaÃßíCYÑ^0(¤OHÜJíÈ¤Ú?Ÿğ}‰6kËU™÷ñìúóFÓÁ2œ•+±õöR©ÚŞ¨­ÛÛc=ÿºÇk²K*GÕ¸Îİ~{g±ˆ×mŒœå>SP¬Ÿ²öŒ<İ{'ë¶Ñ3šwjşîX±ÖcI¼×'ƒqx»¹«øùnm†4oO›Õë‡Òôİ³íæmÛ¶uºÂÂöÔÌâI0†>B0ÀSƒ§O›Õól
+Æ£iAè+§Mú“À0	'> wı$,¶Æ9ùë:~ÇØ‡âİ_œxZş(Eµíbİ–!¼4ÉùÄ7}…1—_Oë>·+_î04óæ„ÀòuéíYŸ¹^BŸé¯Î®ŠæU.[}}Uçwôæ‘gàƒõ:ş`câôôm†Ë_¾7œvè}Õy¥ÖcÛå¿·vlT·y»6ë¤·g;èom–Ù3Ìç{îÔ·d³=5³xŒ¡4cw0”µ¾¾>ş—:qâDrºU'OÌ+õœUÓ¶é
+O]xêÂÓ®Õó<”ír±÷O+ÍyÙ¾ïÔ_·ãæ£•Çáûò°ßMßõ9ÿ8;¢yÍö­Ş»¶/;ZNË_·—Ÿo³XÎ]Ùg;mÏªGzİÆ®¾Fn;·õõOÔ_ùËXõwmajWvÈMóó­µçtÙ^j{–ë ŸOP•ùêÄ·ş®²ìã×„Û QÅü¯LÏ?xoÚó3Õõù”¿7å™^ÖêşàÖãy-ÖcÓr|íÃ¿UYxí»mÛLTÊ³m­^?”®¡y>òÈ#ÙáÃ‡³›nº){÷»ßæøW²·nİš_avVjïŞ½Ùm·İ–İÿıµyZÅöÔåİ~‚1ôŒ]ïÓ[üó9|¢¦ÁSƒ§6Ëéé¯8Ö®Šíš\MËI_	­\IÌ)®0V¯êV¯°¯ØÕ®rv¼b\™»ğVùÆ
+“[h÷ä¡Ç¢zËíä* ÛñU×êã„çˆ|{†ë%¹FDWISÛ³ñªo4OàÂy9ß1ŞoƒõWğŞÔv÷C¸¤^“-«¹ßæ¯–£²¯%ö¡h=6-Ç÷^5š^.Gı¸(©¼¿e›)LOı­Í*y.âG¿ØçØ·+ÆEßTô;Åÿ'ıjykê“Šçıó†ãûŞ°Zœ§:áÏ!ªî3ÜJ€§O6«çÙ-O^W<®ŸXüwo+a%}s
+Æ9Ç³[.MsËæ«Öøã¤ª‚r€Q”_ş(ìäÛ³âW¬“Iû~yÇó‰«x_<€™P]Çõí™Ş9ÑzŸ>û:Êòë>~oáP]‡e0®¼'5ğÊ×ëdY“ûmÊ‹u\İŠeHíCÕõØ´ßûúõÁrøı½±Š÷·m3EÒ³%ô·6Cğtù®»îš*0³=5Îqƒq²ÑØ?o åòWÏáåy4uœşWısŸ!à©ÁSƒ§Íêyú „ÍâäÔ.×Cè^1ö„åÉ¿U8‘¯Ûqèòƒÿ¸6T0×Cî,ÒË[ÛÉu4"j/µ=sßãb}^8Äï-ö™ê *Æ©×äDËZ÷Lì/9ÑúmÚ‡¢õØ´©+Ææ~Ô²Í©íÙ–Õë‡Òài“òls…Ùİ’
+ÌCÚ½ûqØ—FıjynÌ+:'9ŠçıóF‘/oSŸÙt˜ÙVÿ!à©ÁSƒ§ÍêyÎŒk'ØQ Øp¢“sox’Ë_7{0n\®Êu[8‡ŠúI³xÍdz¹=óé#—ın`µ›
+a®ÍÊt¢j!,ZÔö¬,w@<È™.ûõş˜ZN}û¥=«ÁX¯×‰Cİ³y_sNãé£Çî{ÔÖzlZøÇÔšÖOezÛ6¤¶g[V¯Jƒ§MÏ00»ï0OsKö¶gï‚qŞ'ç• ÿŸú¦øœQàÏÁş¾/yşñó¯ö‰EŞüA£|9œ_?=ïÏãªŸÅr¯IşÕ íÚ'ÆxjğÔài³zõĞQœDZãÊÉÃO«©úü‹ğ¨Â“ úDTÆåIù–£§HªËS¬Ûè¤œ.&¯É)§óoÏÄs|{kRÃAB}€Q_¿éíYŸj`2Ûãí•ÁFjûËoãµÁ×xİMÜëå€%œ0ˆ	æ_ü—^Ôr¸t*ïMí‰ı«m›1éíÙú[<5a›]¾Ã¼sçÎìÚk¯m}…9¤oÛs•~•:ìójıßˆú´æsË¸_ó}d½oU­ßûÈßVø‹Dÿ\àúò$úõÊëZ¸ö‚q <5xÚ¬gı„Ô%¯İ¾¿˜^Öèùšgp"rå[~²ª„²ãÅ¯ıº×4†µj0v”'Â°ì™w	+n3ZæbÀP]ÏTp	Bœ¯Ô2Æ.{Fë6t4oÏxşõÈôß1Î²;¯ç]l¿bY'í«ş©`ìœòÍ#ÿô~2¯´gzóš´ëk=–ÄËqıá­Ô%ñ¾’X·ÚiŞ6«×¥ÁÓf‘©ÀÿJv—ıêÛö\Õ`<î×‚¾9îKã>¾¤úºøœ\<Ş³Ûõé“yåïQç¾m¾¢\'=O¿<åô¦ùF¡·k à©ÁSƒ§%e0®ŸÈØ<5xÚàiƒ§fO÷§Œ¦ù•l÷g¥¦e3<W7ˆÂa2ğ¦Âltõ·ò¡hDGÏñÿæ¯)æ%Coç`ò	•åiºRíÛ+ÜÛ»ö‚q <5xÚàYB0ÆSƒ§O<m–É³Ë-Ù]ôk3<W:§%ƒq°İª„Å2»Ç.Hæ3ÃáóÔ¯`kš_ã¦+Áåû+ÁxìÁ¸¤O<mğÔ,§'ÁO<mğ´éƒg˜oºé¦©ófx®z0f2·
+ª“±@>ÿòÿy8M]È_¯^W¹Âİ¼|S_1nåÚÆxjğÔàiƒ§<5xÚàiƒ§f<»\a¾ôÒK;]a.™Åsõƒñ8‹š<_	˜©éEŞ\…áCéZyåØ¢|cÊ«º“vÓ>şueÀnºE;j«‹k à©ÁSƒ§6xjğÔàiƒ§šeöLæç<ç9y˜)«í-Ù³x"(‹Ÿ÷W“Ã«¸FĞ¬ßbM3(‚h<ÿ2G¡¹œp¥·|øºbZ¸Ş«òº®=€`€§O6xÚà©ÁSƒ§6xjúè9Íw˜8Ğé
+s‰sJ0„ÅøùI(-+}E7,Ë÷ªÛ£SŒuPó˜„Ü¢Ò~e`.+ıWÚº.?ã <5xjğ´ÁÓO<mğ´ÁS³J‹øÑ/ç¸JÁ†Á8 O<mğ´ÁSƒ§O<mğÔÁÓæÃ‡O˜#ÁúHc0vQY<ğÀøÿ]j}}=9İªcÇå•zÎªiÛt…§.<uáiWß=ï¼rKvÕÁêëRÕªÍƒWe[®¼³úxËöìƒ_\ç×¯Ï¶2ñòÏw{Ş™]åL¡WCÍg{Ş—]ŞdÖ¼mîÌŞã_ãÖñõ·ëúú¯ûçıº?jÚ}ÈUÊ3Şî»aû¨ı«²;ƒ×LÛf¾=ÿß{Zmƒ¸t›~]ç[lëí7Ü—?~àcï”ëĞ•óŞrŞõÙ}Á´™<ç¶ß¶/ú[]xêZÏ‡z(»ë®»²øÃÙ;Şñìì³Ï®}‡ùôÓOÏÎ8ãŒìÅ/~± ıÀã3Ï<³¶ßsÅ¸xjğ´ÁÓfÓ=ıwwÚ|oÆnÓ'üşW(]°˜³Í†åŸïöôßYjñ§æ²=ı:³~œ¤øÔîìî&Oc>ÓîCšgb;ËWı~×´mşøÇëÙ-·Û1İÚ,¶uùã*Å‡z[äßÓ‹¾ï6½'ı­6xjº´Ş’ı÷¼'{ÊSÂcèÜJ€§O6½ö$×¨·¹±Á8(Säìâ[²õ&O‚qN·6	Æ]ÀSƒ§Mß<¹•úÁ8 O<mzë™§Ñ ¾¬Êà>şeÇµlßwT›õ×ça¢Æ¯ÏƒÓøùdÀéÚæˆ2ù_”¿÷š»Û³İ/Lşè;û*óZÍ;ÆM¿ä™O?ïúJ@ª“^OÅö¬/_ú—7ãyŒÊ-[„“Á¸a;…øuÎ?^O•ı¶a?ãèùÔŸº(^Ì£²\‡³İÏM(æ=çÛ®¶Y¬ƒbZüaNøÜÈ³C0ŞŸïeíH¿§a]•²ê6xjfñ$C!à©ÁSƒ§M¯=SW\Ë`„×2¸¤‚ä„¦+Æ.\5Š?ÿJXil³!`”!n²l>HÂñÃ ’
+MµiAX-—Í¿¦º.Šù»ï¦6"Öë®ÏM¶g1mŠ+Æùr!.~µïö¡Z˜Lm›x>#jû­_¸NJ·pÿès»òiõ×U}ãZ]1N,C1Ÿè}Ÿ9ãÈóèÍ;jï+×Çdù|ÛÁûÛu O<5³xŒ¡ŒğÔà©ÁÓ¦×Ma"º’åñûÖRÓCšƒ±ûQ¦	õ×ÅA¨ E›© 7âÇ_Ü=šß…ã`Ò6«íúåZÛµçCuRaKİ2Ş´^ã6›–5&Ÿ_‡`¯ãbŠÂY<jûmc0®ÎëG?:T	åºŒ·_<¿v·RÇûUñx×û\ŸxW·Cüiƒqu{ıèGG“ó­-´ÿ¶ê 6xjfñ$C!à©ÁSƒ§M¯=k&
+Š«`*°%Ş›ŒşuãpÒF˜m&™ãÇ?¾;¿j\t(Q	‚Årì¸ùhşÔ„ºW^Ëù»_&NÓ¼^‹yíÏk1Á¸¾Ë}¨Ú]ôÚ˜Ú~ÛŒ«e0nšw2'Õ-GmæË´–íûœ»5¾\Åv˜ñx»şƒq´o¹u[Y–|[Ô÷Ó¸ıÁöCÀÓOÍ,«Œƒ¾¾¬Ô9r°øõ“¯“úù³oŒğÔà©ÁÓ¦×µ@Ó|Xx0n,Ñ¦?qp©ã¸½€0<úuQÆ>ü„^•õV,¿k«y{6¯×"@mP0n¬j{q@—»æYÛÒ©`\¼®l«º-ºãÊşàüGÛü¨¿z›ïáó9s
+ÆÑr¹ã3ŒË¿°ıPğ´ÁS3‹ç*ã²Ï-û¹ßıİpğçL‚±‡O<mğÔÌÍ³háÖ³è`\=I˜‰@æXôãÊ´`ÍÛ³y½ƒ”	Æá:n»ƒk°ì5ÏÄvHyÔ‚±_mÛGókÿ«ÔÏ2°:Ïòÿù2Uöƒx»T×Ó|¯ëù8Ûu O<5³xö>ç}QıœYŸ›‡Lxnh>÷‚q <5xÚôÚ3hò~-˜Íòc+§Ã…ãĞûŒ6‚Uú;Æõ`RuõËe~Ç¸ >{|èr¨íÙ´^ã6S2E>¿®ß1Öe¹5­û	õíUóœ67ÒŠ÷NŒ½ÏîÑvñïÏ=ıºXyT÷•xŸ2×<Óß1÷Óxú`û¡àiƒ§fÏ~ãz_süÈáìøúñèyWµOLõÔy·ìÛÇõéùó£å›üÊğ~	ß_ïSËå)k´\ñ¹1Ç¯‹`^ñyÈÍ§œ¿ûü|Ÿ à©ÁSƒ§M¿=öòäœ°â ÒD~B
+Oºş„dãT›M¡©ÂøDY=y^è¦Mó«Ô£÷îˆ¦O²Ñ	|<ÏQ•Ë(·§X¯›õ«ÔµuœZçş}á:©{Ö÷£”GÓãÊº-§ª\·ÏŞ}ÍhšĞñ¥{î9gÃàhÜ~Õ£}0çá?Ğ‰Ş—:†Š÷NÖÑpû¡öàiƒ§fÏ~cÎ
+û[‹D]ëËRçZßZöwa¿X_rŞµeôËQi£ÖnvƒóNt>(ğí&ÆU‡Õ`€§O6}÷ì+!ÆŸ8Æµ';Ô¦ÍñIÈŸ`òÇ-‚qNÜæôÇøÂ[×Û³<iNæŸ
+<ñß1Ş²{í_{{Ö×«{o¸=Œsêë¸¶‚mXVåÃƒ)Ïx?jŒA¼ß/§]¾ßæw¯Ñƒÿ^¿ë¶iŸ‹oÅ{;ãÑ|«Çxrk|…xİFË“:>ÛÒ÷~¨-xÚà©™Å³×ÁØ÷µq®(û·d¿9÷£#â ÛÔ¶ïË×çzŸ+—£l7šWIqnšÌS¶ÑâÜÛGÆxjğÔàiƒ§ÍjzÖlO<mğ´ÁS3‹ç°‚q"ğzâ>Û=N}ÈXı02~_’øF¿|Mï­¶‡ú€|¾©eì?ã <5xjğ´ÁÓf%=óAFõ$ÊöÔà©ÁÓO<5³xëVêæ××Bhå
+q=P¯Mk(3ûùW__m§ñŠo%ğú÷óªÖÀ‚±;ÊZ__ÿ¿K8q"9İª“'Oæ•zÎªiÛt…§.<uáiv­”çwöåßCv'Q÷İàğ9¶§.<uáivá©kÏ;vô8ûğ˜ºZZR¹¹ıãÊk7Şˆôëü¼[©›Ú(¦GÁ8á´Ê¸`¼mÛ¶Ú>Íãà©ÁÓO<5xjğ´ÁÓOš!yöûŠñˆ†ïáøĞ„ËôUØ† šÏ{O¶ßÑø¹Êå€hz:Ü6\¹.¯"—ÓÜÒß1n
+Ğõé« ·Rà©ÁSƒ§6xjğÔàiƒ§<5Î±÷ÁxD ãï—¡8
+–qøQ¾¿®}€­Í» ¨ã6ƒ§õÀ.ïdÙ¯óa¹ú^¿œax÷©å^ÆxjğÔàiƒ§<5xÚàiƒ§Os\…`œSŞ°j·*—Lo=dV©‡ß*e¨Wt¸ùªm„}¹`º¢]L+kôœ¿’µ”œßªB0ÀSƒ§O<mğÔà©ÁÓO<5xjœãÊã‘‡íÆĞ?ÆxjğÔàiƒ§<5xÚàiƒ§Os$/1©ï¯ø-Òm!à©ÁSƒ§6‹ñt·B¥oÙ2=İ	4ş!OwÏÉƒlîölø’6l{ëZµénkº•ÍÜ1q›ù€©ùö¾&8>5xjğ´é›'Áx¹©İª=ªU¾Eº-ã <5xjğ´ÁÓf!"ìhOÿİ"‚±ÿ_wÚ{V×uc›şSıùãD›c	<5Cò$C!à©ÁSƒ§6ñ$Gã‚qWğÔà©’'ÁúÁ8 O<mğL“ÿ2ä%û³Ã•[›|8ÉƒJ9-DEÀsß	
+Û,n‘*Ş/Ùr².ŸÕäûE><«–ä|K¢_ó\»}ë`\ıµLWÅ/e=Ç.ZÎ†å=ÃåDë>}¸^n£ï}ï¾qø¬®³p^õu½ï;‰}(^Ê¤èíU§¡Ír½‰~‰5¹®º¶Y§Çgı­OÍ<	ÆĞGÆxjğÔàiƒgšqÆ lá'¼E0QÁ8g"ıc‡­»¿xúà5	vé+ÆÅò†áÍ¤ğu~^“ 8=Ó”LBŸïhÚÑÒsƒ?-Qks„Ÿvá­ëŞ³ºë¢\·Åzÿ”…÷—5xŸcŒGÓêë"œWu]7îC©+Æå£÷–ûmÂ+¯«‘h3µ^ıü+ë5hÓá¶g}ÿ´éz¬””Ó0m›ú[š!yŒ¡ŒğÔà©ÁÓÏ4EĞ,‚Hé™µP4}0.ÃçzÅ³”êG!©âY	„ş}•pë˜èÆíYsôx‡qhAÃò×<A>"ÁMÛ³)V·§Æñº¨m“ê²7îC‰õ~0Ùo›¶AH¢ÍVëµêè(¶g›6«4zL<»3m›ú[š!yŒ¡ŒğÔà©ÁÓÏ4a°)=ŒKrÏ/îÎÃĞ¸â`¢pŞUÏÉ²Tÿ2™_»íé_?^¶8ÇNñòN–£º=ë^5üºvíî¸ù¨Ÿâç‘
+Á²…·RW˜[0®¾/ôÃ}šD›j½]ë,T÷[Õf•®ÇJIu{vcÚ6ô·<5Cò$C!à©ÁSƒ§i6%ÁÏUb«A©ş¸œ÷ä}qåóñó®cï:šŸÚÅÕÈ²|Èò­‚qà‚åˆ·g¹?¿ñ²„NõçªU,›ÆÍ·qjØÊ÷…ÆE0ÁSƒ§Mß<	ÆĞGƒqyğº:vìØøÿ]êäÉ“ÉéV=úè£y¥³jÚ6]á©O]xÚ…gºî¾f&.¾%¿İ·ô\¿õÂQÀ¸0»åhğÚ£·ä?"U~/øÇ?¾;Û=zì¾?¶Y{o~E8œ×zvËÅE›ÿ_ÅÓO¿æî†Çå¼wgwşßì9Y®êôÉü·§¿z=q§_˜İômßfÍÉÕÄ«¸uz²ÕíY÷RUzæÛiìÕnÇ}#ıºšgu~ë¶¶Tßz†ÛjüşJ%Úì¸^Ë×ĞéÂSvõÍó‚. CïpÁø¬³ÎªíÓã…§.<íÂÓ®Uöœw0.œ
+ÆÅû\ ªxúùOB\"üËPñ¬,[¤Êš´Û´=“Ş£*ºãÉãê “å˜¼·¹&Õ÷5Ïpúâƒq¹nŠö&Û³i„•h³Õz­î³îq¹=ãéV5zUÙo;Ö´mº¢¿Õ…§®!yŒ¡4cÿ|·šhğÔàiƒ§Í*{N+uyÛñìPÙ¦¿E·òŞÚûÊÛ€÷ŒCİdÚ¨‚Û~Ãe+)Ú•:¾ÕvDâvêâ}Åü·§_şÊmØS§[©~9Ê«›p9š×ÿx{úå¨İÆ,¼ÛßJ]]×ÍûĞäöù1¾M×F¹ß–·¼‡óOQk³ãz-½òí™p²èÃñB«ÁS3$On¥†>ÂwŒğÔà©ÁÓÏ4a8)=Ûãqhq!Å•›O-Ü¯‡›è}£ró-BcğQvÊçKÊà5®TÈ,ÃÓø5ûÇ!QnÏ Í¼Ü2ûy«m€sŒŞ›_	/+XEÍqTõĞ—^%]‚qè½ësÍûĞ8ØW¾Ëï·å÷|ã6»¬×Z›ñûlè‡4xÚài³cè#ã <5xjğ´ÁÓO<mğ´ÁSƒ§Æ9^zé¥Ù_øB? œ}öÙÙk_ûZÿhÁ¸xjğ´ÁÓO<mğ´ÁSƒ§fHW^yevÆgø) ıàùÏ~vÙe—ùGÆÀSƒ§6xjğÔàiƒ§<5Cò¼õÖ[ó¯Xüû¿ÿ»Ÿ
+°Üœ8q"ßg?øÁú)ÆÀSƒ§6xjğÔàiƒ§<5Còüîw¿Û2 –‘ıû÷çûì×¾ö5?eÁ¸xjğ´ÁÓO<mğ´ÁSƒ§fhîûš/~ñ‹ıT€åÆí¯Mß‹'w O6xÚà©ÁSƒ§6xjğÔÍóãÿx~î¶ÛnóÏ ,'ŸùÌgò}õoşæoü”*ãà©ÁÓO<5xjğ´ÁÓOš!z¾îu¯ËùÌgfÿó?ÿ“?XF^ò’—äW‹›O‚qğÔàiƒ§<5xÚàiƒ§OÍ=¿ñod§œrJvñÅç–?ú£?Ê¯úÓŸn<>	ÆÀSƒ§6xjğÔàiƒ§<5CõüÈG>’Ë/¿ÜOXşôOÿ4ß7İÄ©ã“`Ü<5xÚàiƒ§f˜Ç³ı—lÉ¶ì>ìÎöŒNpk·÷'Ìì¹¾?[»dÿ¨Å’¸í4lO<mğ´YÏë¯¿> ¯}íkùN°éüçşgvÑEåûäûßÿş|š:>	ÆÀSƒ§6xj†éÙ.œ:fõ<¼{ÔN%·ƒí©ÁSƒ§6Ëâù‰O|"{ÊS’‡‘÷¾÷½Ù±cÇü3 ƒû[ÅõW•vÚiÙğ„ìæ›oöÏèãs‹;ÊZ__ÿ¿K¹ÆSÓ­:yòd^©ç¬š¶MWxêÂSváiºªmÍö­ëûÓÒ5«ç¡÷ÚYÛ—M<¯Ší©O]xÚ…§]Ëäé®Ô½å-oÉÃ±«íÛ·gøÀ²ù—Éÿ~ì}÷İGQs«¯ıëù/N_wİuùâSO=5ßï^ÿú×gßşö·+û¦Úo¹bÜ<5xÚàiƒ§fY<ß¾6ğµ–í_÷O:Ü-É£éW¼3¿íyüºèªoy…öpe~kÙ¾ï„m¶»•:^¦ú­ÖÅûÂ×Læy¼ßÁs{ÓSW«kşWŞéŸñÙ3šîÖIÔf4ö[6xÚà©Y¤çC=”íÙ³'{ÙË^6é)jõ¢½(ûó?ÿóÆ[ùÕ~K0î <mğ´ÁS³E(Ü3Š™ò€NóÁØ¤Š€éğ!1‡ÅûFÜ¾\ÌG´í`\Ìg-»å¨÷ôíO^“ÓÑkœgıVêz0.Ûš,ßáìªÈ¡ÆîuÁ:ñÓÂe`¿Õàiƒ§šòtí|ó›ßÌ>ûÙÏfÈxšºã;’Ó­š¶ÍO~ò“y¥³
+O»æáù¯ÿú¯ù?øÁüŞÖŒÚo	ÆÀSƒ§6xj6ß30>dC°¼ı†ûüÏøJjñ°¨süÕÛq5‚qĞvè™lVSaŞaçiãØÓó½ƒWå¡w<İ‡àêëê!›ıVƒ§6xjğÔài³*ãà©ÁÓO<5ËæYÛIÅÁøªƒ‘§Ÿ^†Úz-È¿ë;²F0Âv+O¿ãåîŒ£`_ò½ï·Œ§–iÁ¸+xÚàiƒ§O6«âI0î <mğ´ÁS³Õï×úğ_IÍ¯e×=ö¬†Ú<ˆA±äèÍ;FónŒ‹å±‚qññrûy…AØyZÁ8l+¤S0æÏ~«ÁÓO<5xjğ´YO‚qğÔàiƒ§šM÷Œ®øIã¹bÜ&çíÌãVêy\1&·O<mğÔà©ÁÓfU<	ÆÀSƒ§6xj6İ3|ñwgËpZÆ›ùãI[õ@Zà¯"w	ÆQ°/IÇ˜`\‚§O<mğÔà©Á“`Ü	<5xÚàiƒ§fÓ=}0œ„Ôå´0§mŸ„ÃÄ{‹`œš6ã¯R—¡×¿§|>ªã¶ƒ`\ü0¨Çm§æÕô«Ôã<5xÚàiƒ§OãNà©ÁÓO<5Káá¢\¬Ñò5Wİp}åµñ•Ö<d‚âş2¤æµ';TiÓÆòªµl+z>¼;÷ÜŠ÷×ƒ±#nËº2^@0î
+6xÚà©ÁSƒ§ÍªxŒ;€§O<mğÔôÆ³ÆñwŒ#Ê`\°lO<mğ´ÁSƒ§O<m–É“`Ü<5xÚàiƒ§¦7ãVà©ÁÓO<5xjğ´YO‚qğÔàiƒ§šŞxŒ[§O<mğÔà©ÁÓfU<	ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fãà©ÁÓO<5xjğ´ÁÓO<mğ´ÁS³Ï-naÊzàÆÿïRëëëÉéV;v,¯ÔsVMÛ¦+<uá©O»ğ´O]xêÂÓ.<íÂSºğ´O»–É“+ÆÀSƒ§6xjğÔàiƒ§<5xÚàiƒ§fşYöÿ‘ÃÇ±ÓÉİœ    IEND®B`‚
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: image/svg+xml
+Content-Transfer-Encoding: binary
+Content-Location: https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><defs><path d="M21.5 5h-9.17L11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5h9.17L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5z" id="a"/></defs><clipPath id="b"><use overflow="visible" xlink:href="#a"/></clipPath><g clip-path="url(#b)"><image height="31" opacity=".2" overflow="visible" transform="translate(3 1)" width="29" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAfCAYAAAAbW8YEAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABQBJREFUeNq8V8tu20YUvXdm+LCk RKiMwI1TFEXhVZJd1gW66xekv9DPqPsvXdU/UaDroJskKy+CInCcGpKtFy2SM/f2DEXZia0odtKW AkFJ8zhzzn3S0Ycvps+79EMDbj3Yfgv4EM+XTN/fEOb3Zg3AXmq7j64D5/e/x/EfzZMnX5jx+LFZ LLyp6yNDOzskYb6RubFdpbdvKUl2Jc+d9PvP5dmzUyH6TVoYXQOq+H5g9vb+cONsO9maLpIyyZPU kZNAppmh9Vpg5kSXwCSVJ5/Vi/r8Tl73y2F9ePidJ3oaga+B4vkUgF+6EW1ndz11gvNdDdL1bDNr yKkCWO16thyUGWIIeae2ZGvn1of5xFExoGF5eHgM4ANZsW032Tf05MjeW+xmNKeedeWAg9tmywPM 6rGYzOAPBSfQ5Ss0Nf4pAmRrSmBP1ehIxQ6DpxF1aXaSH5X0bDcAR1aOxLRPtPdrZrwnd55Sx3gz IMO72OwBq9kmox0RSkHHRNxrRJWFDbQXKpR1xN4eOfx0NqnMdFHulY/rw/1RAE5crEvvffGCvX/E VUoOC3Mm24eaO6TyNZjeB5E+sDLMt2tCqZEW8lcgPSU2x0IhKlAYoTP4xUTueUMvHvJK3ouQ8ffH HP62JpGeg/VSYciqNADbHQxvY5etdr65yhNXlG2B5xjzgWfHJoSeZ5Olbuaq+czQyYSvxal701dJ SWoigRNqXItjORhsC+x74NfDtPQ6aGPkgAUlGROpTKBQR4gbB1x6fjz3/DK8GsoHj/SVG6pJACi+ NhQdApsQJFPCeliYKImgeEJmylc3Xzw5yp9xnIMYMkZt9HjVhK/GeHtqZI5+KUVJXtSVQcwcYDPo FI93jhW+DWSjzZrGts0NQSwOZTFoMaMBaly6CTFZG2KXUt3Z1aQzC36rKrFJ0cgUb6aZRnuRwjtI lo7Eq3CLWSya4eJ7a+TN2eudvClbk17ItFepoQLrpyQyxkZTjBYIiwqnXwF/1mXerQivtu+Hohp7 tf7cWJnCTgBleCQ3bBEaPiaCTRXkNqBLu955o2kv+NzIIogDkGlAEfuwL51DYh9z3sdK1y1ALyX2 FxJLK3Fj339NYnO16P4fEl8J9HUSaytxTHFRYqrhnJ60AZU2lNpDNOULaZH1FqBXJS4LhN8ECeos MgbLWUx3AK+xv4+ZKN6ACxxlZw0xDzdZKj7Z6E1ALyQ+91WNclwgIU6wwRli7xTkzjA8BQCSBxfL +MUhlnGMDMYlfsPuWsdSF4GZa226io1MW4nzPvkQbWgDnIlGYHSCTU+QbOI9BNtTTB7hxmEIh+FT KDJGZoiVpkA6KmNRj90E0duPNmaNxJ29QVh0RxWsOMNRh0JyDIk7LBK1iw62BV1cLKaXpY2n+HWs GkZidOZEysp3fDK4K3TvK90EisGf6bD/k6CTqDpBZt6EoTWcSXQU5mhX1FvNm/XRiyQiaw0XKmDi EXL9kdV6FMMu9kvpyUDoB3SIB5uYxp2+fSr9P7Na7IOipsUpxZ5BqISNTw1rFy6bGrKoIjAbS9uu EKoT2NowqiWJ7cqM0KD9lT8X2t+lKz3S2l4Z/e4v9ptXzcFyn9Zd8nlHHcjXaNZsaCvKqlW6dWP2 Ibr7sdE2e68H9sy+TvN5J6nwydLUvtuWfmoLugH4Zg34JzbbHwO/wavG+68VdJPXihuC/zcvUJ+0 0W2ufwQYAGHKK2CFMIrzAAAAAElFTkSuQmCC"/><radialGradient cx="7.394" cy="5.437" gradientUnits="userSpaceOnUse" id="c" r="23.416"><stop offset="0" stop-color="#EEE"/><stop offset=".432" stop-color="#E6E6E6"/><stop offset="1" stop-color="#E1E1E1"/></radialGradient><path d="M13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5H7l6 18z" fill="url(#c)"/></g><path clip-path="url(#b)" d="M18 11v-1h-1v1h-3.75v1h5.32c-.2.49-.6 1.3-1.32 2.14-.51-.6-.86-1.18-1.1-1.64h-1.11c.36.84.9 1.66 1.52 2.38l-2.6 2.58.71.71 2.58-2.58 2.58 2.58.71-.71-2.6-2.58c.74-.86 1.33-1.85 1.68-2.88H21v-1h-3z" fill="#607D8B"/><linearGradient gradientUnits="userSpaceOnUse" id="d" x1="12.333" x2="23" y1="14" y2="14"><stop offset="0" stop-color="#212121" stop-opacity=".1"/><stop offset="1" stop-color="#212121" stop-opacity=".02"/></linearGradient><path clip-path="url(#b)" d="M12.33 5L23 15.67V23H13" fill="url(#d)"/><g clip-path="url(#b)"><image height="8" opacity=".1" overflow="visible" transform="translate(10.5 17.5)" width="9" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAJCAYAAAALpr0TAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAOFJREFUeNp0UD1LA0EUnLe7JsJh CiFpLVNYaS3411L7Z/InUpgmqRIRLGxEOEVQsoRcbnecu6AGTB4M72vevjdr+DPDf+Nvs3858q7a Fp4oDOZBJ5dJMCVDzJ2T+LYYpeAyTj39UMNXhA00HABXKy89bY6UlqrFoMHm5QK0a/mbXYxSyyZm eCBTe5Kr68+NGq+Kv4QzoSM8q3ZP8imjXjdEv/6Ysnd+q6a7UN4XFsKYlifbUJXvj3ftytAqM1vJ z6UgGvgiIbN90g8RVddFKZ/pzqX+Y5NDtdonHTI71vgWYADzWmdx/4fpmQAAAABJRU5ErkJggg=="/><path d="M17 19l-4 4-1.33-4" fill="#3F51B5"/></g><path clip-path="url(#b)" d="M21.5 5H7l.04.12H21.5c.82 0 1.5.67 1.5 1.5V6.5c0-.83-.68-1.5-1.5-1.5z" fill="#212121" fill-opacity=".02"/><path clip-path="url(#b)" d="M21.5 22.88H13L11.71 19h-.04L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-.12c0 .82-.68 1.5-1.5 1.5z" fill="#212121" fill-opacity=".1"/><path clip-path="url(#b)" d="M12.97 22.91L13 23l4-4h-.12" fill="#1A237E" fill-opacity=".2"/><path clip-path="url(#b)" d="M11.67 19.12h5.21L17 19h-5.33" fill="#1A237E" fill-opacity=".1"/><g clip-path="url(#b)"><image height="22" opacity=".2" overflow="visible" transform="translate(-.5 -.5)" width="20" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAXCAYAAADk3wSdAAAACXBIWXMAAAsSAAALEgHS3X78AAAA GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUpJREFUeNqslbFOwzAQQO/sQCRc sqAOlRgrMjCVr+Er+IZ+Ax/WTCwVeyVQl9IOQY2Pc2qhNFwcGsdSrHNsP52fpTPCeUP4X6PQZA2Z Pi41lqXRpCYKtA5tsFBVFdo9penh821ZSWsS112X1hBdPXG44BSyQMaEoHcJ6QJLu+LxrguKQDQB UAuOn3nfLATlqc0psmvuvyQVibfARyaXoQPeh6Hk9Mw4uL2bv3xs31+P7UWq5Rd7LsvN8akg5zBP KTPSIgWXN3OCQo6ARkpiCNQd36maegV6DGgjW1lBJFRWMBQaVDAUGlQwAvSvghhop4IYaKeCkaDn CmKhooJYqKhAtao59VV1od3w99BU4EsfcQVXruBuPBMvgJIv1sdmPSVA3HOhLvy/bCC0qDk8rjP9 TtWB36gVv1Hrvjeq792SjokRF/Z7Fz8CDAC8EmWDKVGDLgAAAABJRU5ErkJggg=="/><path d="M11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5H17L11 1z" fill="#4285F4"/></g><path clip-path="url(#b)" d="M2.5 1C1.68 1 1 1.68 1 2.5v.12c0-.82.68-1.5 1.5-1.5H11V1H2.5z" fill="#FFF" fill-opacity=".02"/><path clip-path="url(#b)" d="M11 1v.12l5.92 17.75H2.5c-.82 0-1.5-.67-1.5-1.5v.12c0 .84.68 1.51 1.5 1.51H17L11 1z" fill="#212121" fill-opacity=".1"/><g clip-path="url(#b)"><path d="M7.5 10v1.2h1.98c-.08.52-.6 1.51-1.98 1.51-1.2 0-2.17-.99-2.17-2.21S6.3 8.29 7.5 8.29c.68 0 1.13.29 1.39.54l.95-.92C9.24 7.35 8.44 7 7.5 7 5.57 7 4 8.57 4 10.5S5.57 14 7.5 14c2.02 0 3.36-1.42 3.36-3.42 0-.23-.02-.41-.06-.58H7.5z" fill="#EEE"/><path d="M4 7h7v7H4z" fill="none"/></g><radialGradient cx="1.457" cy="1.42" gradientUnits="userSpaceOnUse" id="e" r="29.792"><stop offset="0" stop-color="#FFF" stop-opacity=".1"/><stop offset="1" stop-color="#FFF" stop-opacity="0"/></radialGradient><path d="M21.5 5h-9.17L11 1H2.5C1.68 1 1 1.68 1 2.5v15c0 .83.68 1.5 1.5 1.5h9.17L13 23h8.5c.82 0 1.5-.68 1.5-1.5v-15c0-.83-.68-1.5-1.5-1.5z" fill="url(#e)"/></svg>
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4----
+Content-Type: text/html
+Content-ID: <frame-0523401FB97428B79E0B2655B2FEA47A@mhtml.blink>
+Content-Transfer-Encoding: binary
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body></body></html>
+------MultipartBoundary--XpKLQxLcRhncUa3HwWZsstR2iMPyW6q7xQOzBHvYB4------
